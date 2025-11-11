@@ -1,34 +1,70 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
+import { supabase } from './config/supabase'
+import { logger } from './utils/logger'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [connectionStatus, setConnectionStatus] = useState('checking...')
+
+  useEffect(() => {
+    // Test Supabase connection
+    const testConnection = async () => {
+      try {
+        logger.info('Testing Supabase connection...')
+        
+        // Simple query to test connection
+        const { data, error } = await supabase
+          .from('_test_connection')
+          .select('*')
+          .limit(1)
+        
+        if (error) {
+          // Expected error if table doesn't exist - but connection works!
+          if (error.code === '42P01') {
+            setConnectionStatus('✅ Connected to Supabase!')
+            logger.info('Supabase connection successful')
+          } else {
+            throw error
+          }
+        } else {
+          setConnectionStatus('✅ Connected to Supabase!')
+          logger.info('Supabase connection successful', data)
+        }
+      } catch (error) {
+        setConnectionStatus('❌ Connection failed')
+        logger.error('Supabase connection failed', error)
+      }
+    }
+
+    testConnection()
+  }, [])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div style={{ 
+      padding: '40px', 
+      fontFamily: 'system-ui',
+      maxWidth: '600px',
+      margin: '0 auto'
+    }}>
+      <h1>🏰 Portfolio V2 - Phase 0 Setup</h1>
+      <div style={{ 
+        padding: '20px', 
+        background: '#f0f0f0', 
+        borderRadius: '8px',
+        marginTop: '20px'
+      }}>
+        <h2>Setup Status:</h2>
+        <ul style={{ lineHeight: '2' }}>
+          <li>✅ React + Vite installed</li>
+          <li>✅ Supabase client configured</li>
+          <li>✅ Logger utility created</li>
+          <li>✅ Folder structure ready</li>
+          <li>{connectionStatus}</li>
+        </ul>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+      <p style={{ marginTop: '20px', color: '#666' }}>
+        Check the browser console (F12) for detailed logs!
       </p>
-    </>
+    </div>
   )
 }
 
