@@ -1,0 +1,300 @@
+/**
+ * ========================================
+ * THEME BASE - Variable Template
+ * ========================================
+ * This file defines the CSS variable structure.
+ * Actual color values are set in theme-specific files like:
+ * - theme-mystic-blue-gold.css
+ * - theme-dark-leather.css
+ * - etc.
+ * 
+ * DO NOT modify this file unless adding new variables.
+ * To change the theme, modify or create a new theme-*.css file.
+ */
+
+/* Import fonts that might be used across themes */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Philosopher:wght@400;700&display=swap');
+
+/**
+ * ========================================
+ * BASE STYLES - Applied to all themes
+ * ========================================
+ */
+
+/* Box sizing reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* HTML setup */
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* Body uses theme variables */
+body {
+  /* Background - set by theme */
+  background: var(--color-bg-primary);
+  background-attachment: fixed;
+  color: var(--color-text-primary);
+  
+  /* Typography - set by theme */
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  
+  /* Better font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Layout */
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Heading styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-heading);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+h1 { 
+  font-size: var(--font-size-5xl);
+  letter-spacing: var(--letter-spacing-wide);
+}
+h2 { 
+  font-size: var(--font-size-3xl);
+  letter-spacing: var(--letter-spacing-normal);
+}
+h3 { font-size: var(--font-size-2xl); }
+h4 { font-size: var(--font-size-xl); }
+h5 { font-size: var(--font-size-lg); }
+h6 { font-size: var(--font-size-base); }
+
+/* Link styles */
+a {
+  color: var(--color-link);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-link-hover);
+  text-shadow: var(--glow-primary);
+}
+
+/* Button reset */
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all var(--transition-base);
+}
+
+/* Input styling */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: var(--glow-focus);
+}
+
+/* Image defaults */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* List reset */
+ul, ol {
+  list-style: none;
+}
+
+/**
+ * ========================================
+ * UTILITY CLASSES
+ * ========================================
+ */
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Text alignment */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Text colors - use theme variables */
+.text-muted { color: var(--color-text-muted); }
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-secondary); }
+.text-accent { color: var(--color-accent); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+
+/* Glow effects - use theme glow variables */
+.glow-primary {
+  text-shadow: var(--glow-primary);
+}
+
+.glow-secondary {
+  text-shadow: var(--glow-secondary);
+}
+
+.glow-accent {
+  text-shadow: var(--glow-accent);
+}
+
+/* Spacing utilities */
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mt-xl { margin-top: var(--spacing-xl); }
+
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.mb-xl { margin-bottom: var(--spacing-xl); }
+
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+.p-xl { padding: var(--spacing-xl); }
+
+/**
+ * ========================================
+ * CUSTOM SCROLLBAR
+ * ========================================
+ */
+
+/* Webkit browsers */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar-thumb);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-bg-secondary);
+  box-shadow: var(--glow-scrollbar);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-scrollbar-thumb-hover);
+  box-shadow: var(--glow-scrollbar-hover);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar-thumb) var(--color-bg-secondary);
+}
+
+/**
+ * ========================================
+ * ANIMATIONS
+ * ========================================
+ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: var(--glow-primary);
+  }
+  50% {
+    box-shadow: var(--glow-primary-strong);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Animation utility classes */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}

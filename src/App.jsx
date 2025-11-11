@@ -18,10 +18,12 @@ function App() {
           .limit(1)
         
         if (error) {
-          // Expected error if table doesn't exist - but connection works!
-          if (error.code === '42P01') {
+          // Expected error codes when table doesn't exist - but connection works!
+          // 42P01 = PostgreSQL error (direct connection)
+          // PGRST116 = PostgREST error (REST API - table not found)
+          if (error.code === '42P01' || error.code === 'PGRST205') {
             setConnectionStatus('✅ Connected to Supabase!')
-            logger.info('Supabase connection successful')
+            logger.info('Supabase connection successful (test table not found, but that is expected)')
           } else {
             throw error
           }
