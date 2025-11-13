@@ -1,0 +1,225 @@
+/**
+ * ========================================
+ * PLACEHOLDER PAGE STYLES
+ * ========================================
+ * Shared styles for all placeholder pages
+ * Used for pages that haven't been implemented yet
+ */
+
+/* ========================================
+ * PAGE CONTAINER
+ * ======================================== */
+
+.placeholder-page {
+  /* Full width with padding */
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-2xl) var(--spacing-lg);
+
+  /* Fade in animation */
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* ========================================
+ * HEADER SECTION
+ * ======================================== */
+
+.placeholder-header {
+  /* Center content */
+  text-align: center;
+
+  /* Spacing */
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-xl);
+
+  /* Border decoration */
+  border-bottom: 2px solid var(--color-border);
+}
+
+.placeholder-header h1 {
+  /* Title styling (inherits from theme) */
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+
+  /* Add glow */
+  text-shadow: var(--glow-primary);
+}
+
+.placeholder-subtitle {
+  /* Subtitle styling */
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* ========================================
+ * CONTENT SECTION
+ * ======================================== */
+
+.placeholder-content {
+  /* Content spacing */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+
+  /* Text styling */
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+}
+
+.placeholder-content p {
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+/* ========================================
+ * INFO BOX
+ * ======================================== */
+
+.info-box {
+  /* Box styling */
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+
+  /* Shadow and glow */
+  box-shadow: var(--shadow-card);
+
+  /* Center content */
+  text-align: center;
+}
+
+.info-box h2 {
+  /* Info box title */
+  color: var(--color-heading);
+  font-size: var(--font-size-2xl);
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  text-shadow: var(--glow-secondary);
+}
+
+.info-box p {
+  /* Info box text */
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+/* ========================================
+ * FEATURE LIST
+ * ======================================== */
+
+.feature-list {
+  /* List styling */
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-lg) 0;
+
+  /* Text alignment */
+  text-align: left;
+}
+
+.feature-list li {
+  /* List item styling */
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  /* Spacing between items */
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+
+  /* Background on hover */
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.feature-list li:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.feature-list strong {
+  /* Bold text in list */
+  color: var(--color-secondary);
+}
+
+/* ========================================
+ * STATUS BADGE
+ * ======================================== */
+
+.status-badge {
+  /* Badge styling */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  /* Padding and borders */
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(74, 158, 255, 0.2));
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-md);
+
+  /* Text styling */
+  color: var(--color-accent-light);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+
+  /* Glow effect */
+  box-shadow: var(--glow-accent);
+
+  /* Center in container */
+  margin: var(--spacing-xl) auto 0;
+}
+
+/* ========================================
+ * RESPONSIVE DESIGN
+ * ======================================== */
+
+/* Tablets and smaller */
+@media (max-width: 768px) {
+  .placeholder-page {
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .placeholder-header h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .placeholder-subtitle {
+    font-size: var(--font-size-base);
+  }
+
+  .info-box {
+    padding: var(--spacing-lg);
+  }
+
+  .info-box h2 {
+    font-size: var(--font-size-xl);
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .placeholder-page {
+    padding: var(--spacing-lg) var(--spacing-sm);
+  }
+
+  .placeholder-header {
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+  }
+
+  .info-box {
+    padding: var(--spacing-md);
+  }
+
+  .feature-list li {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .status-badge {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}

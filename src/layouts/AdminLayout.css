@@ -1,0 +1,428 @@
+/**
+ * ========================================
+ * ADMIN LAYOUT STYLES
+ * ========================================
+ * Styles for the admin panel layout
+ * Includes sidebar navigation and responsive design
+ */
+
+/* ========================================
+ * LAYOUT CONTAINER
+ * ======================================== */
+
+.admin-layout {
+  /* Full viewport height */
+  min-height: 100vh;
+
+  /* Flexbox layout: sidebar + main content */
+  display: flex;
+
+  /* Background uses theme */
+  background: var(--color-bg-primary);
+}
+
+/* ========================================
+ * SIDEBAR
+ * ======================================== */
+
+.admin-sidebar {
+  /* Sidebar dimensions */
+  width: 280px;
+  min-height: 100vh;
+
+  /* Flexbox for vertical layout */
+  display: flex;
+  flex-direction: column;
+
+  /* Styling */
+  background: var(--color-bg-secondary);
+  border-right: 2px solid var(--color-border);
+
+  /* Shadow and glow */
+  box-shadow: var(--shadow-lg);
+
+  /* Fixed position on desktop */
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+
+  /* Layer above content */
+  z-index: var(--z-fixed);
+
+  /* Smooth transitions */
+  transition: transform var(--transition-base);
+}
+
+/* ========================================
+ * SIDEBAR HEADER
+ * ======================================== */
+
+.sidebar-header {
+  /* Padding */
+  padding: var(--spacing-xl) var(--spacing-lg);
+
+  /* Center content */
+  text-align: center;
+
+  /* Bottom border */
+  border-bottom: 2px solid var(--color-border);
+}
+
+.sidebar-title {
+  /* Title styling (inherits from theme) */
+  font-size: var(--font-size-xl);
+  margin-top: var(--spacing-sm);
+  text-shadow: var(--glow-primary);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+/* ========================================
+ * NAVIGATION MENU
+ * ======================================== */
+
+.sidebar-nav {
+  /* Take up remaining space */
+  flex: 1;
+
+  /* Padding */
+  padding: var(--spacing-lg) 0;
+
+  /* Enable scrolling if menu is long */
+  overflow-y: auto;
+}
+
+.nav-list {
+  /* Reset list styles */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  /* Spacing between items */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.nav-item {
+  /* Item padding */
+  padding: 0 var(--spacing-md);
+}
+
+/* ========================================
+ * NAVIGATION LINKS
+ * ======================================== */
+
+.nav-link {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+
+  /* Padding */
+  padding: var(--spacing-md) var(--spacing-lg);
+
+  /* Text styling */
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+
+  /* Border and background */
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+
+  /* Smooth transitions */
+  transition: all var(--transition-fast);
+
+  /* Cursor */
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  /* Hover state */
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+  box-shadow: var(--glow-primary);
+}
+
+.nav-link.active {
+  /* Active state (current page) */
+  background: linear-gradient(
+    135deg,
+    rgba(212, 175, 55, 0.2),
+    rgba(184, 148, 31, 0.2)
+  );
+  color: var(--color-heading);
+  border-left: 4px solid var(--color-secondary);
+  padding-left: calc(var(--spacing-lg) - 4px); /* Adjust for border */
+  box-shadow: var(--glow-secondary);
+}
+
+.nav-label {
+  /* Label text */
+  flex: 1;
+}
+
+/* ========================================
+ * SIDEBAR FOOTER
+ * ======================================== */
+
+.sidebar-footer {
+  /* Padding */
+  padding: var(--spacing-lg) var(--spacing-md);
+
+  /* Top border */
+  border-top: 2px solid var(--color-border);
+}
+
+/* ========================================
+ * LOGOUT BUTTON
+ * ======================================== */
+
+.logout-button {
+  /* Full width button */
+  width: 100%;
+
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+
+  /* Padding */
+  padding: var(--spacing-md) var(--spacing-lg);
+
+  /* Text styling */
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+
+  /* Button styling */
+  background-color: rgba(255, 74, 110, 0.2);
+  border: 2px solid var(--color-error);
+  border-radius: var(--radius-sm);
+
+  /* Cursor */
+  cursor: pointer;
+
+  /* Smooth transitions */
+  transition: all var(--transition-base);
+}
+
+.logout-button:hover {
+  /* Hover state */
+  background-color: rgba(255, 74, 110, 0.3);
+  box-shadow: 0 0 20px rgba(255, 74, 110, 0.5);
+  transform: translateY(-2px);
+}
+
+.logout-button:active {
+  /* Click state */
+  transform: translateY(0);
+}
+
+/* ========================================
+ * MAIN CONTENT AREA
+ * ======================================== */
+
+.admin-main {
+  /* Take up remaining space */
+  flex: 1;
+
+  /* Add left margin for sidebar */
+  margin-left: 280px;
+
+  /* Full height */
+  min-height: 100vh;
+
+  /* Flexbox for mobile header + content */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========================================
+ * MOBILE HEADER (Hidden on desktop)
+ * ======================================== */
+
+.mobile-header {
+  /* Hidden on desktop */
+  display: none;
+
+  /* Will be flex on mobile */
+  align-items: center;
+  justify-content: space-between;
+
+  /* Padding */
+  padding: var(--spacing-md) var(--spacing-lg);
+
+  /* Styling */
+  background: var(--color-bg-secondary);
+  border-bottom: 2px solid var(--color-border);
+
+  /* Shadow */
+  box-shadow: var(--shadow-md);
+
+  /* Above content */
+  z-index: var(--z-sticky);
+}
+
+.mobile-header-title {
+  /* Center content */
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  /* Text styling */
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-heading);
+  color: var(--color-heading);
+}
+
+.mobile-menu-button,
+.mobile-logout-button {
+  /* Button styling */
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  color: var(--color-text-primary);
+
+  /* Center icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Smooth transition */
+  transition: all var(--transition-fast);
+}
+
+.mobile-menu-button:hover,
+.mobile-logout-button:hover {
+  color: var(--color-secondary);
+  transform: scale(1.1);
+}
+
+/* ========================================
+ * MOBILE CLOSE BUTTON (Hidden on desktop)
+ * ======================================== */
+
+.mobile-close-button {
+  /* Hidden on desktop */
+  display: none;
+
+  /* Button styling */
+  position: absolute;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  color: var(--color-text-primary);
+
+  /* Transition */
+  transition: all var(--transition-fast);
+}
+
+.mobile-close-button:hover {
+  color: var(--color-error);
+  transform: rotate(90deg);
+}
+
+/* ========================================
+ * PAGE CONTENT
+ * ======================================== */
+
+.admin-content {
+  /* Take up remaining space */
+  flex: 1;
+
+  /* Padding */
+  padding: var(--spacing-2xl) var(--spacing-xl);
+
+  /* Enable scrolling */
+  overflow-y: auto;
+}
+
+/* ========================================
+ * MOBILE OVERLAY (Darkens background)
+ * ======================================== */
+
+.mobile-overlay {
+  /* Hidden on desktop */
+  display: none;
+}
+
+/* ========================================
+ * RESPONSIVE DESIGN - TABLET & MOBILE
+ * ======================================== */
+
+/* Tablets and smaller (below 1024px) */
+@media (max-width: 1024px) {
+  /* Hide sidebar by default on mobile */
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+
+  /* Show sidebar when mobile menu is open */
+  .admin-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  /* Show mobile header */
+  .mobile-header {
+    display: flex;
+  }
+
+  /* Show mobile close button */
+  .mobile-close-button {
+    display: flex;
+  }
+
+  /* Remove left margin from main content */
+  .admin-main {
+    margin-left: 0;
+  }
+
+  /* Show overlay when menu is open */
+  .mobile-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: calc(var(--z-fixed) - 1);
+  }
+
+  /* Reduce content padding on mobile */
+  .admin-content {
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+}
+
+/* Mobile phones (below 480px) */
+@media (max-width: 480px) {
+  /* Narrower sidebar on small phones */
+  .admin-sidebar {
+    width: 260px;
+  }
+
+  /* Smaller padding in content */
+  .admin-content {
+    padding: var(--spacing-lg) var(--spacing-sm);
+  }
+
+  /* Smaller mobile header */
+  .mobile-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .mobile-header-title {
+    font-size: var(--font-size-base);
+  }
+}

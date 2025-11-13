@@ -1,73 +1,170 @@
-import { useEffect, useState } from 'react'
-import { supabase } from './config/supabase'
+/**
+ * ========================================
+ * MAIN APP COMPONENT
+ * ========================================
+ * This is the root component that sets up routing
+ * and handles all navigation in the application
+ *
+ * FEATURES:
+ * - React Router for navigation
+ * - Protected routes for admin pages
+ * - Public login page
+ * - Redirects for unauthenticated users
+ */
+
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { logger } from './utils/logger'
 
+// Import layouts
+import AdminLayout from './layouts/AdminLayout'
+
+// Import components
+import ProtectedRoute from './components/ProtectedRoute'
+
+// Import pages
+import Login from './pages/Login'
+import AdminDashboard from './pages/AdminDashboard'
+import CharacterStats from './pages/CharacterStats'
+import Pages from './pages/Pages'
+import Quests from './pages/Quests'
+import Inventory from './pages/Inventory'
+import Skills from './pages/Skills'
+import ThemeSettings from './pages/ThemeSettings'
+
+// ========================================
+// APP COMPONENT
+// ========================================
+
 function App() {
-  const [connectionStatus, setConnectionStatus] = useState('checking...')
-
-  useEffect(() => {
-    // Test Supabase connection
-    const testConnection = async () => {
-      try {
-        logger.info('Testing Supabase connection...')
-        
-        // Simple query to test connection
-        const { data, error } = await supabase
-          .from('_test_connection')
-          .select('*')
-          .limit(1)
-        
-        if (error) {
-          // Expected error codes when table doesn't exist - but connection works!
-          // 42P01 = PostgreSQL error (direct connection)
-          // PGRST116 = PostgREST error (REST API - table not found)
-          if (error.code === '42P01' || error.code === 'PGRST205') {
-            setConnectionStatus('✅ Connected to Supabase!')
-            logger.info('Supabase connection successful (test table not found, but that is expected)')
-          } else {
-            throw error
-          }
-        } else {
-          setConnectionStatus('✅ Connected to Supabase!')
-          logger.info('Supabase connection successful', data)
-        }
-      } catch (error) {
-        setConnectionStatus('❌ Connection failed')
-        logger.error('Supabase connection failed', error)
-      }
-    }
-
-    testConnection()
-  }, [])
+  // Log app initialization
+  logger.info('🚀 Portfolio V2 App initialized')
 
   return (
-    <div style={{ 
-      padding: '40px', 
-      fontFamily: 'system-ui',
-      maxWidth: '600px',
-      margin: '0 auto'
-    }}>
-      <h1>🏰 Portfolio V2 - Phase 0 Setup</h1>
-      <div style={{ 
-        padding: '20px', 
-        background: '#f0f0f0', 
-        borderRadius: '8px',
-        marginTop: '20px'
-      }}>
-        <h2>Setup Status:</h2>
-        <ul style={{ lineHeight: '2' }}>
-          <li>✅ React + Vite installed</li>
-          <li>✅ Supabase client configured</li>
-          <li>✅ Logger utility created</li>
-          <li>✅ Folder structure ready</li>
-          <li>{connectionStatus}</li>
-        </ul>
-      </div>
-      <p style={{ marginTop: '20px', color: '#666' }}>
-        Check the browser console (F12) for detailed logs!
-      </p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* ========================================
+         * ROOT REDIRECT
+         * Redirects / to /admin
+         * ======================================== */}
+        <Route
+          path="/"
+          element={<Navigate to="/admin" replace />}
+        />
+
+        {/* ========================================
+         * LOGIN PAGE (Public)
+         * Anyone can access this page
+         * ======================================== */}
+        <Route
+          path="/admin/login"
+          element={<Login />}
+        />
+
+        {/* ========================================
+         * ADMIN ROUTES (Protected)
+         * All admin routes require authentication
+         * Each route is wrapped in ProtectedRoute and AdminLayout
+         * ======================================== */}
+
+        {/* Admin Dashboard (Overview) */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <AdminDashboard />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Character Stats Page */}
+        <Route
+          path="/admin/character-stats"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <CharacterStats />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Pages Management */}
+        <Route
+          path="/admin/pages"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Pages />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Quests Management */}
+        <Route
+          path="/admin/quests"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Quests />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Inventory & Achievements */}
+        <Route
+          path="/admin/inventory"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Inventory />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Skills Management */}
+        <Route
+          path="/admin/skills"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Skills />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Theme Settings */}
+        <Route
+          path="/admin/theme"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <ThemeSettings />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========================================
+         * 404 NOT FOUND
+         * Any unmatched route redirects to admin
+         * ======================================== */}
+        <Route
+          path="*"
+          element={<Navigate to="/admin" replace />}
+        />
+      </Routes>
+    </BrowserRouter>
   )
 }
+
+// ========================================
+// EXPORTS
+// ========================================
 
 export default App

@@ -1,0 +1,400 @@
+/**
+ * ========================================
+ * LOGIN PAGE STYLES
+ * ========================================
+ * Fantasy/RPG themed login page for admin portal
+ */
+
+/* ========================================
+ * PAGE CONTAINER
+ * ======================================== */
+
+.login-page {
+  /* Full viewport height */
+  min-height: 100vh;
+  width: 100%;
+
+  /* Center the login card */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Padding for mobile */
+  padding: var(--spacing-md);
+
+  /* Background uses theme gradient */
+  background: var(--color-bg-primary);
+
+  /* Prevent content overflow */
+  overflow: hidden;
+  position: relative;
+}
+
+/* ========================================
+ * BACKGROUND DECORATION
+ * ======================================== */
+
+.login-background {
+  /* Position absolutely to cover page */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  /* Add subtle pattern or texture */
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(74, 158, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+
+  /* Behind the card */
+  z-index: var(--z-background);
+
+  /* Prevent interaction */
+  pointer-events: none;
+}
+
+/* ========================================
+ * LOGIN CARD
+ * ======================================== */
+
+.login-card {
+  /* Card dimensions */
+  width: 100%;
+  max-width: 450px;
+
+  /* Card styling */
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+
+  /* Card shadow and glow */
+  box-shadow: var(--shadow-card);
+
+  /* Padding inside card */
+  padding: var(--spacing-2xl);
+
+  /* Above background */
+  position: relative;
+  z-index: var(--z-content);
+
+  /* Animation on page load */
+  animation: fadeIn 0.6s ease-out, pulseGlow 3s ease-in-out infinite;
+}
+
+/* ========================================
+ * HEADER SECTION
+ * ======================================== */
+
+.login-header {
+  /* Center content */
+  text-align: center;
+
+  /* Spacing below header */
+  margin-bottom: var(--spacing-xl);
+}
+
+.login-title {
+  /* Title styling (uses theme variables) */
+  font-size: var(--font-size-3xl);
+  color: var(--color-heading);
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+
+  /* Add glow effect */
+  text-shadow: var(--glow-primary);
+
+  /* Letter spacing for ornate feel */
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.login-subtitle {
+  /* Subtitle styling */
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* ========================================
+ * FORM SECTION
+ * ======================================== */
+
+.login-form {
+  /* Spacing between form elements */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ========================================
+ * FORM GROUP (Label + Input)
+ * ======================================== */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.form-label {
+  /* Label styling */
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-tight);
+
+  /* Align icon with text */
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* ========================================
+ * PASSWORD INPUT WITH TOGGLE
+ * ======================================== */
+
+.password-input-wrapper {
+  /* Position relative for absolute toggle button */
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form-input {
+  /* Input dimensions */
+  width: 100%;
+  padding: var(--spacing-md);
+  padding-right: calc(var(--spacing-md) + 40px); /* Space for toggle button */
+
+  /* Input styling (uses theme variables) */
+  font-size: var(--font-size-base);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+
+  /* Smooth transitions */
+  transition: all var(--transition-base);
+}
+
+.form-input:focus {
+  /* Focus state */
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: var(--glow-focus);
+}
+
+.form-input:disabled {
+  /* Disabled state */
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-input::placeholder {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Password toggle button */
+.password-toggle {
+  /* Position absolutely inside input */
+  position: absolute;
+  right: var(--spacing-sm);
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* Button styling */
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  cursor: pointer;
+
+  /* Center icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Styling */
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+
+  /* Transition */
+  transition: all var(--transition-fast);
+}
+
+.password-toggle:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.password-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ========================================
+ * ERROR MESSAGE
+ * ======================================== */
+
+.error-message {
+  /* Error box styling */
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  /* Padding and borders */
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(255, 74, 110, 0.1);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-sm);
+
+  /* Text styling */
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+
+  /* Animation */
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* ========================================
+ * SUBMIT BUTTON
+ * ======================================== */
+
+.submit-button {
+  /* Button dimensions */
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+
+  /* Button styling */
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-heading);
+  letter-spacing: var(--letter-spacing-normal);
+
+  /* Colors */
+  background: linear-gradient(135deg, var(--color-secondary-dark), var(--color-secondary));
+  color: var(--color-primary-dark);
+  border: 2px solid var(--color-secondary-light);
+  border-radius: var(--radius-sm);
+
+  /* Shadow and glow */
+  box-shadow: var(--shadow-md), var(--glow-secondary);
+
+  /* Center content */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+
+  /* Cursor */
+  cursor: pointer;
+
+  /* Smooth transitions */
+  transition: all var(--transition-base);
+}
+
+.submit-button:hover:not(:disabled) {
+  /* Hover state */
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--glow-primary-strong);
+  border-color: var(--color-secondary-light);
+}
+
+.submit-button:active:not(:disabled) {
+  /* Click state */
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.submit-button:disabled {
+  /* Disabled state */
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========================================
+ * LOADING SPINNER
+ * ======================================== */
+
+.loading-spinner {
+  /* Spinner dimensions */
+  width: 20px;
+  height: 20px;
+
+  /* Spinner styling */
+  border: 3px solid rgba(0, 0, 0, 0.3);
+  border-top-color: var(--color-primary-dark);
+  border-radius: 50%;
+
+  /* Spin animation */
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+ * FOOTER
+ * ======================================== */
+
+.login-footer {
+  /* Spacing above footer */
+  margin-top: var(--spacing-xl);
+
+  /* Center content */
+  text-align: center;
+}
+
+.login-note {
+  /* Note styling */
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+
+  /* Center icon with text */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+/* ========================================
+ * RESPONSIVE DESIGN
+ * ======================================== */
+
+/* Tablets and smaller */
+@media (max-width: 768px) {
+  .login-card {
+    padding: var(--spacing-xl);
+    max-width: 400px;
+  }
+
+  .login-title {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .login-page {
+    padding: var(--spacing-sm);
+  }
+
+  .login-card {
+    padding: var(--spacing-lg);
+  }
+
+  .login-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .submit-button {
+    font-size: var(--font-size-base);
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
