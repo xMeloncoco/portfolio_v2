@@ -215,12 +215,16 @@ export async function createQuest(questData, tagIds = []) {
       return { data: null, error: 'Quest title is required' }
     }
 
-    // Clean quest fields
+    // Clean quest fields - NOTE: description column may not exist in DB yet
     const cleanQuestData = {
       title: questData.title.trim(),
       quest_type: questData.quest_type || 'side',
-      status: questData.status || 'not_started',
-      description: questData.description || ''
+      status: questData.status || 'not_started'
+    }
+
+    // Only include description if provided and not empty
+    if (questData.description && questData.description.trim() !== '') {
+      cleanQuestData.description = questData.description.trim()
     }
 
     // Insert the quest
