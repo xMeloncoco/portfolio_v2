@@ -158,7 +158,7 @@ function AdminLayout({ children }) {
       <aside className={`admin-sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         {/* Sidebar header */}
         <div className="sidebar-header">
-          <Icon name="castle" size={40} alt="Castle icon" />
+          <Icon name="castle" size={48} alt="Castle icon" />
           <h1 className="sidebar-title">Admin Portal</h1>
         </div>
 
@@ -177,7 +177,7 @@ function AdminLayout({ children }) {
                   title={item.description}
                   aria-label={item.description}
                 >
-                  <Icon name={item.icon} size={24} alt="" />
+                  <Icon name={item.icon} size={28} alt="" />
                   <span className="nav-label">{item.label}</span>
                 </NavLink>
               </li>
@@ -193,7 +193,7 @@ function AdminLayout({ children }) {
             title="Logout from admin portal"
             aria-label="Logout"
           >
-            <Icon name="logout" size={24} alt="" />
+            <Icon name="logout" size={28} alt="" />
             <span>Logout</span>
           </button>
         </div>
@@ -204,7 +204,7 @@ function AdminLayout({ children }) {
           onClick={toggleMobileMenu}
           aria-label="Close menu"
         >
-          <Icon name="cross" size={24} alt="" />
+          <Icon name="cross" size={28} alt="" />
         </button>
       </aside>
 
@@ -231,11 +231,11 @@ function AdminLayout({ children }) {
             aria-label="Open menu"
             aria-expanded={isMobileMenuOpen}
           >
-            <Icon name="menu" size={28} alt="" />
+            <Icon name="menu" size={32} alt="" />
           </button>
 
           <div className="mobile-header-title">
-            <Icon name="castle" size={28} alt="" />
+            <Icon name="castle" size={32} alt="" />
             <span>Admin Portal</span>
           </div>
 
@@ -244,7 +244,7 @@ function AdminLayout({ children }) {
             onClick={handleLogout}
             aria-label="Logout"
           >
-            <Icon name="logout" size={24} alt="" />
+            <Icon name="logout" size={28} alt="" />
           </button>
         </header>
 

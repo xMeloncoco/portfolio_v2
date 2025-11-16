@@ -13,7 +13,7 @@ function AdminDashboard() {
   return (
     <div className="placeholder-page">
       <div className="placeholder-header">
-        <Icon name="home" size={48} />
+        <Icon name="home" size={56} />
         <h1>Admin Dashboard</h1>
         <p className="placeholder-subtitle">Welcome to the Admin Portal</p>
       </div>
@@ -23,16 +23,16 @@ function AdminDashboard() {
         <p>Use the navigation menu to access different sections:</p>
 
         <ul className="feature-list">
-          <li><Icon name="adventure" size={20} /> <strong>Character Stats:</strong> Coming in Phase 8</li>
-          <li><Icon name="logbook" size={20} /> <strong>Pages:</strong> Implementation begins Phase 2</li>
-          <li><Icon name="adventure" size={20} /> <strong>Quests:</strong> Implementation begins Phase 3</li>
-          <li><Icon name="treasure-chest" size={20} /> <strong>Inventory:</strong> Implementation begins Phase 4</li>
-          <li><Icon name="skills" size={20} /> <strong>Skills:</strong> Coming in a later phase</li>
-          <li><Icon name="theme" size={20} /> <strong>Theme:</strong> Coming in a later phase</li>
+          <li><Icon name="adventure" size={24} /> <strong>Character Stats:</strong> Coming in Phase 8</li>
+          <li><Icon name="logbook" size={24} /> <strong>Pages:</strong> Implementation begins Phase 2</li>
+          <li><Icon name="adventure" size={24} /> <strong>Quests:</strong> Implementation begins Phase 3</li>
+          <li><Icon name="treasure-chest" size={24} /> <strong>Inventory:</strong> Implementation begins Phase 4</li>
+          <li><Icon name="skills" size={24} /> <strong>Skills:</strong> Coming in a later phase</li>
+          <li><Icon name="theme" size={24} /> <strong>Theme:</strong> Coming in a later phase</li>
         </ul>
 
         <div className="status-badge">
-          <Icon name="done" size={20} />
+          <Icon name="done" size={24} />
           Phase 1 Complete - Login & Navigation Working
         </div>
       </div>

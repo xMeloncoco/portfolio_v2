@@ -13,14 +13,14 @@ function CharacterStats() {
   return (
     <div className="placeholder-page">
       <div className="placeholder-header">
-        <Icon name="default-user" size={48} />
+        <Icon name="default-user" size={56} />
         <h1>Character Stats</h1>
         <p className="placeholder-subtitle">Edit your portfolio character information</p>
       </div>
 
       <div className="placeholder-content">
         <div className="info-box">
-          <Icon name="hourglass" size={32} />
+          <Icon name="hourglass" size={40} />
           <h2>Coming in Phase 8</h2>
           <p>
             The Character Stats editor will allow you to customize:

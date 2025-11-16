@@ -13,23 +13,23 @@ function Quests() {
   return (
     <div className="placeholder-page">
       <div className="placeholder-header">
-        <Icon name="adventure" size={48} />
+        <Icon name="adventure" size={56} />
         <h1>Quests</h1>
         <p className="placeholder-subtitle">Manage your project quests and sub-quests</p>
       </div>
 
       <div className="placeholder-content">
         <div className="info-box">
-          <Icon name="hourglass" size={32} />
+          <Icon name="hourglass" size={40} />
           <h2>Implementation begins Phase 3</h2>
           <p>
             The Quest manager will support:
           </p>
           <ul className="feature-list">
-            <li><Icon name="crown" size={20} /> <strong>Main Quests:</strong> Major projects and goals</li>
-            <li><Icon name="sword" size={20} /> <strong>Side Quests:</strong> Smaller tasks and features</li>
-            <li><Icon name="future" size={20} /> <strong>Future Quests:</strong> Planned future work</li>
-            <li><Icon name="done" size={20} /> <strong>Sub-quests:</strong> Checklist items for each quest</li>
+            <li><Icon name="crown" size={24} /> <strong>Main Quests:</strong> Major projects and goals</li>
+            <li><Icon name="sword" size={24} /> <strong>Side Quests:</strong> Smaller tasks and features</li>
+            <li><Icon name="future" size={24} /> <strong>Future Quests:</strong> Planned future work</li>
+            <li><Icon name="done" size={24} /> <strong>Sub-quests:</strong> Checklist items for each quest</li>
           </ul>
           <p>
             Track progress, link to project pages, and manage quest statuses with
