@@ -1,0 +1,448 @@
+/**
+ * ========================================
+ * INVENTORY FORM STYLES
+ * ========================================
+ * Styles for the inventory item creation/editing form
+ */
+
+/* ========================================
+ * CONTAINER
+ * ======================================== */
+
+.inventory-form-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* ========================================
+ * HEADER
+ * ======================================== */
+
+.inventory-form-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.inventory-form-header h1 {
+  margin: 0;
+  text-shadow: var(--glow-primary);
+}
+
+.form-subtitle {
+  color: var(--color-text-secondary);
+  margin: var(--spacing-xs) 0 0;
+  font-size: var(--font-size-base);
+}
+
+/* ========================================
+ * ERROR BANNER
+ * ======================================== */
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(255, 74, 110, 0.1);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  color: var(--color-error);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ========================================
+ * LOADING STATE
+ * ======================================== */
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3xl);
+  color: var(--color-text-secondary);
+}
+
+.loading-spinner-large {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--color-border);
+  border-top-color: var(--color-secondary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-md);
+}
+
+/* ========================================
+ * FORM
+ * ======================================== */
+
+.inventory-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/* ========================================
+ * FORM SECTIONS
+ * ======================================== */
+
+.form-section {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin: 0 0 var(--spacing-lg);
+  color: var(--color-heading);
+  font-size: var(--font-size-lg);
+}
+
+/* ========================================
+ * FORM GROUPS
+ * ======================================== */
+
+.form-group {
+  margin-bottom: var(--spacing-lg);
+  position: relative;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  display: block;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-label .required {
+  color: var(--color-error);
+  margin-left: var(--spacing-xs);
+}
+
+.label-hint {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm);
+  margin-left: var(--spacing-xs);
+}
+
+/* ========================================
+ * FORM INPUTS
+ * ======================================== */
+
+.form-input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  transition: all var(--transition-fast);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.2);
+}
+
+.form-input.error {
+  border-color: var(--color-error);
+}
+
+.form-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ========================================
+ * SELECT
+ * ======================================== */
+
+.form-select {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.2);
+}
+
+/* ========================================
+ * TEXTAREA
+ * ======================================== */
+
+.form-textarea {
+  width: 100%;
+  padding: var(--spacing-md);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 200px;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.2);
+}
+
+.form-textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ========================================
+ * CHARACTER COUNT
+ * ======================================== */
+
+.char-count {
+  display: block;
+  text-align: right;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-xs);
+}
+
+/* ========================================
+ * ERROR MESSAGE
+ * ======================================== */
+
+.error-message {
+  display: block;
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+}
+
+/* ========================================
+ * TYPE SELECTOR
+ * ======================================== */
+
+.type-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.type-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.type-option:hover {
+  border-color: var(--color-border-light);
+  transform: translateY(-2px);
+}
+
+.type-option.selected {
+  border-color: var(--color-secondary);
+  background: rgba(255, 215, 0, 0.1);
+  box-shadow: var(--glow-secondary);
+}
+
+.type-label {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+}
+
+.type-description {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+/* ========================================
+ * ICON GRID
+ * ======================================== */
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.icon-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.icon-option:hover {
+  border-color: var(--color-border-light);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+.icon-option.selected {
+  border-color: var(--color-secondary);
+  background: rgba(255, 215, 0, 0.1);
+  box-shadow: var(--glow-secondary);
+}
+
+/* ========================================
+ * FORM ACTIONS
+ * ======================================== */
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-lg);
+}
+
+.cancel-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: transparent;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cancel-button:hover {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.cancel-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.save-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--color-secondary-dark), var(--color-secondary));
+  color: var(--color-primary-dark);
+  border: 2px solid var(--color-secondary-light);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--glow-secondary);
+}
+
+.save-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-primary-strong);
+}
+
+.save-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.button-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top-color: var(--color-primary-dark);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+ * RESPONSIVE DESIGN
+ * ======================================== */
+
+@media (max-width: 768px) {
+  .inventory-form-container {
+    padding: var(--spacing-md);
+  }
+
+  .inventory-form-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .type-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-button,
+  .save-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-section {
+    padding: var(--spacing-md);
+  }
+
+  .icon-grid {
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  }
+
+  .icon-option {
+    width: 50px;
+    height: 50px;
+  }
+}
