@@ -17,11 +17,12 @@ import { logger } from './utils/logger'
 
 // Import layouts
 import AdminLayout from './layouts/AdminLayout'
+import PublicLayout from './layouts/PublicLayout'
 
 // Import components
 import ProtectedRoute from './components/ProtectedRoute'
 
-// Import pages
+// Import admin pages
 import Login from './pages/Login'
 import AdminDashboard from './pages/AdminDashboard'
 import CharacterStats from './pages/CharacterStats'
@@ -35,6 +36,13 @@ import Inventory from './pages/Inventory'
 import Skills from './pages/Skills'
 import ThemeSettings from './pages/ThemeSettings'
 
+// Import public pages
+import Home from './pages/public/Home'
+import Blog from './pages/public/Blog'
+import Projects from './pages/public/Projects'
+import PublicQuests from './pages/public/PublicQuests'
+import PageDetail from './pages/public/PageDetail'
+
 // ========================================
 // APP COMPONENT
 // ========================================
@@ -47,12 +55,58 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* ========================================
-         * ROOT REDIRECT
-         * Redirects / to /admin
+         * PUBLIC ROUTES
+         * These pages are accessible to everyone
          * ======================================== */}
+
+        {/* Home Page */}
         <Route
           path="/"
-          element={<Navigate to="/admin" replace />}
+          element={
+            <PublicLayout>
+              <Home />
+            </PublicLayout>
+          }
+        />
+
+        {/* Blog Page */}
+        <Route
+          path="/blog"
+          element={
+            <PublicLayout>
+              <Blog />
+            </PublicLayout>
+          }
+        />
+
+        {/* Projects Page */}
+        <Route
+          path="/projects"
+          element={
+            <PublicLayout>
+              <Projects />
+            </PublicLayout>
+          }
+        />
+
+        {/* Public Quests Page */}
+        <Route
+          path="/quests"
+          element={
+            <PublicLayout>
+              <PublicQuests />
+            </PublicLayout>
+          }
+        />
+
+        {/* Public Page Detail */}
+        <Route
+          path="/page/:id"
+          element={
+            <PublicLayout>
+              <PageDetail />
+            </PublicLayout>
+          }
         />
 
         {/* ========================================
@@ -228,11 +282,11 @@ function App() {
 
         {/* ========================================
          * 404 NOT FOUND
-         * Any unmatched route redirects to admin
+         * Any unmatched route redirects to home
          * ======================================== */}
         <Route
           path="*"
-          element={<Navigate to="/admin" replace />}
+          element={<Navigate to="/" replace />}
         />
       </Routes>
     </BrowserRouter>
