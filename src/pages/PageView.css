@@ -391,8 +391,8 @@
 }
 
 .content-body strong {
-  color: var(--color-secondary);
-  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
 }
 
 .content-body em {
