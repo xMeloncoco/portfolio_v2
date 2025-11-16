@@ -29,6 +29,8 @@ import Pages from './pages/Pages'
 import PageForm from './pages/PageForm'
 import PageView from './pages/PageView'
 import Quests from './pages/Quests'
+import QuestForm from './pages/QuestForm'
+import QuestView from './pages/QuestView'
 import Inventory from './pages/Inventory'
 import Skills from './pages/Skills'
 import ThemeSettings from './pages/ThemeSettings'
@@ -147,6 +149,42 @@ function App() {
             <ProtectedRoute>
               <AdminLayout>
                 <Quests />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Create New Quest */}
+        <Route
+          path="/admin/quests/new"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <QuestForm />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* View Quest Details */}
+        <Route
+          path="/admin/quests/:id"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <QuestView />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Edit Quest */}
+        <Route
+          path="/admin/quests/:id/edit"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <QuestForm />
               </AdminLayout>
             </ProtectedRoute>
           }
