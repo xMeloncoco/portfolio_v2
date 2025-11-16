@@ -84,9 +84,9 @@ function Icon({
    */
   const getIconPath = (iconName) => {
     try {
-      // Use Vite's import.meta.glob for dynamic imports
-      // This constructs the path: /src/assets/icons/set1/home.png
-      return `/src/assets/icons/${ICON_SET}/${iconName}.png`
+      // Icons are in public/assets/icons/ folder
+      // In production, this becomes /base-path/assets/icons/set1/home.png
+      return `${import.meta.env.BASE_URL}assets/icons/${ICON_SET}/${iconName}.png`
     } catch (error) {
       logger.error(`Error generating icon path for: ${iconName}`, error)
       return null

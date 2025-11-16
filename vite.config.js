@@ -7,4 +7,8 @@ export default defineConfig({
   // Set base to your GitHub repo name for GitHub Pages deployment
   // Change '/portfolio_v2/' to match your actual repo name
   base: '/portfolio_v2/',
+  // Build to docs/ folder for easy GitHub Pages deployment
+  build: {
+    outDir: 'docs',
+  },
 })
