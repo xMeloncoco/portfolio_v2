@@ -82,8 +82,7 @@ export async function getAllQuests(options = {}) {
         ),
         sub_quests (
           id, title, is_completed, sort_order
-        ),
-        project_page:pages (id, title)
+        )
       `)
       .order('updated_at', { ascending: false })
 
@@ -151,11 +150,6 @@ export async function getQuestById(questId) {
         ),
         sub_quests (
           id, title, is_completed, sort_order
-        ),
-        project_page:pages (id, title),
-        page_quests (
-          page_id,
-          pages (id, title, page_type, updated_at)
         )
       `)
       .eq('id', questId)
