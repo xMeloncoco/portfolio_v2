@@ -1,0 +1,97 @@
+/**
+ * ========================================
+ * FULL INVENTORY PAGE STYLES
+ * ========================================
+ * Styles for the full inventory display page
+ */
+
+/* ========================================
+ * PAGE CONTAINER
+ * ======================================== */
+
+.full-inventory-page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* ========================================
+ * PAGE HEADER
+ * ======================================== */
+
+.full-page-header {
+  margin-bottom: var(--spacing-3xl);
+  text-align: center;
+}
+
+.back-to-home {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-secondary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-xl);
+  transition: all var(--transition-fast);
+}
+
+.back-to-home:hover {
+  color: var(--color-primary);
+  transform: translateX(-5px);
+}
+
+.full-page-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin: 0 0 var(--spacing-md);
+  color: var(--color-heading);
+  font-size: var(--font-size-3xl);
+  text-shadow: var(--glow-primary);
+}
+
+.full-page-subtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  line-height: 1.6;
+}
+
+/* ========================================
+ * CONTENT
+ * ======================================== */
+
+.full-inventory-content {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+}
+
+/* ========================================
+ * RESPONSIVE
+ * ======================================== */
+
+@media (max-width: 768px) {
+  .full-inventory-page {
+    padding: var(--spacing-md);
+  }
+
+  .full-page-title {
+    font-size: var(--font-size-2xl);
+    flex-direction: column;
+  }
+
+  .full-page-title .icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .full-inventory-content {
+    padding: var(--spacing-md);
+  }
+}

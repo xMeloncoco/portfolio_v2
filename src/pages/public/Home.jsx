@@ -19,6 +19,8 @@ import { getAllQuests } from '../../services/questsService'
 import { logger } from '../../utils/logger'
 import Icon from '../../components/Icon'
 import Tag from '../../components/Tag'
+import InventoryDisplay from '../../components/InventoryDisplay'
+import AchievementsDisplay from '../../components/AchievementsDisplay'
 import './Home.css'
 
 // ========================================
@@ -298,6 +300,16 @@ function Home() {
             <Icon name="chevron-right" size={20} />
           </Link>
         </div>
+      </section>
+
+      {/* Inventory Section */}
+      <section className="section inventory-section">
+        <InventoryDisplay limit={10} showHeader={true} />
+      </section>
+
+      {/* Achievements Section */}
+      <section className="section achievements-section">
+        <AchievementsDisplay limit={10} showHeader={true} />
       </section>
 
       {/* Recent Blog Posts */}

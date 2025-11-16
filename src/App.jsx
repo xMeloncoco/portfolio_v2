@@ -43,6 +43,8 @@ import Blog from './pages/public/Blog'
 import Projects from './pages/public/Projects'
 import PublicQuests from './pages/public/PublicQuests'
 import PageDetail from './pages/public/PageDetail'
+import FullInventory from './pages/public/FullInventory'
+import FullAchievements from './pages/public/FullAchievements'
 
 // ========================================
 // APP COMPONENT
@@ -106,6 +108,26 @@ function App() {
           element={
             <PublicLayout>
               <PageDetail />
+            </PublicLayout>
+          }
+        />
+
+        {/* Full Inventory Page */}
+        <Route
+          path="/inventory"
+          element={
+            <PublicLayout>
+              <FullInventory />
+            </PublicLayout>
+          }
+        />
+
+        {/* Full Achievements Page */}
+        <Route
+          path="/achievements"
+          element={
+            <PublicLayout>
+              <FullAchievements />
             </PublicLayout>
           }
         />
