@@ -47,7 +47,7 @@ export async function getAllPages(options = {}) {
         ),
         page_quests (
           quest_id,
-          quests (id, name)
+          quests (id, title)
         )
       `)
       .order('updated_at', { ascending: false })
@@ -106,7 +106,7 @@ export async function getPageById(pageId) {
         ),
         page_quests (
           quest_id,
-          quests (id, name)
+          quests (id, title)
         ),
         devlog_items (
           id, title, status, sort_order
