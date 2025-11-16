@@ -21,6 +21,7 @@ import Icon from '../../components/Icon'
 import Tag from '../../components/Tag'
 import InventoryDisplay from '../../components/InventoryDisplay'
 import AchievementsDisplay from '../../components/AchievementsDisplay'
+import CharacterStatsPreview from '../../components/CharacterStatsPreview'
 import './Home.css'
 
 // ========================================
@@ -177,6 +178,15 @@ function Home() {
         <div className="hero-decoration">
           <Icon name="adventure" size={200} />
         </div>
+      </section>
+
+      {/* Character Stats Preview */}
+      <section className="section character-stats-section">
+        <div className="section-header">
+          <Icon name="stats" size={36} />
+          <h2>Character Stats</h2>
+        </div>
+        <CharacterStatsPreview />
       </section>
 
       {/* Featured Projects */}
