@@ -45,6 +45,7 @@ import PublicQuests from './pages/public/PublicQuests'
 import PageDetail from './pages/public/PageDetail'
 import FullInventory from './pages/public/FullInventory'
 import FullAchievements from './pages/public/FullAchievements'
+import PublicCharacterStats from './pages/public/CharacterStats'
 
 // ========================================
 // APP COMPONENT
@@ -128,6 +129,16 @@ function App() {
           element={
             <PublicLayout>
               <FullAchievements />
+            </PublicLayout>
+          }
+        />
+
+        {/* Character Stats Page (D&D Character Sheet) */}
+        <Route
+          path="/character"
+          element={
+            <PublicLayout>
+              <PublicCharacterStats />
             </PublicLayout>
           }
         />

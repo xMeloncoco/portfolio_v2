@@ -83,7 +83,8 @@ function PageForm() {
     content: '',
     project_status: 'planning',
     project_start_date: '',
-    project_end_date: ''
+    project_end_date: '',
+    external_link: ''
   })
 
   // Tags and quests
@@ -141,7 +142,8 @@ function PageForm() {
           content: data.content || '',
           project_status: data.project_status || 'planning',
           project_start_date: data.project_start_date || '',
-          project_end_date: data.project_end_date || ''
+          project_end_date: data.project_end_date || '',
+          external_link: data.external_link || ''
         })
 
         // Set selected tags
@@ -294,6 +296,7 @@ function PageForm() {
         pageData.project_status = formData.project_status
         pageData.project_start_date = formData.project_start_date || null
         pageData.project_end_date = formData.project_end_date || null
+        pageData.external_link = formData.external_link || null
       }
 
       // Add tag IDs
@@ -530,6 +533,23 @@ function PageForm() {
                   <span className="error-message">{validationErrors.project_end_date}</span>
                 )}
               </div>
+            </div>
+
+            {/* External Link */}
+            <div className="form-group">
+              <label htmlFor="external_link" className="form-label">
+                External Link
+                <span className="label-hint">(Live project URL)</span>
+              </label>
+              <input
+                type="url"
+                id="external_link"
+                name="external_link"
+                value={formData.external_link}
+                onChange={handleChange}
+                className="form-input"
+                placeholder="https://your-project.com"
+              />
             </div>
           </div>
         )}
