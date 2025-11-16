@@ -26,6 +26,8 @@ import Login from './pages/Login'
 import AdminDashboard from './pages/AdminDashboard'
 import CharacterStats from './pages/CharacterStats'
 import Pages from './pages/Pages'
+import PageForm from './pages/PageForm'
+import PageView from './pages/PageView'
 import Quests from './pages/Quests'
 import Inventory from './pages/Inventory'
 import Skills from './pages/Skills'
@@ -97,6 +99,42 @@ function App() {
             <ProtectedRoute>
               <AdminLayout>
                 <Pages />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Create New Page */}
+        <Route
+          path="/admin/pages/new"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <PageForm />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* View Page Details */}
+        <Route
+          path="/admin/pages/:id"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <PageView />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Edit Page */}
+        <Route
+          path="/admin/pages/:id/edit"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <PageForm />
               </AdminLayout>
             </ProtectedRoute>
           }
