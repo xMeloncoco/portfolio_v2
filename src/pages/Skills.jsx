@@ -12,14 +12,14 @@ function Skills() {
   return (
     <div className="placeholder-page">
       <div className="placeholder-header">
-        <Icon name="skills" size={48} />
+        <Icon name="skills" size={56} />
         <h1>Skills</h1>
         <p className="placeholder-subtitle">Manage your skills and technologies</p>
       </div>
 
       <div className="placeholder-content">
         <div className="info-box">
-          <Icon name="hourglass" size={32} />
+          <Icon name="hourglass" size={40} />
           <h2>Coming in a later phase</h2>
           <p>
             The Skills feature will allow you to showcase your technical abilities

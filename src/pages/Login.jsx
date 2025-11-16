@@ -145,7 +145,7 @@ function Login() {
       <div className="login-card">
         {/* Header with castle icon */}
         <div className="login-header">
-          <Icon name="castle" size={64} alt="Castle icon" />
+          <Icon name="castle" size={80} alt="Castle icon" />
           <h1 className="login-title">Admin Portal</h1>
           <p className="login-subtitle">Enter the Sacred Password</p>
         </div>
@@ -155,7 +155,7 @@ function Login() {
           {/* Password input field */}
           <div className="form-group">
             <label htmlFor="password" className="form-label">
-              <Icon name="lock" size={20} alt="" />
+              <Icon name="lock" size={24} alt="" />
               Password
             </label>
 
@@ -185,7 +185,7 @@ function Login() {
               >
                 <Icon
                   name={showPassword ? 'cross' : 'inspect-code'}
-                  size={20}
+                  size={24}
                   alt=""
                 />
               </button>
@@ -195,7 +195,7 @@ function Login() {
           {/* Error message display */}
           {error && (
             <div className="error-message" role="alert">
-              <Icon name="cross" size={16} alt="Error" />
+              <Icon name="cross" size={20} alt="Error" />
               <span>{error}</span>
             </div>
           )}
@@ -213,7 +213,7 @@ function Login() {
               </>
             ) : (
               <>
-                <Icon name="sword" size={20} alt="" />
+                <Icon name="sword" size={24} alt="" />
                 <span>Enter</span>
               </>
             )}
@@ -223,7 +223,7 @@ function Login() {
         {/* Footer note */}
         <div className="login-footer">
           <p className="login-note">
-            <Icon name="baby-feet" size={16} alt="" />
+            <Icon name="baby-feet" size={20} alt="" />
             Only authorized admins may enter
           </p>
         </div>

@@ -44,7 +44,7 @@ const FALLBACK_ICON = 'default-user'
 /**
  * Default size for icons (in pixels)
  */
-const DEFAULT_ICON_SIZE = 24
+const DEFAULT_ICON_SIZE = 28
 
 // ========================================
 // ICON COMPONENT

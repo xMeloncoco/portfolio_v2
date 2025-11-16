@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS admin_config (
 -- Default password: "admin123" (CHANGE THIS IMMEDIATELY)
 -- This is hashed using bcrypt
 INSERT INTO admin_config (password_hash)
-VALUES ('$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy')
+VALUES ('$2b$10$N8ChhGJW0c13H2/FbajyKeAJqiI/WNV1DHogZE/CTG8fNZtiPdHXO')
 ON CONFLICT DO NOTHING;
 
 -- ========================================
