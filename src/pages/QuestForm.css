@@ -373,6 +373,34 @@
   padding: var(--spacing-sm);
   background: var(--color-bg-tertiary);
   border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  cursor: grab;
+}
+
+.subquest-item:active {
+  cursor: grabbing;
+}
+
+.subquest-item.dragging {
+  opacity: 0.5;
+  background: rgba(187, 134, 252, 0.2);
+  border: 1px dashed var(--color-primary);
+}
+
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  padding: var(--spacing-xs);
+  cursor: grab;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
+.drag-handle:hover {
+  opacity: 1;
+  color: var(--color-text-primary);
 }
 
 .subquest-checkbox {
@@ -395,13 +423,17 @@
   border: 2px solid var(--color-border);
   border-radius: var(--radius-xs);
   transition: all var(--transition-fast);
+  position: relative;
 }
 
-.checkbox-custom svg {
+.checkbox-custom::after {
+  content: '✓';
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-primary-dark);
   opacity: 0;
   transform: scale(0);
   transition: all var(--transition-fast);
-  color: var(--color-primary-dark);
 }
 
 .subquest-checkbox input:checked + .checkbox-custom {
@@ -409,7 +441,7 @@
   border-color: var(--color-secondary);
 }
 
-.subquest-checkbox input:checked + .checkbox-custom svg {
+.subquest-checkbox input:checked + .checkbox-custom::after {
   opacity: 1;
   transform: scale(1);
 }

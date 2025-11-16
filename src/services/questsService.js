@@ -28,16 +28,12 @@ import { logger } from '../utils/logger'
  * Maps internal status to fun RPG-style display names
  */
 export const STATUS_DISPLAY_NAMES = {
-  gathering_info: 'Gathering Resources',
-  creating_plan: 'Crafting Battle Plan',
-  in_progress: 'In Progress',
+  not_started: 'Awaiting Orders',
+  in_progress: 'On The Move',
   debugging: 'Stuck in Battle',
-  testing: 'Testing Potions',
-  polishing: 'Polishing Artifact',
-  finished: 'Quest Complete!',
   on_hold: 'Waiting for Mana',
-  dropped: 'Quest Abandoned',
-  future: 'Future Quest'
+  completed: 'Quest Complete!',
+  abandoned: 'Quest Abandoned'
 }
 
 /**
@@ -203,42 +199,28 @@ export async function getQuestById(questId) {
 /**
  * Create a new quest
  * @param {Object} questData - The quest data
- * @param {string} questData.name - Quest name (required)
+ * @param {string} questData.title - Quest title (required)
  * @param {string} [questData.quest_type='side'] - Quest type
- * @param {string} [questData.visibility='private'] - Visibility
- * @param {string} [questData.short_description] - Short description
- * @param {string} [questData.long_description] - Long description
- * @param {string} [questData.status='gathering_info'] - Status
- * @param {string} [questData.started_date] - Start date
- * @param {string} [questData.finished_date] - Finish date
- * @param {string} [questData.project_page_id] - Linked project page ID
- * @param {Array} [questData.tagIds=[]] - Array of tag UUIDs
- * @param {Array} [questData.subQuests=[]] - Array of sub-quest titles
+ * @param {string} [questData.status='not_started'] - Status
+ * @param {string} [questData.description] - Quest description
+ * @param {Array} [tagIds=[]] - Array of tag UUIDs
  * @returns {Promise<{data: Object|null, error: string|null}>}
  */
-export async function createQuest(questData) {
+export async function createQuest(questData, tagIds = []) {
   try {
-    logger.info('Creating new quest:', questData.name)
+    logger.info('Creating new quest:', questData.title)
 
     // Validate required fields
-    if (!questData.name || questData.name.trim() === '') {
-      return { data: null, error: 'Quest name is required' }
+    if (!questData.title || questData.title.trim() === '') {
+      return { data: null, error: 'Quest title is required' }
     }
-
-    // Extract tags and sub-quests for separate insertion
-    const { tagIds = [], subQuests = [], ...questFields } = questData
 
     // Clean quest fields
     const cleanQuestData = {
-      name: questFields.name.trim(),
-      quest_type: questFields.quest_type || 'side',
-      visibility: questFields.visibility || 'private',
-      short_description: questFields.short_description || '',
-      long_description: questFields.long_description || '',
-      status: questFields.status || 'gathering_info',
-      started_date: questFields.started_date || null,
-      finished_date: questFields.finished_date || null,
-      project_page_id: questFields.project_page_id || null
+      title: questData.title.trim(),
+      quest_type: questData.quest_type || 'side',
+      status: questData.status || 'not_started',
+      description: questData.description || ''
     }
 
     // Insert the quest
@@ -271,23 +253,6 @@ export async function createQuest(questData) {
       }
     }
 
-    // Add sub-quests if provided
-    if (subQuests.length > 0) {
-      const subQuestData = subQuests.map((title, index) => ({
-        quest_id: quest.id,
-        title: title.trim(),
-        sort_order: index
-      }))
-
-      const { error: subQuestError } = await supabase
-        .from('sub_quests')
-        .insert(subQuestData)
-
-      if (subQuestError) {
-        logger.warn('Error adding sub-quests', subQuestError)
-      }
-    }
-
     // Fetch the complete quest with relations
     const result = await getQuestById(quest.id)
     logger.info(`Quest created successfully: ${quest.id}`)
@@ -306,21 +271,18 @@ export async function createQuest(questData) {
  * Update an existing quest
  * @param {string} questId - The quest UUID
  * @param {Object} questData - The updated quest data
- * @param {Array} [questData.tagIds] - Array of tag UUIDs (replaces existing)
+ * @param {Array} [tagIds] - Array of tag UUIDs (replaces existing)
  * @returns {Promise<{data: Object|null, error: string|null}>}
  */
-export async function updateQuest(questId, questData) {
+export async function updateQuest(questId, questData, tagIds) {
   try {
     logger.info(`Updating quest: ${questId}`)
 
-    // Extract tags for separate handling
-    const { tagIds, ...questFields } = questData
-
     // Update the quest itself
-    if (Object.keys(questFields).length > 0) {
+    if (Object.keys(questData).length > 0) {
       const { error: questError } = await supabase
         .from('quests')
-        .update(questFields)
+        .update(questData)
         .eq('id', questId)
 
       if (questError) {

@@ -21,6 +21,25 @@ import Tag from './Tag'
 import './TagSelector.css'
 
 // ========================================
+// PRESET COLORS FOR TAG CREATION
+// ========================================
+
+const PRESET_COLORS = [
+  '#3498db', // Blue
+  '#2ecc71', // Green
+  '#e74c3c', // Red
+  '#f39c12', // Orange
+  '#9b59b6', // Purple
+  '#1abc9c', // Teal
+  '#e91e63', // Pink
+  '#00bcd4', // Cyan
+  '#ff9800', // Amber
+  '#795548', // Brown
+  '#607d8b', // Blue Grey
+  '#8bc34a'  // Light Green
+]
+
+// ========================================
 // TAG SELECTOR COMPONENT
 // ========================================
 
@@ -297,17 +316,20 @@ function TagSelector({ selectedTags = [], onTagsChange, placeholder = 'Search or
                   <span>Create &quot;{searchQuery}&quot;</span>
                 </div>
                 <div className="create-tag-options">
-                  <div className="color-picker">
+                  <div className="color-picker-preset">
                     <label>Color:</label>
-                    <input
-                      type="color"
-                      value={newTagColor}
-                      onChange={(e) => setNewTagColor(e.target.value)}
-                    />
-                    <span
-                      className="color-preview"
-                      style={{ backgroundColor: newTagColor }}
-                    ></span>
+                    <div className="preset-colors">
+                      {PRESET_COLORS.map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          className={`preset-color-btn ${newTagColor === color ? 'selected' : ''}`}
+                          style={{ backgroundColor: color }}
+                          onClick={() => setNewTagColor(color)}
+                          title={color}
+                        />
+                      ))}
+                    </div>
                   </div>
                   <button
                     className="create-tag-button"

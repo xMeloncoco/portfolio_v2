@@ -165,31 +165,42 @@
   flex-wrap: wrap;
 }
 
-.color-picker {
+.color-picker-preset {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: var(--spacing-xs);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 
-.color-picker input[type="color"] {
-  width: 32px;
-  height: 32px;
-  padding: 2px;
-  background: var(--color-bg-tertiary);
-  border: 1px solid var(--color-border);
+.color-picker-preset label {
+  font-weight: var(--font-weight-medium);
+}
+
+.preset-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.preset-color-btn {
+  width: 28px;
+  height: 28px;
+  border: 2px solid transparent;
   border-radius: var(--radius-sm);
   cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
-.color-picker input[type="color"]::-webkit-color-swatch-wrapper {
-  padding: 0;
+.preset-color-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.color-picker input[type="color"]::-webkit-color-swatch {
-  border: none;
-  border-radius: var(--radius-xs);
+.preset-color-btn.selected {
+  border-color: white;
+  box-shadow: 0 0 0 2px var(--color-secondary);
+  transform: scale(1.1);
 }
 
 .color-preview {

@@ -86,6 +86,7 @@ function QuestForm() {
   // Sub-quests
   const [subQuests, setSubQuests] = useState([])
   const [newSubQuestTitle, setNewSubQuestTitle] = useState('')
+  const [draggedIndex, setDraggedIndex] = useState(null)
 
   // UI state
   const [isLoading, setIsLoading] = useState(false)
@@ -224,6 +225,52 @@ function QuestForm() {
   }
 
   /**
+   * Handle drag start for sub-quest reordering
+   * @param {number} index - Index of dragged item
+   */
+  const handleDragStart = (index) => {
+    setDraggedIndex(index)
+  }
+
+  /**
+   * Handle drag over for sub-quest reordering
+   * @param {Event} e - Drag event
+   */
+  const handleDragOver = (e) => {
+    e.preventDefault()
+  }
+
+  /**
+   * Handle drop for sub-quest reordering
+   * @param {number} dropIndex - Index where item is dropped
+   */
+  const handleDrop = (dropIndex) => {
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null)
+      return
+    }
+
+    const newSubQuests = [...subQuests]
+    const draggedItem = newSubQuests[draggedIndex]
+
+    // Remove from old position
+    newSubQuests.splice(draggedIndex, 1)
+    // Insert at new position
+    newSubQuests.splice(dropIndex, 0, draggedItem)
+
+    setSubQuests(newSubQuests)
+    setDraggedIndex(null)
+    logger.info(`Reordered sub-quest from ${draggedIndex} to ${dropIndex}`)
+  }
+
+  /**
+   * Handle drag end (cleanup)
+   */
+  const handleDragEnd = () => {
+    setDraggedIndex(null)
+  }
+
+  /**
    * Validate form data
    * @returns {boolean} - True if valid
    */
@@ -300,7 +347,7 @@ function QuestForm() {
         for (const subQuest of subQuests) {
           if (subQuest.is_new) {
             // Add new sub-quest
-            await addSubQuest(questId, { title: subQuest.title })
+            await addSubQuest(questId, subQuest.title)
           } else if (subQuest.is_deleted) {
             // Delete sub-quest
             await deleteSubQuest(subQuest.id)
@@ -512,17 +559,26 @@ function QuestForm() {
             {/* Sub-quests List */}
             {subQuests.length > 0 && (
               <div className="subquests-list">
-                {subQuests.map((subQuest) => (
-                  <div key={subQuest.id} className="subquest-item">
+                {subQuests.map((subQuest, index) => (
+                  <div
+                    key={subQuest.id}
+                    className={`subquest-item ${draggedIndex === index ? 'dragging' : ''}`}
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragOver={handleDragOver}
+                    onDrop={() => handleDrop(index)}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <div className="drag-handle" title="Drag to reorder">
+                      <Icon name="menu" size={16} />
+                    </div>
                     <label className="subquest-checkbox">
                       <input
                         type="checkbox"
                         checked={subQuest.is_completed}
                         onChange={() => handleToggleSubQuest(subQuest.id)}
                       />
-                      <span className="checkbox-custom">
-                        <Icon name="checkmark" size={14} />
-                      </span>
+                      <span className="checkbox-custom"></span>
                     </label>
                     <span
                       className={`subquest-title ${subQuest.is_completed ? 'completed' : ''}`}
