@@ -33,6 +33,7 @@ import Quests from './pages/Quests'
 import QuestForm from './pages/QuestForm'
 import QuestView from './pages/QuestView'
 import Inventory from './pages/Inventory'
+import InventoryForm from './pages/InventoryForm'
 import Skills from './pages/Skills'
 import ThemeSettings from './pages/ThemeSettings'
 
@@ -251,6 +252,30 @@ function App() {
             <ProtectedRoute>
               <AdminLayout>
                 <Inventory />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Create New Inventory Item */}
+        <Route
+          path="/admin/inventory/new"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <InventoryForm />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Edit Inventory Item */}
+        <Route
+          path="/admin/inventory/:id/edit"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <InventoryForm />
               </AdminLayout>
             </ProtectedRoute>
           }
