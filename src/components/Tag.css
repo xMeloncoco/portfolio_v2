@@ -1,0 +1,179 @@
+/**
+ * ========================================
+ * TAG COMPONENT STYLES
+ * ========================================
+ * Styles for the reusable tag component
+ */
+
+/* ========================================
+ * BASE TAG STYLES
+ * ======================================== */
+
+.tag {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+
+  /* Padding - uses size modifiers */
+  padding: var(--spacing-xs) var(--spacing-sm);
+
+  /* Border and styling */
+  border: 1px solid var(--tag-color, var(--color-secondary));
+  border-radius: var(--radius-full);
+
+  /* Typography */
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+
+  /* Transitions */
+  transition: all var(--transition-fast);
+
+  /* Prevent selection */
+  user-select: none;
+}
+
+/* ========================================
+ * SIZE VARIANTS
+ * ======================================== */
+
+.tag--small {
+  padding: 2px var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  gap: 2px;
+}
+
+.tag--normal {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.tag--large {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  gap: var(--spacing-sm);
+}
+
+/* ========================================
+ * CLICKABLE TAG
+ * ======================================== */
+
+.tag--clickable {
+  cursor: pointer;
+}
+
+.tag--clickable:hover {
+  /* Darken the background on hover */
+  background-color: var(--tag-color);
+  color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tag--clickable:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.tag--clickable:focus {
+  outline: 2px solid var(--tag-color);
+  outline-offset: 2px;
+}
+
+/* ========================================
+ * TAG NAME
+ * ======================================== */
+
+.tag-name {
+  /* Ensure text is visible */
+  line-height: 1.2;
+}
+
+/* ========================================
+ * REMOVE BUTTON
+ * ======================================== */
+
+.tag-remove {
+  /* Reset button styles */
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Size */
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+
+  /* Styling */
+  border-radius: 50%;
+  color: inherit;
+  opacity: 0.7;
+
+  /* Transitions */
+  transition: all var(--transition-fast);
+}
+
+.tag-remove:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.tag-remove:focus {
+  outline: none;
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.tag--small .tag-remove {
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+}
+
+.tag--large .tag-remove {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+}
+
+/* ========================================
+ * TAG LIST CONTAINER
+ * ======================================== */
+
+/* Helper class for displaying multiple tags */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+/* Compact variant for lists */
+.tag-list--compact {
+  gap: 4px;
+}
+
+/* ========================================
+ * RESPONSIVE ADJUSTMENTS
+ * ======================================== */
+
+@media (max-width: 480px) {
+  .tag {
+    font-size: var(--font-size-xs);
+    padding: 2px var(--spacing-xs);
+  }
+
+  .tag--large {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+}
