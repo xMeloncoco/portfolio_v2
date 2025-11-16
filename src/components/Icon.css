@@ -18,6 +18,9 @@
 
   /* Transition for hover effects */
   transition: all var(--transition-fast);
+
+  /* Prevent icon from shrinking in flex containers */
+  flex-shrink: 0;
 }
 
 /* Icon as button (when onClick is provided) */

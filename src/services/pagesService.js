@@ -59,9 +59,11 @@ export async function getAllPages(options = {}) {
 
     if (options.visibility) {
       query = query.eq('visibility', options.visibility)
-    } else if (!options.includePrivate) {
+    } else if (options.includePrivate === false) {
+      // Only filter to public if explicitly set to false
       query = query.eq('visibility', 'public')
     }
+    // Default: show all pages (includePrivate is true by default)
 
     const { data, error } = await query
 

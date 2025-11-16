@@ -177,10 +177,8 @@ function TagSelector({ selectedTags = [], onTagsChange, placeholder = 'Search or
       setIsCreating(true)
       logger.info(`Creating new tag: ${searchQuery}`)
 
-      const { data, error } = await createTag({
-        name: searchQuery.trim(),
-        color: newTagColor
-      })
+      // createTag expects (name, color) not an object
+      const { data, error } = await createTag(searchQuery.trim(), newTagColor)
 
       if (error) {
         logger.error('Error creating tag', error)
