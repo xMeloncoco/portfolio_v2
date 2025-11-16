@@ -1,0 +1,66 @@
+/**
+ * ========================================
+ * ICON COMPONENT STYLES
+ * ========================================
+ * Styles for the Icon component
+ */
+
+/* Base icon styling */
+.icon {
+  /* Prevent selection */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+
+  /* Smooth rendering */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+
+  /* Transition for hover effects */
+  transition: all var(--transition-fast);
+}
+
+/* Icon as button (when onClick is provided) */
+.icon[role="button"] {
+  cursor: pointer;
+}
+
+.icon[role="button"]:hover {
+  /* Slight scale up on hover */
+  transform: scale(1.1);
+
+  /* Add a subtle glow */
+  filter: drop-shadow(var(--glow-primary));
+}
+
+.icon[role="button"]:active {
+  /* Slight scale down when clicked */
+  transform: scale(0.95);
+}
+
+/* Focus state for accessibility */
+.icon[role="button"]:focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Text fallback when icon fails to load */
+.icon-text-fallback {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-heading);
+}
+
+.icon-text-fallback[role="button"] {
+  cursor: pointer;
+}
+
+.icon-text-fallback[role="button"]:hover {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-light);
+}
