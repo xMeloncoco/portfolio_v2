@@ -19,6 +19,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getPageById, deletePage } from '../services/pagesService'
+import { getDevlogIssues } from '../services/devlogIssuesService'
+import { ISSUE_STATUS_LABELS, ISSUE_SEVERITY_CONFIG } from '../services/issuesService'
 import { logger } from '../utils/logger'
 import Icon from '../components/Icon'
 import Tag from '../components/Tag'
@@ -70,6 +72,9 @@ function PageView() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  // Devlog issues
+  const [devlogIssues, setDevlogIssues] = useState([])
+
   // Delete modal
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -103,6 +108,11 @@ function PageView() {
       } else if (data) {
         setPage(data)
         logger.info('Page data loaded successfully')
+
+        // If this is a devlog, fetch associated issues
+        if (data.page_type === 'devlog') {
+          await fetchDevlogIssues(id)
+        }
       } else {
         setError('Page not found')
         logger.warn(`Page not found: ${id}`)
@@ -112,6 +122,27 @@ function PageView() {
       logger.error('Unexpected error fetching page', err)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  /**
+   * Fetch issues worked on in this devlog
+   * @param {string} devlogId - Devlog page ID
+   */
+  const fetchDevlogIssues = async (devlogId) => {
+    try {
+      logger.info(`Fetching issues for devlog: ${devlogId}`)
+
+      const { data, error: fetchError } = await getDevlogIssues(devlogId)
+
+      if (fetchError) {
+        logger.error('Error fetching devlog issues', fetchError)
+      } else {
+        setDevlogIssues(data || [])
+        logger.info(`Loaded ${data?.length || 0} issues for devlog`)
+      }
+    } catch (err) {
+      logger.error('Unexpected error fetching devlog issues', err)
     }
   }
 
@@ -403,6 +434,62 @@ function PageView() {
                 <span className="quest-status">{quest.status}</span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Issues Worked On (for devlogs only) */}
+      {page.page_type === 'devlog' && devlogIssues.length > 0 && (
+        <div className="devlog-issues-section">
+          <h3>
+            <Icon name="bug" size={24} />
+            Issues Worked On ({devlogIssues.length})
+          </h3>
+          <div className="devlog-issues-list">
+            {devlogIssues.map((devlogIssue) => {
+              const issue = devlogIssue.issue
+              if (!issue) return null
+
+              const severityConfig = issue.severity ? ISSUE_SEVERITY_CONFIG[issue.severity] : null
+              const statusLabel = ISSUE_STATUS_LABELS[devlogIssue.status_change] || devlogIssue.status_change
+
+              return (
+                <div key={devlogIssue.id} className="devlog-issue-item">
+                  <div className="devlog-issue-header">
+                    <span className={`issue-type-badge ${issue.issue_type}`}>
+                      {issue.issue_type === 'bug' ? 'Bug' : 'Improvement'}
+                    </span>
+                    {severityConfig && (
+                      <span
+                        className="issue-severity-badge"
+                        style={{ backgroundColor: severityConfig.color }}
+                      >
+                        {severityConfig.label}
+                      </span>
+                    )}
+                    <span className="devlog-issue-title">{issue.title}</span>
+                  </div>
+
+                  {devlogIssue.status_change && (
+                    <div className="devlog-issue-status">
+                      <span className="status-label">Status Updated To:</span>
+                      <span className="status-value">{statusLabel}</span>
+                    </div>
+                  )}
+
+                  {devlogIssue.work_notes && (
+                    <div className="devlog-issue-notes">
+                      <span className="notes-label">Work Notes:</span>
+                      <p className="notes-content">{devlogIssue.work_notes}</p>
+                    </div>
+                  )}
+
+                  {issue.description && (
+                    <p className="devlog-issue-description">{issue.description}</p>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
