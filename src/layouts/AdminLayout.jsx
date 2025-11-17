@@ -63,6 +63,12 @@ const NAV_ITEMS = [
     description: 'Manage quests (Phase 3)'
   },
   {
+    path: '/admin/issues',
+    icon: 'bug',
+    label: 'Issues',
+    description: 'Track bugs and improvements'
+  },
+  {
     path: '/admin/inventory',
     icon: 'treasure-chest',
     label: 'Inventory',

@@ -20,6 +20,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getPageById, createPage, updatePage } from '../services/pagesService'
 import { getAllQuests } from '../services/questsService'
+import { getQuestIssues, ISSUE_STATUS_LABELS, ISSUE_SEVERITY_CONFIG, updateIssueStatus } from '../services/issuesService'
+import { bulkLinkIssuesToDevlog } from '../services/devlogIssuesService'
 import { logger } from '../utils/logger'
 import Icon from '../components/Icon'
 import TagSelector from '../components/TagSelector'
@@ -92,6 +94,11 @@ function PageForm() {
   const [selectedQuestIds, setSelectedQuestIds] = useState([])
   const [availableQuests, setAvailableQuests] = useState([])
 
+  // Issues (for devlogs)
+  const [questIssues, setQuestIssues] = useState([])
+  const [issueWorkData, setIssueWorkData] = useState({}) // { issueId: { selected: bool, status_change: string, work_notes: string } }
+  const [isLoadingIssues, setIsLoadingIssues] = useState(false)
+
   // UI state
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -117,6 +124,18 @@ function PageForm() {
   useEffect(() => {
     fetchQuests()
   }, [])
+
+  /**
+   * Fetch issues when quest is selected and page type is devlog
+   */
+  useEffect(() => {
+    if (formData.page_type === 'devlog' && selectedQuestIds.length > 0) {
+      fetchQuestIssues(selectedQuestIds[0])
+    } else {
+      setQuestIssues([])
+      setIssueWorkData({})
+    }
+  }, [selectedQuestIds, formData.page_type])
 
   /**
    * Load page data for editing
@@ -184,6 +203,40 @@ function PageForm() {
     }
   }
 
+  /**
+   * Fetch issues for a specific quest
+   * @param {string} questId - Quest UUID
+   */
+  const fetchQuestIssues = async (questId) => {
+    try {
+      setIsLoadingIssues(true)
+      logger.info(`Fetching issues for quest: ${questId}`)
+
+      const { data, error: fetchError } = await getQuestIssues(questId)
+
+      if (fetchError) {
+        logger.error('Error fetching quest issues', fetchError)
+      } else {
+        setQuestIssues(data || [])
+        // Initialize issue work data for all issues
+        const initialWorkData = {}
+        data.forEach(issue => {
+          initialWorkData[issue.id] = {
+            selected: false,
+            status_change: issue.status,
+            work_notes: ''
+          }
+        })
+        setIssueWorkData(initialWorkData)
+        logger.info(`Loaded ${data?.length || 0} issues for quest`)
+      }
+    } catch (err) {
+      logger.error('Unexpected error fetching quest issues', err)
+    } finally {
+      setIsLoadingIssues(false)
+    }
+  }
+
   // ========================================
   // FORM HANDLERS
   // ========================================
@@ -230,6 +283,52 @@ function PageForm() {
         return [...prev, questId]
       }
     })
+  }
+
+  /**
+   * Handle issue selection toggle
+   * @param {string} issueId - Issue ID
+   */
+  const handleIssueToggle = (issueId) => {
+    setIssueWorkData(prev => ({
+      ...prev,
+      [issueId]: {
+        ...prev[issueId],
+        selected: !prev[issueId]?.selected
+      }
+    }))
+  }
+
+  /**
+   * Handle issue status change
+   * @param {string} issueId - Issue ID
+   * @param {string} newStatus - New status
+   */
+  const handleIssueStatusChange = (issueId, newStatus) => {
+    setIssueWorkData(prev => ({
+      ...prev,
+      [issueId]: {
+        ...prev[issueId],
+        status_change: newStatus,
+        selected: true // Auto-select when status is changed
+      }
+    }))
+  }
+
+  /**
+   * Handle issue work notes change
+   * @param {string} issueId - Issue ID
+   * @param {string} notes - Work notes
+   */
+  const handleIssueNotesChange = (issueId, notes) => {
+    setIssueWorkData(prev => ({
+      ...prev,
+      [issueId]: {
+        ...prev[issueId],
+        work_notes: notes,
+        selected: notes.trim() !== '' || prev[issueId]?.selected // Auto-select when notes are added
+      }
+    }))
   }
 
   /**
@@ -320,6 +419,12 @@ function PageForm() {
       } else {
         logger.info(`Page ${isEditing ? 'updated' : 'created'} successfully`)
 
+        // If this is a devlog, save issue work data
+        if (formData.page_type === 'devlog' && result.data) {
+          const pageId = result.data.id
+          await saveIssueWorkData(pageId)
+        }
+
         // Navigate to pages list
         navigate('/admin/pages')
       }
@@ -328,6 +433,50 @@ function PageForm() {
       logger.error('Unexpected error saving page', err)
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  /**
+   * Save issue work data for devlog
+   * @param {string} devlogId - The created/updated devlog page ID
+   */
+  const saveIssueWorkData = async (devlogId) => {
+    try {
+      // Get all selected issues with their work data
+      const selectedIssues = Object.entries(issueWorkData)
+        .filter(([_, data]) => data.selected)
+        .map(([issueId, data]) => ({
+          issue_id: issueId,
+          status_change: data.status_change,
+          work_notes: data.work_notes
+        }))
+
+      if (selectedIssues.length === 0) {
+        logger.info('No issues selected for this devlog')
+        return
+      }
+
+      logger.info(`Saving ${selectedIssues.length} issue work entries`)
+
+      // Bulk link issues to devlog
+      const { error: linkError } = await bulkLinkIssuesToDevlog(devlogId, selectedIssues)
+
+      if (linkError) {
+        logger.error('Error linking issues to devlog', linkError)
+        // Don't throw error, page is already saved
+      } else {
+        // Update actual issue statuses
+        for (const issueData of selectedIssues) {
+          const originalIssue = questIssues.find(i => i.id === issueData.issue_id)
+          if (originalIssue && originalIssue.status !== issueData.status_change) {
+            await updateIssueStatus(issueData.issue_id, issueData.status_change)
+            logger.info(`Updated issue ${issueData.issue_id} status to ${issueData.status_change}`)
+          }
+        }
+        logger.info('Issue work data saved successfully')
+      }
+    } catch (err) {
+      logger.error('Error saving issue work data', err)
     }
   }
 
@@ -608,6 +757,108 @@ function PageForm() {
             )}
           </div>
         </div>
+
+        {/* Issues Section (for devlogs only) */}
+        {formData.page_type === 'devlog' && selectedQuestIds.length > 0 && (
+          <div className="form-section">
+            <h2 className="section-title">
+              <Icon name="bug" size={24} />
+              Issues Worked On
+            </h2>
+
+            {isLoadingIssues ? (
+              <div className="loading-issues">
+                <div className="loading-spinner"></div>
+                <p>Loading quest issues...</p>
+              </div>
+            ) : questIssues.length === 0 ? (
+              <div className="no-issues-message">
+                <Icon name="bug" size={32} />
+                <p>No issues found for this quest. Create issues first in the Issues page.</p>
+              </div>
+            ) : (
+              <div className="issues-work-list">
+                <p className="issues-help-text">
+                  Select the issues you worked on in this session. Update their status and add notes about the work done.
+                </p>
+                {questIssues.map((issue) => {
+                  const workData = issueWorkData[issue.id] || {}
+                  const severityConfig = issue.severity ? ISSUE_SEVERITY_CONFIG[issue.severity] : null
+
+                  return (
+                    <div
+                      key={issue.id}
+                      className={`issue-work-item ${workData.selected ? 'selected' : ''}`}
+                    >
+                      <div className="issue-work-header">
+                        <label className="issue-select-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={workData.selected || false}
+                            onChange={() => handleIssueToggle(issue.id)}
+                          />
+                          <span className="checkbox-mark">
+                            <Icon name="checkmark" size={12} />
+                          </span>
+                        </label>
+
+                        <div className="issue-work-info">
+                          <div className="issue-work-title">
+                            <span className={`issue-type-badge ${issue.issue_type}`}>
+                              {issue.issue_type === 'bug' ? 'Bug' : 'Improvement'}
+                            </span>
+                            {severityConfig && (
+                              <span
+                                className="issue-severity-badge"
+                                style={{ backgroundColor: severityConfig.color }}
+                              >
+                                {severityConfig.label}
+                              </span>
+                            )}
+                            <span className="issue-title-text">{issue.title}</span>
+                          </div>
+                          {issue.description && (
+                            <p className="issue-work-description">{issue.description}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {workData.selected && (
+                        <div className="issue-work-details">
+                          <div className="issue-status-change">
+                            <label className="status-label">Update Status:</label>
+                            <select
+                              value={workData.status_change || issue.status}
+                              onChange={(e) => handleIssueStatusChange(issue.id, e.target.value)}
+                              className="status-select"
+                            >
+                              {Object.entries(ISSUE_STATUS_LABELS).map(([value, label]) => (
+                                <option key={value} value={value}>
+                                  {label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div className="issue-work-notes">
+                            <label className="notes-label">Work Notes:</label>
+                            <textarea
+                              value={workData.work_notes || ''}
+                              onChange={(e) => handleIssueNotesChange(issue.id, e.target.value)}
+                              placeholder="Describe the work done on this issue..."
+                              className="work-notes-textarea"
+                              rows={3}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Form Actions */}
         <div className="form-actions">

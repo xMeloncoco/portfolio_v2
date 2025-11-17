@@ -32,6 +32,8 @@ import PageView from './pages/PageView'
 import Quests from './pages/Quests'
 import QuestForm from './pages/QuestForm'
 import QuestView from './pages/QuestView'
+import Issues from './pages/Issues'
+import IssueForm from './pages/IssueForm'
 import Inventory from './pages/Inventory'
 import InventoryForm from './pages/InventoryForm'
 import Skills from './pages/Skills'
@@ -273,6 +275,42 @@ function App() {
             <ProtectedRoute>
               <AdminLayout>
                 <QuestForm />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Issues Management */}
+        <Route
+          path="/admin/issues"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Issues />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Create New Issue */}
+        <Route
+          path="/admin/issues/new"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <IssueForm />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Edit Issue */}
+        <Route
+          path="/admin/issues/:id/edit"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <IssueForm />
               </AdminLayout>
             </ProtectedRoute>
           }
