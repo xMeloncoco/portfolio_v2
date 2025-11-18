@@ -12,18 +12,18 @@
 -- DELETE FROM sub_quests;
 -- DELETE FROM issues;
 -- DELETE FROM quests;
--- DELETE FROM projects;
+-- DELETE FROM pages WHERE page_type = 'project';
 -- DELETE FROM tags;
 
 -- ============================================================================
--- STEP 1: Insert Projects
+-- STEP 1: Insert Projects (as Pages)
 -- ============================================================================
 
-INSERT INTO projects (id, title, description, status, visibility) VALUES
-  ('00000000-0000-0000-0000-000000000001', 'Portfolio Website', NULL, 'in_progress', 'public'),
-  ('00000000-0000-0000-0000-000000000002', 'Personal Tamagotchi', NULL, 'active', 'private'),
-  ('00000000-0000-0000-0000-000000000003', 'Project Floor', 'A project together with my sister to create a system to improve healthcare administration processes.', 'active', 'private'),
-  ('00000000-0000-0000-0000-000000000004', 'AI Storyteller Application', NULL, 'in_progress', 'public');
+INSERT INTO pages (id, title, page_type, content, visibility, project_status) VALUES
+  ('00000000-0000-0000-0000-000000000001', 'Portfolio Website', 'project', NULL, 'public', 'in_progress'),
+  ('00000000-0000-0000-0000-000000000002', 'Personal Tamagotchi', 'project', NULL, 'private', 'active'),
+  ('00000000-0000-0000-0000-000000000003', 'Project Floor', 'project', 'A project together with my sister to create a system to improve healthcare administration processes.', 'private', 'active'),
+  ('00000000-0000-0000-0000-000000000004', 'AI Storyteller Application', 'project', NULL, 'public', 'in_progress');
 
 -- ============================================================================
 -- STEP 2: Insert Tags
@@ -133,12 +133,12 @@ INSERT INTO issues (attached_to_type, attached_to_id, issue_type, severity, titl
   ('quest', '20000000-0000-0000-0000-000000000001', 'issues', 'major', '[b] linked quests is shown as checklist', NULL, 'open'),
 
   -- Improvements for "Portfolio Website" Project
-  ('project', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[B] Putting Tags underneath input bar', NULL, 'open'),
-  ('project', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[B] Showing available tags on typing', NULL, 'open'),
-  ('project', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[B] add option to choose own color at tags', NULL, 'open'),
-  ('project', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[B] when pressing on the category of a page, also direct to that page.', NULL, 'open'),
-  ('project', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[B] option to add icons to inventory', NULL, 'open'),
-  ('project', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[F] Revamp progress bar quests', 'have progress bar of quests take into considerations issues as well as sub', 'open'),
+  ('page', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[B] Putting Tags underneath input bar', NULL, 'open'),
+  ('page', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[B] Showing available tags on typing', NULL, 'open'),
+  ('page', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[B] add option to choose own color at tags', NULL, 'open'),
+  ('page', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[B] when pressing on the category of a page, also direct to that page.', NULL, 'open'),
+  ('page', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[B] option to add icons to inventory', NULL, 'open'),
+  ('page', '00000000-0000-0000-0000-000000000001', 'improvements', NULL, '[F] Revamp progress bar quests', 'have progress bar of quests take into considerations issues as well as sub', 'open'),
 
   -- Issues for "AI Storyteller Application version 1" Quest
   ('quest', '20000000-0000-0000-0000-000000000012', 'issues', 'major', 'Story template needs start location', NULL, 'open'),
@@ -154,7 +154,7 @@ INSERT INTO issues (attached_to_type, attached_to_id, issue_type, severity, titl
 -- ============================================================================
 
 -- Check counts
-SELECT 'Projects' as entity, COUNT(*) as count FROM projects
+SELECT 'Project Pages' as entity, COUNT(*) as count FROM pages WHERE page_type = 'project'
 UNION ALL
 SELECT 'Tags', COUNT(*) FROM tags
 UNION ALL
@@ -178,7 +178,7 @@ SELECT
   COUNT(DISTINCT i.id) as issue_count
 FROM quests q
 LEFT JOIN page_quests pq ON q.id = pq.quest_id
-LEFT JOIN projects p ON pq.page_id = p.id
+LEFT JOIN pages p ON pq.page_id = p.id AND p.page_type = 'project'
 LEFT JOIN sub_quests sq ON q.id = sq.quest_id
 LEFT JOIN issues i ON i.attached_to_type = 'quest' AND i.attached_to_id = q.id
 GROUP BY q.id, q.title, q.quest_type, q.status, p.title
