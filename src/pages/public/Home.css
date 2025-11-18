@@ -320,6 +320,7 @@
   grid-template-columns: repeat(6, 1fr);
   gap: var(--spacing-sm);
   min-width: 0;
+  width: 100%;
 }
 
 .stat-block {
@@ -332,6 +333,7 @@
   transition: all var(--transition-base);
   cursor: pointer;
   min-width: 0;
+  overflow: hidden;
 }
 
 .stat-block:hover,
@@ -347,6 +349,7 @@
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.1em;
   margin-bottom: var(--spacing-xs);
+  white-space: nowrap;
 }
 
 .stat-score {
@@ -368,6 +371,9 @@
   color: var(--color-text-muted);
   margin-top: var(--spacing-xs);
   display: block;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-tooltip {
@@ -686,11 +692,11 @@
 }
 
 .quest-card.main {
-  border-left: 4px solid var(--color-secondary);
+  border: 2px solid var(--color-secondary);
 }
 
 .quest-card.side {
-  border-left: 4px solid var(--color-primary);
+  border: 2px solid var(--color-primary);
 }
 
 .quest-card h4 {
