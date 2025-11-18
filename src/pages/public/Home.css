@@ -314,9 +314,8 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: var(--spacing-sm);
-  min-width: 0;
   width: 100%;
 }
 
@@ -344,9 +343,11 @@
   font-size: var(--font-size-xs);
   color: var(--color-secondary);
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   margin-bottom: var(--spacing-xs);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-score {
@@ -902,12 +903,17 @@
   }
 
   /* Keep stats in one line, adjust sizing */
+  .stats-grid {
+    gap: var(--spacing-xs);
+  }
+
   .stat-block {
-    padding: var(--spacing-xs);
+    padding: var(--spacing-xs) 2px;
   }
 
   .stat-name {
     font-size: 0.625rem;
+    letter-spacing: 0;
   }
 
   .stat-score {
@@ -916,6 +922,10 @@
 
   .stat-modifier {
     font-size: var(--font-size-xs);
+  }
+
+  .stat-description {
+    font-size: 0.625rem;
   }
 
   /* Mobile tooltip positioning */
@@ -974,13 +984,22 @@
   }
 
   /* Hide stat description on very small screens */
+  .stats-grid {
+    gap: 4px;
+  }
+
   .stat-description {
     display: none;
+  }
+
+  .stat-block {
+    padding: 4px 2px;
   }
 
   .stat-name {
     font-size: 0.5rem;
     margin-bottom: 2px;
+    letter-spacing: 0;
   }
 
   .stat-score {
@@ -988,7 +1007,7 @@
   }
 
   .stat-modifier {
-    font-size: 0.625rem;
+    font-size: 0.5rem;
   }
 
   .inventory-grid {
@@ -1007,6 +1026,31 @@
 
   .item-box-name {
     font-size: 0.5rem;
+  }
+}
+
+/* Extra Small Mobile - Even more aggressive scaling */
+@media (max-width: 360px) {
+  .stats-grid {
+    gap: 2px;
+  }
+
+  .stat-block {
+    padding: 2px 1px;
+    border-width: 1px;
+  }
+
+  .stat-name {
+    font-size: 0.4rem;
+    margin-bottom: 1px;
+  }
+
+  .stat-score {
+    font-size: 0.875rem;
+  }
+
+  .stat-modifier {
+    font-size: 0.4rem;
   }
 }
 
