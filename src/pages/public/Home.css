@@ -637,7 +637,7 @@
 
 .main-quests-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-md);
 }
 
@@ -944,6 +944,10 @@
   }
 
   .side-quests-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .main-quests-grid {
     grid-template-columns: 1fr;
   }
 
