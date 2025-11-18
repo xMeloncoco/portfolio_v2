@@ -18,6 +18,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { supabase } from '../config/supabase'
 import { getPageById, createPage, updatePage } from '../services/pagesService'
 import { getAllQuests } from '../services/questsService'
 import { getAllProjects } from '../services/projectsService'
@@ -311,18 +312,54 @@ function PageForm() {
 
       setQuestIssues(allIssues)
 
+      // Get the most recent devlog date to auto-detect new/changed issues
+      let lastDevlogDate = null
+      try {
+        const { data: recentDevlogs } = await supabase
+          .from('pages')
+          .select('created_at, page_connections!inner(connected_to_id, connected_to_type)')
+          .eq('page_type', 'devlog')
+          .order('created_at', { ascending: false })
+          .limit(50)
+
+        if (recentDevlogs) {
+          // Find the most recent devlog that shares any quest/project with current selection
+          const relevantDevlog = recentDevlogs.find(devlog => {
+            const connections = devlog.page_connections || []
+            return connections.some(conn =>
+              (conn.connected_to_type === 'quest' && selectedQuestIds.includes(conn.connected_to_id)) ||
+              (conn.connected_to_type === 'project' && selectedProjectIds.includes(conn.connected_to_id))
+            )
+          })
+
+          if (relevantDevlog) {
+            lastDevlogDate = new Date(relevantDevlog.created_at)
+            logger.info(`Found last devlog date: ${lastDevlogDate.toISOString()}`)
+          }
+        }
+      } catch (err) {
+        logger.warn('Could not fetch last devlog date', err)
+      }
+
       // Initialize issue work data for all issues
       const initialWorkData = {}
       allIssues.forEach(issue => {
+        const issueCreatedDate = new Date(issue.created_at)
+        const issueUpdatedDate = new Date(issue.updated_at)
+
+        // Auto-select if created or updated after last devlog
+        const isNew = lastDevlogDate && (issueCreatedDate > lastDevlogDate || issueUpdatedDate > lastDevlogDate)
+
         initialWorkData[issue.id] = {
-          selected: false,
+          selected: isNew || false, // Auto-select new/changed issues
           status_change: issue.status,
-          work_notes: ''
+          work_notes: '',
+          isNew: isNew || false // Flag for highlighting in UI
         }
       })
       setIssueWorkData(initialWorkData)
 
-      logger.info(`Loaded ${allIssues.length} unique issues`)
+      logger.info(`Loaded ${allIssues.length} unique issues${lastDevlogDate ? `, auto-selected ${Object.values(initialWorkData).filter(d => d.isNew).length} new/changed issues` : ''}`)
 
       // Fetch subquests from all selected quests
       const allSubquests = []
@@ -1124,7 +1161,7 @@ function PageForm() {
                   return (
                     <div
                       key={issue.id}
-                      className={`issue-work-item ${workData.selected ? 'selected' : ''}`}
+                      className={`issue-work-item ${workData.selected ? 'selected' : ''} ${workData.isNew ? 'is-new' : ''}`}
                     >
                       <div className="issue-work-header">
                         <label className="issue-select-checkbox">
@@ -1147,6 +1184,11 @@ function PageForm() {
                                 style={{ backgroundColor: severityConfig.color }}
                               >
                                 {severityConfig.label}
+                              </span>
+                            )}
+                            {workData.isNew && (
+                              <span className="issue-new-badge" title="New or changed since last devlog">
+                                NEW
                               </span>
                             )}
                             <span className="issue-title-text">{issue.title}</span>
