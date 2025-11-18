@@ -746,9 +746,7 @@ function PageForm() {
                       checked={selectedQuestIds.includes(quest.id)}
                       onChange={() => handleQuestToggle(quest.id)}
                     />
-                    <span className="quest-checkbox">
-                      <Icon name="checkmark" size={14} />
-                    </span>
+                    <span className="quest-checkbox"></span>
                     <span className="quest-title">{quest.title}</span>
                     <span className="quest-status">{quest.status}</span>
                   </label>
@@ -797,9 +795,7 @@ function PageForm() {
                             checked={workData.selected || false}
                             onChange={() => handleIssueToggle(issue.id)}
                           />
-                          <span className="checkbox-mark">
-                            <Icon name="checkmark" size={12} />
-                          </span>
+                          <span className="checkbox-mark"></span>
                         </label>
 
                         <div className="issue-work-info">

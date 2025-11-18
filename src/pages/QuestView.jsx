@@ -410,9 +410,7 @@ function QuestView() {
                   checked={subQuest.is_completed}
                   onChange={() => handleToggleSubQuest(subQuest.id)}
                 />
-                <span className="checkbox-custom">
-                  <Icon name="checkmark" size={16} />
-                </span>
+                <span className="checkbox-custom"></span>
                 <span className={`subquest-title ${subQuest.is_completed ? 'completed' : ''}`}>
                   {subQuest.title}
                 </span>
