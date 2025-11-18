@@ -326,12 +326,17 @@
   background: var(--color-bg-tertiary);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--spacing-sm) var(--spacing-xs);
+  padding: var(--spacing-md);
   text-align: center;
   transition: all var(--transition-base);
   cursor: pointer;
   min-width: 0;
   max-width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .stat-block:hover,
@@ -344,7 +349,7 @@
 }
 
 .stat-name {
-  font-size: var(--font-size-xs);
+  font-size: clamp(0.625rem, 1.5vw, 1rem);
   color: var(--color-secondary);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.05em;
@@ -355,7 +360,7 @@
 }
 
 .stat-score {
-  font-size: var(--font-size-2xl);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
   color: var(--color-heading);
   font-weight: var(--font-weight-bold);
   line-height: 1;
@@ -363,13 +368,13 @@
 }
 
 .stat-modifier {
-  font-size: var(--font-size-base);
+  font-size: clamp(0.75rem, 1.8vw, 1.25rem);
   color: var(--color-primary);
   font-weight: var(--font-weight-semibold);
 }
 
 .stat-description {
-  font-size: var(--font-size-xs);
+  font-size: clamp(0.5rem, 1vw, 0.75rem);
   color: var(--color-text-muted);
   margin-top: var(--spacing-xs);
   display: block;
@@ -377,6 +382,12 @@
   overflow: hidden;
   text-overflow: clip;
   white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .stat-description {
+    display: none;
+  }
 }
 
 .stat-tooltip {
@@ -914,24 +925,7 @@
   }
 
   .stat-block {
-    padding: var(--spacing-xs) 2px;
-  }
-
-  .stat-name {
-    font-size: 0.625rem;
-    letter-spacing: 0;
-  }
-
-  .stat-score {
-    font-size: var(--font-size-lg);
-  }
-
-  .stat-modifier {
-    font-size: var(--font-size-xs);
-  }
-
-  .stat-description {
-    font-size: 0.625rem;
+    padding: var(--spacing-sm);
   }
 
   /* Mobile tooltip positioning */
@@ -994,26 +988,8 @@
     gap: 4px;
   }
 
-  .stat-description {
-    display: none;
-  }
-
   .stat-block {
-    padding: 4px 2px;
-  }
-
-  .stat-name {
-    font-size: 0.5rem;
-    margin-bottom: 2px;
-    letter-spacing: 0;
-  }
-
-  .stat-score {
-    font-size: var(--font-size-base);
-  }
-
-  .stat-modifier {
-    font-size: 0.5rem;
+    padding: var(--spacing-xs);
   }
 
   .inventory-grid {
@@ -1042,21 +1018,8 @@
   }
 
   .stat-block {
-    padding: 2px 1px;
+    padding: 4px;
     border-width: 1px;
-  }
-
-  .stat-name {
-    font-size: 0.4rem;
-    margin-bottom: 1px;
-  }
-
-  .stat-score {
-    font-size: 0.875rem;
-  }
-
-  .stat-modifier {
-    font-size: 0.4rem;
   }
 }
 
