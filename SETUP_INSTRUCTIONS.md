@@ -36,7 +36,30 @@ You need to run the SQL setup in your Supabase project:
 
 ---
 
-### Step 2: Set Up Environment Variables
+### Step 2: Set Up Supabase Storage
+
+You need to create the storage bucket for profile pictures:
+
+1. Still in your Supabase project dashboard
+2. Navigate to **SQL Editor**
+3. Open the file `database/supabase-storage-setup.sql`
+4. Copy all the SQL code
+5. Paste it into the Supabase SQL Editor
+6. Click **Run** to execute
+
+**What this does:**
+- Creates the `profile-pictures` storage bucket
+- Sets up storage policies for public read access
+- Allows authenticated users to upload/update/delete images
+- Configures 5MB file size limit and allowed image types
+
+**Verify it worked:**
+- Go to **Storage** in your Supabase dashboard
+- You should see a bucket named `profile-pictures`
+
+---
+
+### Step 3: Set Up Environment Variables
 
 1. Create a `.env` file in the project root (if it doesn't exist)
 2. Add your Supabase credentials:
@@ -53,7 +76,7 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ---
 
-### Step 3: Install Dependencies
+### Step 4: Install Dependencies
 
 Run this command in the project root:
 
@@ -63,7 +86,7 @@ npm install
 
 ---
 
-### Step 4: Start the Development Server
+### Step 5: Start the Development Server
 
 ```bash
 npm run dev
