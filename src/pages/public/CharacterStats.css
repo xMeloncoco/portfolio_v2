@@ -165,40 +165,46 @@
 .character-actions {
   display: flex;
   gap: var(--spacing-md);
+  flex-wrap: wrap;
 }
 
 .action-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-md);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-base);
   border: 2px solid;
+  white-space: nowrap;
+  min-width: 150px;
 }
 
 .action-button.linkedin {
-  background: rgba(0, 119, 181, 0.2);
+  background: rgba(0, 119, 181, 0.3);
   border-color: #0077b5;
-  color: #0077b5;
+  color: #ffffff;
 }
 
 .action-button.linkedin:hover {
-  background: rgba(0, 119, 181, 0.3);
+  background: rgba(0, 119, 181, 0.5);
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 119, 181, 0.3);
 }
 
 .action-button.contact {
-  background: rgba(155, 89, 182, 0.2);
+  background: rgba(155, 89, 182, 0.3);
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: #ffffff;
 }
 
 .action-button.contact:hover {
-  background: rgba(155, 89, 182, 0.3);
+  background: rgba(155, 89, 182, 0.5);
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
 }
 
 /* ========================================

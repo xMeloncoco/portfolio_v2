@@ -76,7 +76,7 @@ function PublicLayout({ children }) {
           {/* Logo/Brand */}
           <Link to="/" className="nav-brand">
             <Icon name="crown" size={32} />
-            <span className="brand-text">Portfolio</span>
+            <span className="brand-text">Portfolio Miriam Schouten</span>
           </Link>
 
           {/* Desktop Navigation */}
