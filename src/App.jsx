@@ -44,6 +44,7 @@ import Home from './pages/public/Home'
 import Blog from './pages/public/Blog'
 import Projects from './pages/public/Projects'
 import PublicQuests from './pages/public/PublicQuests'
+import PublicQuestView from './pages/public/PublicQuestView'
 import PageDetail from './pages/public/PageDetail'
 import FullInventory from './pages/public/FullInventory'
 import FullAchievements from './pages/public/FullAchievements'
@@ -101,6 +102,16 @@ function App() {
           element={
             <PublicLayout>
               <PublicQuests />
+            </PublicLayout>
+          }
+        />
+
+        {/* Public Quest Detail */}
+        <Route
+          path="/quests/:id"
+          element={
+            <PublicLayout>
+              <PublicQuestView />
             </PublicLayout>
           }
         />

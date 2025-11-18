@@ -66,7 +66,7 @@ function PublicQuests() {
    * @param {string} questId - Quest UUID
    */
   const handleQuestClick = (questId) => {
-    navigate(`/admin/quests/${questId}`)
+    navigate(`/quests/${questId}`)
   }
 
   // ========================================
