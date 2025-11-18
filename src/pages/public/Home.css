@@ -323,8 +323,8 @@
 
 .stat-block {
   position: relative;
-  background: var(--color-bg-tertiary);
-  border: 2px solid var(--color-border);
+  background: transparent;
+  border: none;
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
   text-align: center;
@@ -341,9 +341,9 @@
 
 .stat-block:hover,
 .stat-block.hovered {
-  border-color: var(--color-secondary);
+  background: rgba(255, 215, 0, 0.05);
+  border-radius: var(--radius-md);
   transform: translateY(-3px);
-  box-shadow: var(--glow-secondary);
   z-index: 10;
   overflow: visible;
 }
@@ -600,7 +600,7 @@
 .quest-stat {
   text-align: center;
   padding: var(--spacing-md);
-  background: var(--color-bg-tertiary);
+  background: transparent;
   border-radius: var(--radius-md);
 }
 
