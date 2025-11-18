@@ -271,8 +271,9 @@ function Home() {
         <div className="stat-name">{stat.name.substring(0, 3).toUpperCase()}</div>
         <div className="stat-score">{stat.score}</div>
         <div className="stat-modifier">{formattedMod}</div>
+        <div className="stat-description">{stat.description}</div>
 
-        {/* Mobile/Tablet: Click to show tooltip */}
+        {/* Hover/Click tooltip with detailed info */}
         {hoveredStat === statKey && (
           <div className="stat-tooltip">
             <strong>{stat.name}</strong>
@@ -546,72 +547,39 @@ function Home() {
           </div>
         </div>
 
-        {/* Main Quests with Subquests */}
+        {/* Main Quests (without subquests display) */}
         {getMainQuests().length > 0 && (
           <div className="quest-category">
             <h3 className="quest-category-title">
               <Icon name="crown" size={24} />
               Main Quests
             </h3>
-            <div className="quests-list-detailed">
+            <div className="quest-cards main-quests-grid">
               {getMainQuests().map((quest) => {
                 const completed = quest.sub_quests?.filter((sq) => sq.is_completed).length || 0
                 const total = quest.sub_quests?.length || 0
                 const percentage = total > 0 ? Math.round((completed / total) * 100) : 0
 
                 return (
-                  <div key={quest.id} className="quest-card-detailed">
-                    <div className="quest-header-public">
-                      <div className="quest-icon-public">
-                        <Icon name="crown" size={32} />
-                      </div>
-                      <div className="quest-info-public">
-                        <h4>{quest.title}</h4>
-                        {quest.description && (
-                          <p className="quest-description">
-                            {truncateText(quest.description, 100)}
-                          </p>
-                        )}
-                        <div className="quest-progress-public">
-                          <div className="progress-bar-small">
-                            <div
-                              className="progress-fill-small"
-                              style={{ width: `${percentage}%` }}
-                            ></div>
-                          </div>
-                          <span>
-                            {percentage}% Complete ({completed}/{total})
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Subquests */}
-                    {quest.sub_quests && quest.sub_quests.length > 0 && (
-                      <div className="subquests-list">
-                        <h5 className="subquests-title">Objectives:</h5>
-                        <ul className="subquests-items">
-                          {quest.sub_quests.slice(0, 5).map((subquest) => (
-                            <li
-                              key={subquest.id}
-                              className={`subquest-item ${subquest.is_completed ? 'completed' : ''}`}
-                            >
-                              <Icon
-                                name={subquest.is_completed ? 'checkmark' : 'circle'}
-                                size={16}
-                              />
-                              <span>{subquest.title}</span>
-                            </li>
-                          ))}
-                          {quest.sub_quests.length > 5 && (
-                            <li className="subquest-more">
-                              +{quest.sub_quests.length - 5} more objectives
-                            </li>
-                          )}
-                        </ul>
-                      </div>
+                  <Link key={quest.id} to="/quests" className="quest-card main">
+                    <h4>{quest.title}</h4>
+                    {quest.description && (
+                      <p className="quest-description">
+                        {truncateText(quest.description, 100)}
+                      </p>
                     )}
-                  </div>
+                    <div className="quest-progress-public">
+                      <div className="progress-bar-small">
+                        <div
+                          className="progress-fill-small"
+                          style={{ width: `${percentage}%` }}
+                        ></div>
+                      </div>
+                      <span>
+                        {percentage}% ({completed}/{total})
+                      </span>
+                    </div>
+                  </Link>
                 )
               })}
             </div>
