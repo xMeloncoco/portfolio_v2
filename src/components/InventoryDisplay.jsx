@@ -26,9 +26,9 @@ import './InventoryDisplay.css'
 // ========================================
 
 /**
- * InventoryDisplay - Shows inventory items in a grid
+ * InventoryDisplay - Shows inventory items in a grid with empty slots
  * @param {Object} props - Component props
- * @param {number} [props.limit=10] - Maximum items to display
+ * @param {number} [props.limit=10] - Maximum items to display (total slots)
  * @param {boolean} [props.showHeader=true] - Show section header
  * @param {boolean} [props.showAll=false] - Show all items (ignore limit)
  */
@@ -112,6 +112,10 @@ function InventoryDisplay({ limit = 10, showHeader = true, showAll = false }) {
   const hasMore = !showAll && items.length > limit
   const remainingCount = items.length - limit
 
+  // Calculate empty slots
+  const totalSlots = showAll ? items.length : limit
+  const emptySlots = Math.max(0, totalSlots - displayItems.length)
+
   // ========================================
   // RENDER
   // ========================================
@@ -171,12 +175,13 @@ function InventoryDisplay({ limit = 10, showHeader = true, showAll = false }) {
       )}
 
       {/* Items Grid */}
-      {!isLoading && displayItems.length > 0 && (
+      {!isLoading && (
         <div className="inventory-grid">
+          {/* Display filled slots */}
           {displayItems.map((item) => (
             <button
               key={item.id}
-              className="inventory-item-box"
+              className="inventory-item-box filled"
               onClick={() => handleItemClick(item)}
               title={item.item_name}
             >
@@ -187,13 +192,15 @@ function InventoryDisplay({ limit = 10, showHeader = true, showAll = false }) {
             </button>
           ))}
 
-          {/* Show more indicator */}
-          {hasMore && (
-            <Link to="/inventory" className="inventory-more-box">
-              <span className="more-count">+{remainingCount}</span>
-              <span className="more-label">more</span>
-            </Link>
-          )}
+          {/* Display empty slots */}
+          {!showAll && Array.from({ length: emptySlots }).map((_, index) => (
+            <div key={`empty-${index}`} className="inventory-item-box empty">
+              <div className="item-box-icon empty-icon">
+                <Icon name="circle" size={40} />
+              </div>
+              <span className="item-box-name empty-label">Empty</span>
+            </div>
+          ))}
         </div>
       )}
 
