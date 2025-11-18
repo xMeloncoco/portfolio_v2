@@ -35,10 +35,10 @@ import './PageForm.css'
  * Page type options
  */
 const PAGE_TYPES = [
-  { value: 'blog', label: 'Blog', icon: 'writing', description: 'General blog posts and articles' },
+  { value: 'project', label: 'Project', icon: 'castle', description: 'Project documentation with status tracking' },
   { value: 'devlog', label: 'Devlog', icon: 'logbook', description: 'Development logs with to-do lists' },
-  { value: 'notes', label: 'Notes', icon: 'parchment', description: 'Quick notes and references' },
-  { value: 'project', label: 'Project', icon: 'castle', description: 'Project documentation with status tracking' }
+  { value: 'blog', label: 'Blog', icon: 'writing', description: 'General blog posts and articles' },
+  { value: 'notes', label: 'Notes', icon: 'parchment', description: 'Quick notes and references' }
 ]
 
 /**
