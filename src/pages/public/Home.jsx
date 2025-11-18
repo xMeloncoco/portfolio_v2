@@ -122,11 +122,6 @@ function Home() {
 
   return (
     <div className="home-page">
-      {/* Character Stats at the TOP */}
-      <section className="section character-stats-section">
-        <CharacterStatsPreview />
-      </section>
-
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
@@ -185,11 +180,20 @@ function Home() {
         </div>
       </section>
 
-      {/* Current Projects */}
-      <section className="section current-projects">
+      {/* Character Stats Preview */}
+      <section className="section character-stats-section">
+        <div className="section-header">
+          <Icon name="stats" size={36} />
+          <h2>Character Stats</h2>
+        </div>
+        <CharacterStatsPreview />
+      </section>
+
+      {/* Featured Projects */}
+      <section className="section featured-projects">
         <div className="section-header">
           <Icon name="castle" size={36} />
-          <h2>Current Projects</h2>
+          <h2>Featured Projects</h2>
         </div>
 
         {isLoading ? (
@@ -199,7 +203,7 @@ function Home() {
           </div>
         ) : featuredProjects.length > 0 ? (
           <div className="projects-grid">
-            {featuredProjects.slice(0, 3).map((project) => (
+            {featuredProjects.map((project) => (
               <Link
                 key={project.id}
                 to={`/page/${project.id}`}
@@ -257,84 +261,55 @@ function Home() {
             <span>Loading quests...</span>
           </div>
         ) : activeQuests.length > 0 ? (
-          <>
-            <div className="quests-list-public">
-              {activeQuests.slice(0, 2).map((quest) => {
-                const completed = quest.sub_quests?.filter((sq) => sq.is_completed).length || 0
-                const total = quest.sub_quests?.length || 0
-                const percentage = total > 0 ? Math.round((completed / total) * 100) : 0
+          <div className="quests-list-public">
+            {activeQuests.map((quest) => {
+              const completed = quest.sub_quests?.filter((sq) => sq.is_completed).length || 0
+              const total = quest.sub_quests?.length || 0
+              const percentage = total > 0 ? Math.round((completed / total) * 100) : 0
 
-                return (
-                  <div key={quest.id} className="quest-card-detailed">
-                    <div className="quest-header-public">
-                      <div className="quest-icon-public">
-                        <Icon
-                          name={
-                            quest.quest_type === 'main'
-                              ? 'crown'
-                              : quest.quest_type === 'future'
-                              ? 'future'
-                              : 'sword'
-                          }
-                          size={32}
-                        />
-                      </div>
-                      <div className="quest-info-public">
-                        <h4>{quest.title}</h4>
-                        {quest.description && (
-                          <p className="quest-description">{truncateText(quest.description, 100)}</p>
-                        )}
-                        <div className="quest-progress-public">
-                          <div className="progress-bar-small">
-                            <div
-                              className="progress-fill-small"
-                              style={{ width: `${percentage}%` }}
-                            ></div>
-                          </div>
-                          <span>{percentage}% Complete ({completed}/{total})</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Subquests */}
-                    {quest.sub_quests && quest.sub_quests.length > 0 && (
-                      <div className="subquests-list">
-                        <h5 className="subquests-title">Objectives:</h5>
-                        <ul className="subquests-items">
-                          {quest.sub_quests.slice(0, 5).map((subquest) => (
-                            <li key={subquest.id} className={`subquest-item ${subquest.is_completed ? 'completed' : ''}`}>
-                              <Icon
-                                name={subquest.is_completed ? 'checkmark' : 'circle'}
-                                size={16}
-                              />
-                              <span>{subquest.title}</span>
-                            </li>
-                          ))}
-                          {quest.sub_quests.length > 5 && (
-                            <li className="subquest-more">
-                              +{quest.sub_quests.length - 5} more objectives
-                            </li>
-                          )}
-                        </ul>
-                      </div>
-                    )}
+              return (
+                <Link key={quest.id} to={`/quests`} className="quest-card-public">
+                  <div className="quest-icon-public">
+                    <Icon
+                      name={
+                        quest.quest_type === 'main'
+                          ? 'crown'
+                          : quest.quest_type === 'future'
+                          ? 'future'
+                          : 'sword'
+                      }
+                      size={32}
+                    />
                   </div>
-                )
-              })}
-            </div>
-            <div className="section-footer">
-              <Link to="/quests" className="show-all-button">
-                <span>Show All Quests</span>
-                <Icon name="chevron-right" size={20} />
-              </Link>
-            </div>
-          </>
+                  <div className="quest-info-public">
+                    <h4>{quest.title}</h4>
+                    <div className="quest-progress-public">
+                      <div className="progress-bar-small">
+                        <div
+                          className="progress-fill-small"
+                          style={{ width: `${percentage}%` }}
+                        ></div>
+                      </div>
+                      <span>{percentage}% Complete</span>
+                    </div>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
         ) : (
           <div className="empty-section">
             <Icon name="quests" size={48} />
             <p>No active quests at the moment.</p>
           </div>
         )}
+
+        <div className="section-footer">
+          <Link to="/quests" className="view-all-link">
+            <span>View Quest Log</span>
+            <Icon name="chevron-right" size={20} />
+          </Link>
+        </div>
       </section>
 
       {/* Inventory Section */}
@@ -345,6 +320,57 @@ function Home() {
       {/* Achievements Section */}
       <section className="section achievements-section">
         <AchievementsDisplay limit={10} showHeader={true} />
+      </section>
+
+      {/* Recent Blog Posts */}
+      <section className="section recent-posts">
+        <div className="section-header">
+          <Icon name="writing" size={36} />
+          <h2>Recent Posts</h2>
+        </div>
+
+        {isLoading ? (
+          <div className="loading-placeholder">
+            <div className="loading-spinner"></div>
+            <span>Loading posts...</span>
+          </div>
+        ) : recentPosts.length > 0 ? (
+          <div className="posts-list">
+            {recentPosts.map((post) => (
+              <Link
+                key={post.id}
+                to={`/page/${post.id}`}
+                className="post-card"
+              >
+                <div className="post-type">
+                  <Icon
+                    name={post.page_type === 'blog' ? 'writing' : 'logbook'}
+                    size={24}
+                  />
+                  <span>{post.page_type === 'blog' ? 'Blog' : 'Devlog'}</span>
+                </div>
+                <h4>{post.title}</h4>
+                <p>{truncateText(post.content, 100)}</p>
+                <span className="post-date">
+                  <Icon name="time" size={14} />
+                  {formatDate(post.updated_at)}
+                </span>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-section">
+            <Icon name="writing" size={48} />
+            <p>No blog posts yet. Stay tuned!</p>
+          </div>
+        )}
+
+        <div className="section-footer">
+          <Link to="/blog" className="view-all-link">
+            <span>View All Posts</span>
+            <Icon name="chevron-right" size={20} />
+          </Link>
+        </div>
       </section>
 
       {/* Call to Action */}
