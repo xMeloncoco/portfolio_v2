@@ -42,6 +42,18 @@ Execute these SQL files in order in your Supabase SQL Editor:
 # File: supabase-phase3-setup.sql
 ```
 
+4. **Phase 8** - Character settings:
+```bash
+# File: database/supabase-phase8-character-settings.sql
+```
+
+5. **Storage Setup** - Profile pictures bucket:
+```bash
+# File: database/supabase-storage-setup.sql
+```
+
+**Important:** The storage setup is required for uploading profile pictures. Without this, you'll get a "bucket not found" error when trying to upload images.
+
 ## Step 3: Verify Setup
 
 Test the connection:
