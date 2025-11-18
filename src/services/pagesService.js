@@ -7,7 +7,7 @@
  * FEATURES:
  * - CRUD operations for pages
  * - Tag management for pages
- * - Quest linking for pages
+ * - Quest and project linking (polymorphic connections)
  * - Devlog item management
  * - Filtering and sorting
  *
@@ -45,9 +45,10 @@ export async function getAllPages(options = {}) {
           tag_id,
           tags (id, name, color)
         ),
-        page_quests (
-          quest_id,
-          quests (id, title)
+        page_connections (
+          id,
+          connected_to_type,
+          connected_to_id
         )
       `)
       .order('updated_at', { ascending: false })
@@ -72,11 +73,37 @@ export async function getAllPages(options = {}) {
       return { data: [], error: error.message }
     }
 
-    // Transform data to flatten tags
-    const transformedData = data.map(page => ({
-      ...page,
-      tags: page.page_tags?.map(pt => pt.tags) || [],
-      quests: page.page_quests?.map(pq => pq.quests) || []
+    // Fetch related quests and projects for all connections
+    const transformedData = await Promise.all(data.map(async (page) => {
+      const connections = page.page_connections || []
+      const quests = []
+      const projects = []
+
+      // Fetch actual quest/project data for each connection
+      for (const conn of connections) {
+        if (conn.connected_to_type === 'quest') {
+          const { data: quest } = await supabase
+            .from('quests')
+            .select('id, title')
+            .eq('id', conn.connected_to_id)
+            .single()
+          if (quest) quests.push(quest)
+        } else if (conn.connected_to_type === 'project') {
+          const { data: project } = await supabase
+            .from('projects')
+            .select('id, title')
+            .eq('id', conn.connected_to_id)
+            .single()
+          if (project) projects.push(project)
+        }
+      }
+
+      return {
+        ...page,
+        tags: page.page_tags?.map(pt => pt.tags) || [],
+        quests,
+        projects
+      }
     }))
 
     logger.info(`Fetched ${transformedData.length} pages`)
@@ -104,9 +131,10 @@ export async function getPageById(pageId) {
           tag_id,
           tags (id, name, color)
         ),
-        page_quests (
-          quest_id,
-          quests (id, title)
+        page_connections (
+          id,
+          connected_to_type,
+          connected_to_id
         ),
         devlog_items (
           id, title, status, sort_order
@@ -120,11 +148,35 @@ export async function getPageById(pageId) {
       return { data: null, error: error.message }
     }
 
+    // Fetch related quests and projects
+    const connections = data.page_connections || []
+    const quests = []
+    const projects = []
+
+    for (const conn of connections) {
+      if (conn.connected_to_type === 'quest') {
+        const { data: quest } = await supabase
+          .from('quests')
+          .select('id, title')
+          .eq('id', conn.connected_to_id)
+          .single()
+        if (quest) quests.push(quest)
+      } else if (conn.connected_to_type === 'project') {
+        const { data: project } = await supabase
+          .from('projects')
+          .select('id, title')
+          .eq('id', conn.connected_to_id)
+          .single()
+        if (project) projects.push(project)
+      }
+    }
+
     // Transform data
     const transformedData = {
       ...data,
       tags: data.page_tags?.map(pt => pt.tags) || [],
-      quests: data.page_quests?.map(pq => pq.quests) || [],
+      quests,
+      projects,
       devlog_items: data.devlog_items?.sort((a, b) => a.sort_order - b.sort_order) || []
     }
 
@@ -152,6 +204,7 @@ export async function getPageById(pageId) {
  * @param {string} [pageData.project_end_date] - For project pages
  * @param {Array} [pageData.tagIds=[]] - Array of tag UUIDs
  * @param {Array} [pageData.questIds=[]] - Array of quest UUIDs
+ * @param {Array} [pageData.projectIds=[]] - Array of project UUIDs
  * @returns {Promise<{data: Object|null, error: string|null}>}
  */
 export async function createPage(pageData) {
@@ -163,8 +216,8 @@ export async function createPage(pageData) {
       return { data: null, error: 'Page title is required' }
     }
 
-    // Extract tags and quests for separate insertion
-    const { tagIds = [], questIds = [], ...pageFields } = pageData
+    // Extract tags, quests, and projects for separate insertion
+    const { tagIds = [], questIds = [], projectIds = [], ...pageFields } = pageData
 
     // Clean page fields
     const cleanPageData = {
@@ -207,19 +260,32 @@ export async function createPage(pageData) {
       }
     }
 
-    // Add quest links if provided
+    // Add connections (quests and projects) using polymorphic table
+    const connections = []
+
     if (questIds.length > 0) {
-      const questRelations = questIds.map(questId => ({
+      connections.push(...questIds.map(questId => ({
         page_id: page.id,
-        quest_id: questId
-      }))
+        connected_to_type: 'quest',
+        connected_to_id: questId
+      })))
+    }
 
-      const { error: questError } = await supabase
-        .from('page_quests')
-        .insert(questRelations)
+    if (projectIds.length > 0) {
+      connections.push(...projectIds.map(projectId => ({
+        page_id: page.id,
+        connected_to_type: 'project',
+        connected_to_id: projectId
+      })))
+    }
 
-      if (questError) {
-        logger.warn('Error linking quests to page', questError)
+    if (connections.length > 0) {
+      const { error: connError } = await supabase
+        .from('page_connections')
+        .insert(connections)
+
+      if (connError) {
+        logger.warn('Error creating page connections', connError)
       }
     }
 
@@ -243,14 +309,15 @@ export async function createPage(pageData) {
  * @param {Object} pageData - The updated page data
  * @param {Array} [pageData.tagIds] - Array of tag UUIDs (replaces existing)
  * @param {Array} [pageData.questIds] - Array of quest UUIDs (replaces existing)
+ * @param {Array} [pageData.projectIds] - Array of project UUIDs (replaces existing)
  * @returns {Promise<{data: Object|null, error: string|null}>}
  */
 export async function updatePage(pageId, pageData) {
   try {
     logger.info(`Updating page: ${pageId}`)
 
-    // Extract tags and quests for separate handling
-    const { tagIds, questIds, ...pageFields } = pageData
+    // Extract tags, quests, and projects for separate handling
+    const { tagIds, questIds, projectIds, ...pageFields } = pageData
 
     // Update the page itself
     if (Object.keys(pageFields).length > 0) {
@@ -287,24 +354,38 @@ export async function updatePage(pageId, pageData) {
       }
     }
 
-    // Update quest links if provided (replace all existing links)
-    if (questIds !== undefined) {
-      // Delete existing quest links
-      await supabase.from('page_quests').delete().eq('page_id', pageId)
+    // Update connections if provided (replace all existing connections)
+    if (questIds !== undefined || projectIds !== undefined) {
+      // Delete existing connections
+      await supabase.from('page_connections').delete().eq('page_id', pageId)
 
-      // Insert new quest links
-      if (questIds.length > 0) {
-        const questRelations = questIds.map(questId => ({
+      // Build new connections array
+      const connections = []
+
+      if (questIds && questIds.length > 0) {
+        connections.push(...questIds.map(questId => ({
           page_id: pageId,
-          quest_id: questId
-        }))
+          connected_to_type: 'quest',
+          connected_to_id: questId
+        })))
+      }
 
-        const { error: questError } = await supabase
-          .from('page_quests')
-          .insert(questRelations)
+      if (projectIds && projectIds.length > 0) {
+        connections.push(...projectIds.map(projectId => ({
+          page_id: pageId,
+          connected_to_type: 'project',
+          connected_to_id: projectId
+        })))
+      }
 
-        if (questError) {
-          logger.warn('Error updating page quest links', questError)
+      // Insert new connections
+      if (connections.length > 0) {
+        const { error: connError } = await supabase
+          .from('page_connections')
+          .insert(connections)
+
+        if (connError) {
+          logger.warn('Error updating page connections', connError)
         }
       }
     }

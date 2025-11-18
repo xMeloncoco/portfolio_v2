@@ -20,8 +20,10 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getPageById, createPage, updatePage } from '../services/pagesService'
 import { getAllQuests } from '../services/questsService'
-import { getQuestIssues, ISSUE_STATUS_LABELS, ISSUE_SEVERITY_CONFIG, updateIssueStatus } from '../services/issuesService'
+import { getAllProjects } from '../services/projectsService'
+import { getQuestIssues, getProjectIssues, ISSUE_STATUS_LABELS, ISSUE_SEVERITY_CONFIG, updateIssueStatus } from '../services/issuesService'
 import { bulkLinkIssuesToDevlog } from '../services/devlogIssuesService'
+import { bulkLinkSubquestsToDevlog } from '../services/devlogSubquestsService'
 import { logger } from '../utils/logger'
 import Icon from '../components/Icon'
 import TagSelector from '../components/TagSelector'
@@ -89,15 +91,20 @@ function PageForm() {
     external_link: ''
   })
 
-  // Tags and quests
+  // Tags, quests, and projects
   const [selectedTags, setSelectedTags] = useState([])
   const [selectedQuestIds, setSelectedQuestIds] = useState([])
+  const [selectedProjectIds, setSelectedProjectIds] = useState([])
   const [availableQuests, setAvailableQuests] = useState([])
+  const [availableProjects, setAvailableProjects] = useState([])
 
-  // Issues (for devlogs)
+  // Issues and subquests (for devlogs)
   const [questIssues, setQuestIssues] = useState([])
+  const [questSubquests, setQuestSubquests] = useState([])
   const [issueWorkData, setIssueWorkData] = useState({}) // { issueId: { selected: bool, status_change: string, work_notes: string } }
+  const [subquestWorkData, setSubquestWorkData] = useState({}) // { subquestId: { selected: bool, was_completed: bool, work_notes: string } }
   const [isLoadingIssues, setIsLoadingIssues] = useState(false)
+  const [isLoadingSubquests, setIsLoadingSubquests] = useState(false)
 
   // UI state
   const [isLoading, setIsLoading] = useState(false)
@@ -119,23 +126,26 @@ function PageForm() {
   }, [id])
 
   /**
-   * Fetch available quests for linking
+   * Fetch available quests and projects for linking
    */
   useEffect(() => {
     fetchQuests()
+    fetchProjects()
   }, [])
 
   /**
-   * Fetch issues when quest is selected and page type is devlog
+   * Fetch issues and subquests when quests/projects are selected and page type is devlog
    */
   useEffect(() => {
-    if (formData.page_type === 'devlog' && selectedQuestIds.length > 0) {
-      fetchQuestIssues(selectedQuestIds[0])
+    if (formData.page_type === 'devlog' && (selectedQuestIds.length > 0 || selectedProjectIds.length > 0)) {
+      fetchAllIssuesAndSubquests()
     } else {
       setQuestIssues([])
+      setQuestSubquests([])
       setIssueWorkData({})
+      setSubquestWorkData({})
     }
-  }, [selectedQuestIds, formData.page_type])
+  }, [selectedQuestIds, selectedProjectIds, formData.page_type])
 
   /**
    * Load page data for editing
@@ -204,6 +214,24 @@ function PageForm() {
   }
 
   /**
+   * Fetch all available projects
+   */
+  const fetchProjects = async () => {
+    try {
+      const { data, error: fetchError } = await getAllProjects()
+
+      if (fetchError) {
+        logger.error('Error fetching projects', fetchError)
+      } else {
+        setAvailableProjects(data || [])
+        logger.info(`Loaded ${data?.length || 0} projects for linking`)
+      }
+    } catch (err) {
+      logger.error('Unexpected error fetching projects', err)
+    }
+  }
+
+  /**
    * Fetch issues for a specific quest
    * @param {string} questId - Quest UUID
    */
@@ -234,6 +262,101 @@ function PageForm() {
       logger.error('Unexpected error fetching quest issues', err)
     } finally {
       setIsLoadingIssues(false)
+    }
+  }
+
+  /**
+   * Fetch all issues and subquests from selected quests and projects
+   */
+  const fetchAllIssuesAndSubquests = async () => {
+    try {
+      setIsLoadingIssues(true)
+      setIsLoadingSubquests(true)
+
+      logger.info(`Fetching issues from ${selectedQuestIds.length} quests and ${selectedProjectIds.length} projects`)
+
+      // Fetch issues from all selected quests
+      const questIssuePromises = selectedQuestIds.map(questId => getQuestIssues(questId))
+      const questIssuesResults = await Promise.all(questIssuePromises)
+
+      // Fetch issues from all selected projects
+      const projectIssuePromises = selectedProjectIds.map(projectId => getProjectIssues(projectId))
+      const projectIssuesResults = await Promise.all(projectIssuePromises)
+
+      // Merge all issues and deduplicate by ID
+      const allIssues = []
+      const issueIds = new Set()
+
+      questIssuesResults.forEach(result => {
+        if (result.data) {
+          result.data.forEach(issue => {
+            if (!issueIds.has(issue.id)) {
+              issueIds.add(issue.id)
+              allIssues.push(issue)
+            }
+          })
+        }
+      })
+
+      projectIssuesResults.forEach(result => {
+        if (result.data) {
+          result.data.forEach(issue => {
+            if (!issueIds.has(issue.id)) {
+              issueIds.add(issue.id)
+              allIssues.push(issue)
+            }
+          })
+        }
+      })
+
+      setQuestIssues(allIssues)
+
+      // Initialize issue work data for all issues
+      const initialWorkData = {}
+      allIssues.forEach(issue => {
+        initialWorkData[issue.id] = {
+          selected: false,
+          status_change: issue.status,
+          work_notes: ''
+        }
+      })
+      setIssueWorkData(initialWorkData)
+
+      logger.info(`Loaded ${allIssues.length} unique issues`)
+
+      // Fetch subquests from all selected quests
+      const allSubquests = []
+      for (const questId of selectedQuestIds) {
+        const quest = availableQuests.find(q => q.id === questId)
+        if (quest && quest.sub_quests) {
+          allSubquests.push(...quest.sub_quests.map(sq => ({
+            ...sq,
+            quest_id: questId,
+            quest_title: quest.title
+          })))
+        }
+      }
+
+      setQuestSubquests(allSubquests)
+
+      // Initialize subquest work data
+      const initialSubquestData = {}
+      allSubquests.forEach(subquest => {
+        initialSubquestData[subquest.id] = {
+          selected: false,
+          was_completed: false,
+          work_notes: ''
+        }
+      })
+      setSubquestWorkData(initialSubquestData)
+
+      logger.info(`Loaded ${allSubquests.length} subquests`)
+
+    } catch (err) {
+      logger.error('Unexpected error fetching issues and subquests', err)
+    } finally {
+      setIsLoadingIssues(false)
+      setIsLoadingSubquests(false)
     }
   }
 
