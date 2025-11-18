@@ -52,7 +52,14 @@ Execute these SQL files in order in your Supabase SQL Editor:
 # File: database/supabase-storage-setup.sql
 ```
 
-**Important:** The storage setup is required for uploading profile pictures. Without this, you'll get a "bucket not found" error when trying to upload images.
+6. **RLS Policy Fix** - Allow character settings updates:
+```bash
+# File: database/fix-character-settings-rls.sql
+```
+
+**Important:**
+- The storage setup is required for uploading profile pictures. Without this, you'll get a "bucket not found" error.
+- The RLS policy fix is required to save profile picture URLs to the database. Without this, you'll get a "Cannot coerce the result to a single JSON object" error.
 
 ## Step 3: Verify Setup
 
