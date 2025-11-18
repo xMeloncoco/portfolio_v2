@@ -818,6 +818,77 @@ function PageForm() {
           </div>
         </div>
 
+        {/* Quest Linking Section */}
+        <div className="form-section">
+          <h2 className="section-title">
+            <Icon name="quests" size={24} />
+            Linked Quests
+            <span className="label-hint">(Optional - Select quests related to this page)</span>
+          </h2>
+
+          <div className="form-group">
+            <label className="form-label">
+              Link to Quests
+              <span className="label-hint">(Optional)</span>
+            </label>
+
+            {availableQuests.length === 0 ? (
+              <div className="no-quests-message">
+                <Icon name="quests" size={32} />
+                <p>No quests available. Create quests first to link them to pages.</p>
+              </div>
+            ) : (
+              <div className="quest-selector">
+                {availableQuests.map((quest) => (
+                  <label key={quest.id} className="quest-option">
+                    <input
+                      type="checkbox"
+                      checked={selectedQuestIds.includes(quest.id)}
+                      onChange={() => handleQuestToggle(quest.id)}
+                    />
+                    <span className="quest-checkbox"></span>
+                    <span className="quest-title">{quest.title}</span>
+                    <span className="quest-status">{quest.status}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Project Linking Section */}
+        <div className="form-section">
+          <h2 className="section-title">
+            <Icon name="castle" size={24} />
+            Linked Projects
+            <span className="label-hint">(Optional - Select projects related to this page)</span>
+          </h2>
+
+          <div className="form-group">
+            {availableProjects.length === 0 ? (
+              <div className="no-quests-message">
+                <Icon name="castle" size={32} />
+                <p>No projects available. Create projects first to link them to pages.</p>
+              </div>
+            ) : (
+              <div className="quest-selector">
+                {availableProjects.map((project) => (
+                  <label key={project.id} className="quest-option">
+                    <input
+                      type="checkbox"
+                      checked={selectedProjectIds.includes(project.id)}
+                      onChange={() => handleProjectToggle(project.id)}
+                    />
+                    <span className="quest-checkbox"></span>
+                    <span className="quest-title">{project.title}</span>
+                    <span className="quest-status">{project.status}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Content Section */}
         <div className="form-section">
           <h2 className="section-title">
@@ -944,45 +1015,87 @@ function PageForm() {
           </div>
         </div>
 
-        {/* Quest Linking Section */}
-        <div className="form-section">
-          <h2 className="section-title">
-            <Icon name="quests" size={24} />
-            Linked Quests
-          </h2>
+        {/* Subquests Section (for devlogs only) */}
+        {formData.page_type === 'devlog' && questSubquests.length > 0 && (
+          <div className="form-section">
+            <h2 className="section-title">
+              <Icon name="done" size={24} />
+              Quest Objectives Worked On
+            </h2>
 
-          <div className="form-group">
-            <label className="form-label">
-              Link to Quests
-              <span className="label-hint">(Optional)</span>
-            </label>
-
-            {availableQuests.length === 0 ? (
-              <div className="no-quests-message">
-                <Icon name="quests" size={32} />
-                <p>No quests available. Create quests first to link them to pages.</p>
+            {isLoadingSubquests ? (
+              <div className="loading-issues">
+                <div className="loading-spinner"></div>
+                <p>Loading objectives...</p>
               </div>
             ) : (
-              <div className="quest-selector">
-                {availableQuests.map((quest) => (
-                  <label key={quest.id} className="quest-option">
-                    <input
-                      type="checkbox"
-                      checked={selectedQuestIds.includes(quest.id)}
-                      onChange={() => handleQuestToggle(quest.id)}
-                    />
-                    <span className="quest-checkbox"></span>
-                    <span className="quest-title">{quest.title}</span>
-                    <span className="quest-status">{quest.status}</span>
-                  </label>
-                ))}
+              <div className="issues-work-list">
+                <p className="issues-help-text">
+                  Select the quest objectives you worked on in this session.
+                </p>
+                {questSubquests.map((subquest) => {
+                  const workData = subquestWorkData[subquest.id] || {}
+
+                  return (
+                    <div
+                      key={subquest.id}
+                      className={`issue-work-item ${workData.selected ? 'selected' : ''}`}
+                    >
+                      <div className="issue-work-header">
+                        <label className="issue-select-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={workData.selected || false}
+                            onChange={() => handleSubquestToggle(subquest.id)}
+                          />
+                          <span className="checkbox-mark"></span>
+                        </label>
+
+                        <div className="issue-work-info">
+                          <div className="issue-work-title">
+                            <span className="issue-type-badge quest">
+                              {subquest.quest_title}
+                            </span>
+                            <span className="issue-title-text">{subquest.title}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {workData.selected && (
+                        <div className="issue-work-details">
+                          <div className="issue-status-change">
+                            <label className="status-label">
+                              <input
+                                type="checkbox"
+                                checked={workData.was_completed || false}
+                                onChange={(e) => handleSubquestCompletionChange(subquest.id, e.target.checked)}
+                              />
+                              <span style={{ marginLeft: '8px' }}>Mark as completed in this session</span>
+                            </label>
+                          </div>
+
+                          <div className="issue-work-notes">
+                            <label className="notes-label">Work Notes:</label>
+                            <textarea
+                              value={workData.work_notes || ''}
+                              onChange={(e) => handleSubquestNotesChange(subquest.id, e.target.value)}
+                              placeholder="Describe the work done on this objective..."
+                              className="work-notes-textarea"
+                              rows={3}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>
-        </div>
+        )}
 
         {/* Issues Section (for devlogs only) */}
-        {formData.page_type === 'devlog' && selectedQuestIds.length > 0 && (
+        {formData.page_type === 'devlog' && (selectedQuestIds.length > 0 || selectedProjectIds.length > 0) && (
           <div className="form-section">
             <h2 className="section-title">
               <Icon name="bug" size={24} />
@@ -992,12 +1105,12 @@ function PageForm() {
             {isLoadingIssues ? (
               <div className="loading-issues">
                 <div className="loading-spinner"></div>
-                <p>Loading quest issues...</p>
+                <p>Loading issues...</p>
               </div>
             ) : questIssues.length === 0 ? (
               <div className="no-issues-message">
                 <Icon name="bug" size={32} />
-                <p>No issues found for this quest. Create issues first in the Issues page.</p>
+                <p>No issues found for the selected quests/projects. Create issues first in the Issues page.</p>
               </div>
             ) : (
               <div className="issues-work-list">
