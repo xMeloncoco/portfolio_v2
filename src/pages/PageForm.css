@@ -264,8 +264,14 @@
 
 .type-selector {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .type-selector {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .type-option {
@@ -402,9 +408,14 @@
   border-radius: var(--radius-xs);
   transition: all var(--transition-fast);
   flex-shrink: 0;
+  position: relative;
 }
 
-.quest-checkbox svg {
+.quest-checkbox::after {
+  content: '✓';
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-primary-dark);
   opacity: 0;
   transform: scale(0);
   transition: all var(--transition-fast);
@@ -415,10 +426,9 @@
   border-color: var(--color-secondary);
 }
 
-.quest-option input[type="checkbox"]:checked + .quest-checkbox svg {
+.quest-option input[type="checkbox"]:checked + .quest-checkbox::after {
   opacity: 1;
   transform: scale(1);
-  color: var(--color-primary-dark);
 }
 
 .quest-title {
@@ -664,6 +674,17 @@
   border: 2px solid var(--color-border);
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
+  position: relative;
+}
+
+.checkbox-mark::after {
+  content: '✓';
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-primary-dark);
+  opacity: 0;
+  transform: scale(0);
+  transition: all var(--transition-fast);
 }
 
 .issue-select-checkbox input:checked + .checkbox-mark {
@@ -671,13 +692,9 @@
   border-color: var(--color-secondary);
 }
 
-.checkbox-mark svg {
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-}
-
-.issue-select-checkbox input:checked + .checkbox-mark svg {
+.issue-select-checkbox input:checked + .checkbox-mark::after {
   opacity: 1;
+  transform: scale(1);
 }
 
 .issue-work-info {
@@ -710,6 +727,11 @@
   color: white;
 }
 
+.issue-type-badge.quest {
+  background: #9b59b6;
+  color: white;
+}
+
 .issue-severity-badge {
   padding: 2px 8px;
   border-radius: var(--radius-sm);
@@ -717,6 +739,31 @@
   font-weight: var(--font-weight-bold);
   color: white;
   text-transform: uppercase;
+}
+
+.issue-new-badge {
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  background: var(--color-secondary);
+  color: var(--color-primary-dark);
+  text-transform: uppercase;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.issue-work-item.is-new {
+  border-left: 3px solid var(--color-secondary);
+  background: rgba(255, 215, 0, 0.05);
 }
 
 .issue-title-text {
