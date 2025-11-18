@@ -409,6 +409,20 @@ function PageForm() {
   }
 
   /**
+   * Handle project selection toggle
+   * @param {string} projectId - Project ID
+   */
+  const handleProjectToggle = (projectId) => {
+    setSelectedProjectIds((prev) => {
+      if (prev.includes(projectId)) {
+        return prev.filter((id) => id !== projectId)
+      } else {
+        return [...prev, projectId]
+      }
+    })
+  }
+
+  /**
    * Handle issue selection toggle
    * @param {string} issueId - Issue ID
    */
@@ -450,6 +464,52 @@ function PageForm() {
         ...prev[issueId],
         work_notes: notes,
         selected: notes.trim() !== '' || prev[issueId]?.selected // Auto-select when notes are added
+      }
+    }))
+  }
+
+  /**
+   * Handle subquest selection toggle
+   * @param {string} subquestId - Subquest ID
+   */
+  const handleSubquestToggle = (subquestId) => {
+    setSubquestWorkData(prev => ({
+      ...prev,
+      [subquestId]: {
+        ...prev[subquestId],
+        selected: !prev[subquestId]?.selected
+      }
+    }))
+  }
+
+  /**
+   * Handle subquest completion toggle
+   * @param {string} subquestId - Subquest ID
+   * @param {boolean} wasCompleted - Whether it was completed in this session
+   */
+  const handleSubquestCompletionChange = (subquestId, wasCompleted) => {
+    setSubquestWorkData(prev => ({
+      ...prev,
+      [subquestId]: {
+        ...prev[subquestId],
+        was_completed: wasCompleted,
+        selected: true // Auto-select when completion is changed
+      }
+    }))
+  }
+
+  /**
+   * Handle subquest work notes change
+   * @param {string} subquestId - Subquest ID
+   * @param {string} notes - Work notes
+   */
+  const handleSubquestNotesChange = (subquestId, notes) => {
+    setSubquestWorkData(prev => ({
+      ...prev,
+      [subquestId]: {
+        ...prev[subquestId],
+        work_notes: notes,
+        selected: notes.trim() !== '' || prev[subquestId]?.selected // Auto-select when notes are added
       }
     }))
   }
@@ -521,19 +581,24 @@ function PageForm() {
         pageData.external_link = formData.external_link || null
       }
 
-      // Add tag IDs
+      // Add tag IDs, quest IDs, and project IDs
       const tagIds = selectedTags.map((t) => t.id)
+
+      // Prepare page data with connections
+      pageData.tagIds = tagIds
+      pageData.questIds = selectedQuestIds
+      pageData.projectIds = selectedProjectIds
 
       let result
 
       if (isEditing) {
         // Update existing page
         logger.info(`Updating page: ${id}`)
-        result = await updatePage(id, pageData, tagIds, selectedQuestIds)
+        result = await updatePage(id, pageData)
       } else {
         // Create new page
         logger.info('Creating new page')
-        result = await createPage(pageData, tagIds, selectedQuestIds)
+        result = await createPage(pageData)
       }
 
       if (result.error) {
@@ -542,10 +607,11 @@ function PageForm() {
       } else {
         logger.info(`Page ${isEditing ? 'updated' : 'created'} successfully`)
 
-        // If this is a devlog, save issue work data
+        // If this is a devlog, save issue and subquest work data
         if (formData.page_type === 'devlog' && result.data) {
           const pageId = result.data.id
           await saveIssueWorkData(pageId)
+          await saveSubquestWorkData(pageId)
         }
 
         // Navigate to pages list
@@ -600,6 +666,42 @@ function PageForm() {
       }
     } catch (err) {
       logger.error('Error saving issue work data', err)
+    }
+  }
+
+  /**
+   * Save subquest work data for devlog
+   * @param {string} devlogId - The created/updated devlog page ID
+   */
+  const saveSubquestWorkData = async (devlogId) => {
+    try {
+      // Get all selected subquests with their work data
+      const selectedSubquests = Object.entries(subquestWorkData)
+        .filter(([_, data]) => data.selected)
+        .map(([subquestId, data]) => ({
+          id: subquestId,
+          was_completed: data.was_completed,
+          work_notes: data.work_notes
+        }))
+
+      if (selectedSubquests.length === 0) {
+        logger.info('No subquests selected for this devlog')
+        return
+      }
+
+      logger.info(`Saving ${selectedSubquests.length} subquest work entries`)
+
+      // Bulk link subquests to devlog
+      const { error: linkError } = await bulkLinkSubquestsToDevlog(devlogId, selectedSubquests)
+
+      if (linkError) {
+        logger.error('Error linking subquests to devlog', linkError)
+        // Don't throw error, page is already saved
+      } else {
+        logger.info('Subquest work data saved successfully')
+      }
+    } catch (err) {
+      logger.error('Error saving subquest work data', err)
     }
   }
 
