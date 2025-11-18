@@ -309,10 +309,7 @@
  * ======================================== */
 
 .attributes-section {
-  background: var(--color-bg-card);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  /* No background or border - content only */
 }
 
 .stats-grid {
@@ -320,6 +317,7 @@
   grid-template-columns: repeat(6, 1fr);
   gap: var(--spacing-sm);
   min-width: 0;
+  width: 100%;
 }
 
 .stat-block {
@@ -332,6 +330,7 @@
   transition: all var(--transition-base);
   cursor: pointer;
   min-width: 0;
+  overflow: hidden;
 }
 
 .stat-block:hover,
@@ -347,6 +346,7 @@
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.1em;
   margin-bottom: var(--spacing-xs);
+  white-space: nowrap;
 }
 
 .stat-score {
@@ -368,6 +368,9 @@
   color: var(--color-text-muted);
   margin-top: var(--spacing-xs);
   display: block;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-tooltip {
@@ -428,10 +431,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-xl);
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  /* No background or border - content only */
 }
 
 .skills-column {
@@ -569,10 +569,7 @@
  * ======================================== */
 
 .quests-section {
-  background: var(--color-bg-card);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  /* No background or border - content only */
 }
 
 .quest-stats {
@@ -686,11 +683,11 @@
 }
 
 .quest-card.main {
-  border-left: 4px solid var(--color-secondary);
+  border: 2px solid var(--color-secondary);
 }
 
 .quest-card.side {
-  border-left: 4px solid var(--color-primary);
+  border: 2px solid var(--color-primary);
 }
 
 .quest-card h4 {

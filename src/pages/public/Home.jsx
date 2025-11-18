@@ -457,6 +457,9 @@ function Home() {
         <div className="section-header">
           <Icon name="castle" size={36} />
           <h2>Current Projects</h2>
+          <Link to="/projects" className="show-all-link-header">
+            Show All Projects
+          </Link>
         </div>
 
         {isLoading ? (
@@ -504,14 +507,6 @@ function Home() {
           </div>
         )}
 
-        {projects.length > 2 && (
-          <div className="section-footer">
-            <Link to="/projects" className="view-all-link">
-              <span>Show More Projects</span>
-              <Icon name="chevron-right" size={20} />
-            </Link>
-          </div>
-        )}
       </section>
 
       {/* ========================================
@@ -523,7 +518,6 @@ function Home() {
           <h2>Quest Log</h2>
           <Link to="/quests" className="show-all-link-header">
             Show All Quests
-            <Icon name="chevron-right" size={16} />
           </Link>
         </div>
 
