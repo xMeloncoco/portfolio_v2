@@ -315,26 +315,35 @@ function PageForm() {
       // Get the most recent devlog date to auto-detect new/changed issues
       let lastDevlogDate = null
       try {
+        // Fetch recent devlogs
         const { data: recentDevlogs } = await supabase
           .from('pages')
-          .select('created_at, page_connections!inner(connected_to_id, connected_to_type)')
+          .select('id, created_at')
           .eq('page_type', 'devlog')
           .order('created_at', { ascending: false })
           .limit(50)
 
-        if (recentDevlogs) {
+        if (recentDevlogs && recentDevlogs.length > 0) {
+          // Fetch connections for these devlogs
+          const devlogIds = recentDevlogs.map(d => d.id)
+          const { data: allConnections } = await supabase
+            .from('page_connections')
+            .select('page_id, connected_to_id, connected_to_type')
+            .in('page_id', devlogIds)
+
           // Find the most recent devlog that shares any quest/project with current selection
-          const relevantDevlog = recentDevlogs.find(devlog => {
-            const connections = devlog.page_connections || []
-            return connections.some(conn =>
+          for (const devlog of recentDevlogs) {
+            const connections = allConnections?.filter(c => c.page_id === devlog.id) || []
+            const hasSharedConnection = connections.some(conn =>
               (conn.connected_to_type === 'quest' && selectedQuestIds.includes(conn.connected_to_id)) ||
               (conn.connected_to_type === 'project' && selectedProjectIds.includes(conn.connected_to_id))
             )
-          })
 
-          if (relevantDevlog) {
-            lastDevlogDate = new Date(relevantDevlog.created_at)
-            logger.info(`Found last devlog date: ${lastDevlogDate.toISOString()}`)
+            if (hasSharedConnection) {
+              lastDevlogDate = new Date(devlog.created_at)
+              logger.info(`Found last devlog date: ${lastDevlogDate.toISOString()}`)
+              break
+            }
           }
         }
       } catch (err) {
