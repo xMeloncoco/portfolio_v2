@@ -59,7 +59,28 @@ You need to create the storage bucket for profile pictures:
 
 ---
 
-### Step 3: Set Up Environment Variables
+### Step 3: Fix RLS Policies for Character Settings
+
+After creating the storage bucket, you need to fix the Row Level Security policies:
+
+1. Still in your Supabase project dashboard
+2. Navigate to **SQL Editor**
+3. Open the file `database/fix-character-settings-rls.sql`
+4. Copy all the SQL code
+5. Paste it into the Supabase SQL Editor
+6. Click **Run** to execute
+
+**What this does:**
+- Removes the overly restrictive update policy on character_settings
+- Allows updates to character settings (needed to save profile picture URLs)
+- Security is still maintained through your password-protected admin panel
+
+**Why this is needed:**
+Without this fix, you'll get "Cannot coerce the result to a single JSON object" error when trying to save profile pictures or update any character settings.
+
+---
+
+### Step 4: Set Up Environment Variables
 
 1. Create a `.env` file in the project root (if it doesn't exist)
 2. Add your Supabase credentials:
@@ -76,7 +97,7 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ---
 
-### Step 4: Install Dependencies
+### Step 5: Install Dependencies
 
 Run this command in the project root:
 
@@ -86,7 +107,7 @@ npm install
 
 ---
 
-### Step 5: Start the Development Server
+### Step 6: Start the Development Server
 
 ```bash
 npm run dev
