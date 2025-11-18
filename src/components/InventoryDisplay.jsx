@@ -149,12 +149,9 @@ function InventoryDisplay({ limit = 10, showHeader = true, showAll = false }) {
             <Icon name="treasure-chest" size={36} />
             <h2>Inventory</h2>
           </div>
-          {hasMore && (
-            <Link to="/inventory" className="show-all-link">
-              Show all ({items.length})
-              <Icon name="chevron-right" size={16} />
-            </Link>
-          )}
+          <Link to="/inventory" className="show-all-link">
+            Show All Inventory
+          </Link>
         </div>
       )}
 

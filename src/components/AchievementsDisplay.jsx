@@ -146,12 +146,9 @@ function AchievementsDisplay({ limit = 10, showHeader = true, showAll = false })
             <Icon name="trophy" size={36} />
             <h2>Achievements</h2>
           </div>
-          {hasMore && (
-            <Link to="/achievements" className="show-all-link">
-              Show all ({achievements.length})
-              <Icon name="chevron-right" size={16} />
-            </Link>
-          )}
+          <Link to="/achievements" className="show-all-link">
+            Show All Achievements
+          </Link>
         </div>
       )}
 
