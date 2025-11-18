@@ -309,10 +309,7 @@
  * ======================================== */
 
 .attributes-section {
-  background: var(--color-bg-card);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  /* No background or border - content only */
 }
 
 .stats-grid {
@@ -434,10 +431,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-xl);
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  /* No background or border - content only */
 }
 
 .skills-column {
@@ -575,10 +569,7 @@
  * ======================================== */
 
 .quests-section {
-  background: var(--color-bg-card);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  /* No background or border - content only */
 }
 
 .quest-stats {
