@@ -180,11 +180,18 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   transition: all var(--transition-fast);
+  cursor: pointer;
 }
 
 .quest-card-public-full:hover {
   border-color: var(--color-border-light);
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.quest-card-public-full:focus {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
 }
 
 .quest-card-header-public {

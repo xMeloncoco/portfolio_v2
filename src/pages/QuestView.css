@@ -479,6 +479,104 @@
 }
 
 /* ========================================
+ * DEVLOGS SECTION
+ * ======================================== */
+
+.quest-devlogs-section {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.quest-devlogs-section h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin: 0 0 var(--spacing-md);
+  color: var(--color-heading);
+}
+
+.devlogs-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  color: var(--color-text-secondary);
+}
+
+.devlogs-loading .loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-secondary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.devlogs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.devlog-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.devlog-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--color-border-light);
+  transform: translateX(4px);
+}
+
+.devlog-item:focus {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.devlog-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.devlog-title {
+  flex: 1;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+}
+
+.devlog-date {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+.devlog-work-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  padding-left: 32px; /* Align with title (icon + gap) */
+}
+
+.devlog-work-summary span {
+  flex: 1;
+}
+
+/* ========================================
  * RESPONSIVE DESIGN
  * ======================================== */
 
