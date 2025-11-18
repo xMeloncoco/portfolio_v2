@@ -12,6 +12,7 @@
  */
 
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getAllQuests, STATUS_DISPLAY_NAMES } from '../../services/questsService'
 import { logger } from '../../utils/logger'
 import Icon from '../../components/Icon'
@@ -43,12 +44,30 @@ const QUEST_STATUS_CONFIG = {
 
 function PublicQuests() {
   // ========================================
+  // HOOKS
+  // ========================================
+
+  const navigate = useNavigate()
+
+  // ========================================
   // STATE
   // ========================================
 
   const [quests, setQuests] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [selectedType, setSelectedType] = useState('all')
+
+  // ========================================
+  // EVENT HANDLERS
+  // ========================================
+
+  /**
+   * Navigate to quest detail view
+   * @param {string} questId - Quest UUID
+   */
+  const handleQuestClick = (questId) => {
+    navigate(`/admin/quests/${questId}`)
+  }
 
   // ========================================
   // DATA FETCHING
@@ -216,7 +235,14 @@ function PublicQuests() {
             const progress = calculateProgress(quest.sub_quests)
 
             return (
-              <div key={quest.id} className="quest-card-public-full">
+              <div
+                key={quest.id}
+                className="quest-card-public-full"
+                onClick={() => handleQuestClick(quest.id)}
+                onKeyPress={(e) => e.key === 'Enter' && handleQuestClick(quest.id)}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="quest-card-header-public">
                   <div
                     className="quest-type-icon"
