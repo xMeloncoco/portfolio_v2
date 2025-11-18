@@ -1,28 +1,71 @@
 /**
  * ========================================
- * PUBLIC HOME PAGE
+ * PUBLIC HOME PAGE (REDESIGNED)
  * ========================================
- * Landing page for the portfolio with RPG-themed hero section
+ * Landing page integrating character sheet with portfolio
  *
- * FEATURES:
- * - Hero section with character intro
- * - Featured projects
- * - Recent blog posts
- * - Skills preview
- * - Call to action
+ * SECTIONS:
+ * - Hero/Top section (photo, name, level, progress)
+ * - Class/Location/Current Quest cards
+ * - Core Attributes (D&D stats)
+ * - Languages, Frameworks, Tools
+ * - Current Projects (latest 2)
+ * - Quest Log (with sidequests)
+ * - Inventory display
+ * - Achievements display
+ * - Contact section
  */
 
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getAllPages } from '../../services/pagesService'
 import { getAllQuests } from '../../services/questsService'
+import {
+  calculateCharacterStats,
+  calculateModifier,
+  formatModifier
+} from '../../services/characterStatsService'
 import { logger } from '../../utils/logger'
 import Icon from '../../components/Icon'
 import Tag from '../../components/Tag'
 import InventoryDisplay from '../../components/InventoryDisplay'
 import AchievementsDisplay from '../../components/AchievementsDisplay'
-import CharacterStatsPreview from '../../components/CharacterStatsPreview'
 import './Home.css'
+
+// ========================================
+// CONSTANTS
+// ========================================
+
+// Character info (would come from admin settings in future)
+const CHARACTER_INFO = {
+  name: 'Miriam Schouten',
+  title: 'Software Tester / Vibe Coder',
+  class: 'Software Tester / Vibe Coder',
+  location: 'Ermelo, Netherlands',
+  currentQuest: 'Finding my IT spark',
+  birthday: '1995-03-14', // Format: YYYY-MM-DD
+  linkedinUrl: 'https://linkedin.com/in/yourprofile',
+  photoUrl: null // Will use placeholder if null
+}
+
+// Languages
+const LANGUAGES = [
+  { name: 'Dutch', level: 'Native' },
+  { name: 'English', level: 'Fluent' },
+  { name: 'Japanese', level: 'Intermediate' }
+]
+
+// Frameworks
+const FRAMEWORKS = [
+  { name: 'Node.js', tagId: null },
+  { name: 'React', tagId: null }
+]
+
+// Tools
+const TOOLS = [
+  { name: 'Claude AI', tagId: null },
+  { name: 'Mendix', tagId: null }
+]
 
 // ========================================
 // HOME PAGE COMPONENT
@@ -33,50 +76,50 @@ function Home() {
   // STATE
   // ========================================
 
-  const [featuredProjects, setFeaturedProjects] = useState([])
-  const [recentPosts, setRecentPosts] = useState([])
-  const [activeQuests, setActiveQuests] = useState([])
+  const [stats, setStats] = useState(null)
+  const [projects, setProjects] = useState([])
+  const [quests, setQuests] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [hoveredStat, setHoveredStat] = useState(null)
+  const [showContactPopup, setShowContactPopup] = useState(false)
 
   // ========================================
   // DATA FETCHING
   // ========================================
 
-  /**
-   * Fetch featured content on mount
-   */
   useEffect(() => {
     fetchContent()
   }, [])
 
-  /**
-   * Load content from database
-   */
   const fetchContent = async () => {
     try {
       setIsLoading(true)
 
-      // Fetch public pages
-      const { data: pages } = await getAllPages({ visibility: 'public' })
+      // Fetch stats, pages, and quests in parallel
+      const [statsResult, pagesResult, questsResult] = await Promise.all([
+        calculateCharacterStats(),
+        getAllPages({ visibility: 'public' }),
+        getAllQuests({ visibility: 'public' })
+      ])
 
-      if (pages) {
-        // Get featured projects (first 3)
-        const projects = pages
-          .filter((p) => p.page_type === 'project')
-          .slice(0, 3)
-        setFeaturedProjects(projects)
-
-        // Get recent blog posts (first 3)
-        const posts = pages
-          .filter((p) => p.page_type === 'blog' || p.page_type === 'devlog')
-          .slice(0, 3)
-        setRecentPosts(posts)
+      // Set stats
+      if (statsResult.error) {
+        logger.error('Error fetching stats', statsResult.error)
+      } else {
+        setStats(statsResult.data)
       }
 
-      // Fetch active quests
-      const { data: quests } = await getAllQuests({ status: 'in_progress' })
-      if (quests) {
-        setActiveQuests(quests.slice(0, 3))
+      // Set projects (sorted by updated_at, latest first)
+      if (pagesResult.data) {
+        const projectList = pagesResult.data
+          .filter((p) => p.page_type === 'project')
+          .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+        setProjects(projectList)
+      }
+
+      // Set quests
+      if (questsResult.data) {
+        setQuests(questsResult.data)
       }
 
       logger.info('Home page content loaded')
@@ -88,14 +131,107 @@ function Home() {
   }
 
   // ========================================
-  // HELPER FUNCTIONS
+  // COMPUTED VALUES
   // ========================================
 
   /**
-   * Format date for display
-   * @param {string} dateString - ISO date string
-   * @returns {string} - Formatted date
+   * Calculate age (level) from birthday
    */
+  const calculateAge = () => {
+    const birthday = new Date(CHARACTER_INFO.birthday)
+    const today = new Date()
+    let age = today.getFullYear() - birthday.getFullYear()
+    const monthDiff = today.getMonth() - birthday.getMonth()
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthday.getDate())) {
+      age--
+    }
+
+    return age
+  }
+
+  /**
+   * Calculate progress to next birthday (level up)
+   */
+  const calculateBirthdayProgress = () => {
+    const birthday = new Date(CHARACTER_INFO.birthday)
+    const today = new Date()
+
+    // Get this year's birthday
+    const thisYearBirthday = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate())
+
+    // Get next birthday
+    let nextBirthday = thisYearBirthday
+    if (today >= thisYearBirthday) {
+      nextBirthday = new Date(today.getFullYear() + 1, birthday.getMonth(), birthday.getDate())
+    }
+
+    // Get last birthday
+    let lastBirthday = thisYearBirthday
+    if (today < thisYearBirthday) {
+      lastBirthday = new Date(today.getFullYear() - 1, birthday.getMonth(), birthday.getDate())
+    }
+
+    // Calculate progress
+    const totalDays = (nextBirthday - lastBirthday) / (1000 * 60 * 60 * 24)
+    const daysPassed = (today - lastBirthday) / (1000 * 60 * 60 * 24)
+    const progress = Math.round((daysPassed / totalDays) * 100)
+
+    return progress
+  }
+
+  /**
+   * Get quest counts for overview
+   */
+  const getQuestCounts = () => {
+    return {
+      mainActive: quests.filter((q) => q.quest_type === 'main' && q.status === 'in_progress')
+        .length,
+      sideActive: quests.filter((q) => q.quest_type === 'side' && q.status === 'in_progress')
+        .length,
+      future: quests.filter((q) => q.quest_type === 'future').length,
+      completed: quests.filter((q) => q.status === 'completed').length
+    }
+  }
+
+  /**
+   * Get main quests with subquests
+   */
+  const getMainQuests = () => {
+    return quests
+      .filter((q) => q.quest_type === 'main' && q.status === 'in_progress')
+      .slice(0, 2)
+  }
+
+  /**
+   * Get side quests
+   */
+  const getSideQuests = () => {
+    return quests
+      .filter((q) => q.quest_type === 'side' && q.status === 'in_progress')
+      .slice(0, 4)
+  }
+
+  // ========================================
+  // HANDLERS
+  // ========================================
+
+  const handleLinkedInClick = () => {
+    window.open(CHARACTER_INFO.linkedinUrl, '_blank', 'noopener,noreferrer')
+  }
+
+  const handleContactClick = () => {
+    setShowContactPopup(true)
+  }
+
+  const handleCloseContactPopup = () => {
+    setShowContactPopup(false)
+  }
+
+  // ========================================
+  // HELPER FUNCTIONS
+  // ========================================
+
   const formatDate = (dateString) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-GB', {
@@ -105,87 +241,217 @@ function Home() {
     })
   }
 
-  /**
-   * Truncate text to max length
-   * @param {string} text - Text to truncate
-   * @param {number} maxLength - Max characters
-   * @returns {string} - Truncated text
-   */
   const truncateText = (text, maxLength = 150) => {
     if (!text || text.length <= maxLength) return text
     return text.substring(0, maxLength).trim() + '...'
   }
 
   // ========================================
+  // RENDER HELPERS
+  // ========================================
+
+  /**
+   * Render a single stat block
+   */
+  const renderStatBlock = (statKey) => {
+    if (!stats || !stats[statKey]) return null
+
+    const stat = stats[statKey]
+    const modifier = calculateModifier(stat.score)
+    const formattedMod = formatModifier(modifier)
+
+    return (
+      <div
+        key={statKey}
+        className={`stat-block ${hoveredStat === statKey ? 'hovered' : ''}`}
+        onMouseEnter={() => setHoveredStat(statKey)}
+        onMouseLeave={() => setHoveredStat(null)}
+        onClick={() => setHoveredStat(hoveredStat === statKey ? null : statKey)}
+      >
+        <div className="stat-name">{stat.name.substring(0, 3).toUpperCase()}</div>
+        <div className="stat-score">{stat.score}</div>
+        <div className="stat-modifier">{formattedMod}</div>
+
+        {/* Mobile/Tablet: Click to show tooltip */}
+        {hoveredStat === statKey && (
+          <div className="stat-tooltip">
+            <strong>{stat.name}</strong>
+            <p className="stat-description-full">{stat.description}</p>
+            <p>{stat.tooltip}</p>
+            <p className="stat-details">{stat.details}</p>
+            {stat.inverseScoring && <p className="inverse-note">Lower value = Higher score</p>}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ========================================
   // RENDER
   // ========================================
 
+  const age = calculateAge()
+  const birthdayProgress = calculateBirthdayProgress()
+  const questCounts = getQuestCounts()
+
   return (
     <div className="home-page">
-      {/* Character Stats at the TOP */}
-      <section className="section character-stats-section">
-        <CharacterStatsPreview />
-      </section>
+      {/* ========================================
+       * HERO/TOP SECTION
+       * ======================================== */}
+      <section className="hero-section character-hero">
+        <div className="character-portrait">
+          {CHARACTER_INFO.photoUrl ? (
+            <img src={CHARACTER_INFO.photoUrl} alt={CHARACTER_INFO.name} />
+          ) : (
+            <div className="portrait-placeholder">
+              <Icon name="character" size={100} />
+            </div>
+          )}
+          <div className="level-badge">
+            <span className="level-label">LVL</span>
+            <span className="level-number">{age}</span>
+          </div>
+        </div>
 
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <div className="hero-badge">
-            <Icon name="crown" size={24} />
-            <span>Level 99 Developer</span>
+        <div className="character-info">
+          <h1 className="character-name">{CHARACTER_INFO.name}</h1>
+          <p className="character-title">{CHARACTER_INFO.title}</p>
+
+          <div className="xp-bar">
+            <div className="xp-label">Progress to Level {age + 1}</div>
+            <div className="xp-track">
+              <div className="xp-fill" style={{ width: `${birthdayProgress}%` }}></div>
+            </div>
+            <div className="xp-percentage">{birthdayProgress}%</div>
           </div>
 
-          <h1 className="hero-title">
-            Welcome, <span className="highlight">Adventurer</span>
-          </h1>
-
-          <p className="hero-subtitle">
-            I&apos;m a passionate developer on a quest to build amazing digital experiences.
-            Explore my projects, follow my journey, and join me on this adventure.
+          <p className="character-description">
+            A passionate developer on a quest to build amazing digital experiences. Always learning,
+            always growing, always ready for the next adventure.
           </p>
 
-          <div className="hero-stats">
-            <div className="stat-item">
-              <Icon name="castle" size={32} />
-              <div>
-                <span className="stat-value">{featuredProjects.length}+</span>
-                <span className="stat-label">Projects</span>
-              </div>
-            </div>
-            <div className="stat-item">
-              <Icon name="quests" size={32} />
-              <div>
-                <span className="stat-value">{activeQuests.length}</span>
-                <span className="stat-label">Active Quests</span>
-              </div>
-            </div>
-            <div className="stat-item">
-              <Icon name="writing" size={32} />
-              <div>
-                <span className="stat-value">{recentPosts.length}+</span>
-                <span className="stat-label">Blog Posts</span>
-              </div>
-            </div>
+          <div className="character-actions">
+            <button className="action-button linkedin" onClick={handleLinkedInClick}>
+              <Icon name="link" size={20} />
+              <span>LinkedIn</span>
+            </button>
+            <button className="action-button contact" onClick={handleContactClick}>
+              <Icon name="mail" size={20} />
+              <span>Send Message</span>
+            </button>
           </div>
-
-          <div className="hero-actions">
-            <Link to="/projects" className="primary-button">
-              <Icon name="castle" size={24} />
-              <span>View Projects</span>
-            </Link>
-            <Link to="/blog" className="secondary-button">
-              <Icon name="writing" size={24} />
-              <span>Read Blog</span>
-            </Link>
-          </div>
-        </div>
-
-        <div className="hero-decoration">
-          <Icon name="adventure" size={200} />
         </div>
       </section>
 
-      {/* Current Projects */}
+      {/* ========================================
+       * CHARACTER INFO (Class/Location/Quest)
+       * ======================================== */}
+      <section className="info-section">
+        <div className="info-card">
+          <Icon name="crown" size={32} />
+          <div>
+            <span className="info-label">Class</span>
+            <span className="info-value">{CHARACTER_INFO.class}</span>
+          </div>
+        </div>
+        <div className="info-card">
+          <Icon name="map" size={32} />
+          <div>
+            <span className="info-label">Location</span>
+            <span className="info-value">{CHARACTER_INFO.location}</span>
+          </div>
+        </div>
+        <div className="info-card">
+          <Icon name="quests" size={32} />
+          <div>
+            <span className="info-label">Current Quest</span>
+            <span className="info-value">{CHARACTER_INFO.currentQuest}</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================
+       * CORE ATTRIBUTES
+       * ======================================== */}
+      <section className="section attributes-section">
+        <h2 className="section-title">
+          <Icon name="stats" size={32} />
+          Core Attributes
+        </h2>
+
+        {isLoading ? (
+          <div className="loading-placeholder">
+            <div className="loading-spinner"></div>
+            <span>Loading stats...</span>
+          </div>
+        ) : stats ? (
+          <div className="stats-grid">
+            {renderStatBlock('str')}
+            {renderStatBlock('int')}
+            {renderStatBlock('wis')}
+            {renderStatBlock('dex')}
+            {renderStatBlock('con')}
+            {renderStatBlock('cha')}
+          </div>
+        ) : (
+          <div className="stats-error">
+            <p>Unable to calculate stats</p>
+          </div>
+        )}
+      </section>
+
+      {/* ========================================
+       * LANGUAGES, FRAMEWORKS, TOOLS
+       * ======================================== */}
+      <section className="section skills-section">
+        <div className="skills-column">
+          <h3 className="skills-title">
+            <Icon name="book" size={24} />
+            Languages
+          </h3>
+          <ul className="skills-list">
+            {LANGUAGES.map((lang) => (
+              <li key={lang.name} className="skill-item">
+                <span className="skill-name">{lang.name}</span>
+                <span className="skill-level">{lang.level}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="skills-column">
+          <h3 className="skills-title">
+            <Icon name="code" size={24} />
+            Frameworks
+          </h3>
+          <ul className="skills-list">
+            {FRAMEWORKS.map((fw) => (
+              <li key={fw.name} className="skill-item">
+                <span className="skill-name">{fw.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="skills-column">
+          <h3 className="skills-title">
+            <Icon name="tools" size={24} />
+            Tools
+          </h3>
+          <ul className="skills-list">
+            {TOOLS.map((tool) => (
+              <li key={tool.name} className="skill-item">
+                <span className="skill-name">{tool.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ========================================
+       * CURRENT PROJECTS (Latest 2)
+       * ======================================== */}
       <section className="section current-projects">
         <div className="section-header">
           <Icon name="castle" size={36} />
@@ -197,35 +463,36 @@ function Home() {
             <div className="loading-spinner"></div>
             <span>Loading projects...</span>
           </div>
-        ) : featuredProjects.length > 0 ? (
+        ) : projects.length > 0 ? (
           <div className="projects-grid">
-            {featuredProjects.slice(0, 3).map((project) => (
-              <Link
-                key={project.id}
-                to={`/page/${project.id}`}
-                className="project-card"
-              >
+            {projects.slice(0, 2).map((project) => (
+              <Link key={project.id} to={`/page/${project.id}`} className="project-card">
                 <div className="project-icon">
                   <Icon name="castle" size={48} />
                 </div>
                 <h3>{project.title}</h3>
-                <p>{truncateText(project.content)}</p>
+                <div className="project-hover-description">
+                  <p>{truncateText(project.content, 200)}</p>
+                </div>
                 {project.tags && project.tags.length > 0 && (
                   <div className="project-tags">
-                    {project.tags.slice(0, 3).map((tag) => (
-                      <Tag
-                        key={tag.id}
-                        name={tag.name}
-                        color={tag.color}
-                        size="small"
-                      />
+                    {project.tags.slice(0, 4).map((tag) => (
+                      <Tag key={tag.id} name={tag.name} color={tag.color} size="small" />
                     ))}
                   </div>
                 )}
-                <span className="project-date">
-                  <Icon name="time" size={14} />
-                  {formatDate(project.updated_at)}
-                </span>
+                <div className="project-stats">
+                  <span className="project-date">
+                    <Icon name="time" size={14} />
+                    Updated {formatDate(project.updated_at)}
+                  </span>
+                  {project.external_link && (
+                    <span className="project-link-indicator">
+                      <Icon name="link" size={14} />
+                      Live
+                    </span>
+                  )}
+                </div>
               </Link>
             ))}
           </div>
@@ -236,30 +503,58 @@ function Home() {
           </div>
         )}
 
-        <div className="section-footer">
-          <Link to="/projects" className="view-all-link">
-            <span>View All Projects</span>
-            <Icon name="chevron-right" size={20} />
-          </Link>
-        </div>
+        {projects.length > 2 && (
+          <div className="section-footer">
+            <Link to="/projects" className="view-all-link">
+              <span>Show More Projects</span>
+              <Icon name="chevron-right" size={20} />
+            </Link>
+          </div>
+        )}
       </section>
 
-      {/* Active Quests */}
-      <section className="section active-quests">
+      {/* ========================================
+       * QUEST LOG
+       * ======================================== */}
+      <section className="section quests-section">
         <div className="section-header">
           <Icon name="quests" size={36} />
-          <h2>Active Quests</h2>
+          <h2>Quest Log</h2>
+          <Link to="/quests" className="show-all-link-header">
+            Show All Quests
+            <Icon name="chevron-right" size={16} />
+          </Link>
         </div>
 
-        {isLoading ? (
-          <div className="loading-placeholder">
-            <div className="loading-spinner"></div>
-            <span>Loading quests...</span>
+        {/* Quest Numbers Overview */}
+        <div className="quest-stats">
+          <div className="quest-stat">
+            <span className="quest-stat-value">{questCounts.mainActive}</span>
+            <span className="quest-stat-label">Main Active</span>
           </div>
-        ) : activeQuests.length > 0 ? (
-          <>
-            <div className="quests-list-public">
-              {activeQuests.slice(0, 2).map((quest) => {
+          <div className="quest-stat">
+            <span className="quest-stat-value">{questCounts.sideActive}</span>
+            <span className="quest-stat-label">Side Active</span>
+          </div>
+          <div className="quest-stat">
+            <span className="quest-stat-value">{questCounts.future}</span>
+            <span className="quest-stat-label">Future</span>
+          </div>
+          <div className="quest-stat">
+            <span className="quest-stat-value">{questCounts.completed}</span>
+            <span className="quest-stat-label">Completed</span>
+          </div>
+        </div>
+
+        {/* Main Quests with Subquests */}
+        {getMainQuests().length > 0 && (
+          <div className="quest-category">
+            <h3 className="quest-category-title">
+              <Icon name="crown" size={24} />
+              Main Quests
+            </h3>
+            <div className="quests-list-detailed">
+              {getMainQuests().map((quest) => {
                 const completed = quest.sub_quests?.filter((sq) => sq.is_completed).length || 0
                 const total = quest.sub_quests?.length || 0
                 const percentage = total > 0 ? Math.round((completed / total) * 100) : 0
@@ -268,21 +563,14 @@ function Home() {
                   <div key={quest.id} className="quest-card-detailed">
                     <div className="quest-header-public">
                       <div className="quest-icon-public">
-                        <Icon
-                          name={
-                            quest.quest_type === 'main'
-                              ? 'crown'
-                              : quest.quest_type === 'future'
-                              ? 'future'
-                              : 'sword'
-                          }
-                          size={32}
-                        />
+                        <Icon name="crown" size={32} />
                       </div>
                       <div className="quest-info-public">
                         <h4>{quest.title}</h4>
                         {quest.description && (
-                          <p className="quest-description">{truncateText(quest.description, 100)}</p>
+                          <p className="quest-description">
+                            {truncateText(quest.description, 100)}
+                          </p>
                         )}
                         <div className="quest-progress-public">
                           <div className="progress-bar-small">
@@ -291,7 +579,9 @@ function Home() {
                               style={{ width: `${percentage}%` }}
                             ></div>
                           </div>
-                          <span>{percentage}% Complete ({completed}/{total})</span>
+                          <span>
+                            {percentage}% Complete ({completed}/{total})
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -302,7 +592,10 @@ function Home() {
                         <h5 className="subquests-title">Objectives:</h5>
                         <ul className="subquests-items">
                           {quest.sub_quests.slice(0, 5).map((subquest) => (
-                            <li key={subquest.id} className={`subquest-item ${subquest.is_completed ? 'completed' : ''}`}>
+                            <li
+                              key={subquest.id}
+                              className={`subquest-item ${subquest.is_completed ? 'completed' : ''}`}
+                            >
                               <Icon
                                 name={subquest.is_completed ? 'checkmark' : 'circle'}
                                 size={16}
@@ -322,46 +615,75 @@ function Home() {
                 )
               })}
             </div>
-            <div className="section-footer">
-              <Link to="/quests" className="show-all-button">
-                <span>Show All Quests</span>
-                <Icon name="chevron-right" size={20} />
-              </Link>
+          </div>
+        )}
+
+        {/* Side Quests */}
+        {getSideQuests().length > 0 && (
+          <div className="quest-category">
+            <h3 className="quest-category-title">
+              <Icon name="sword" size={24} />
+              Side Quests
+            </h3>
+            <div className="quest-cards side-quests-grid">
+              {getSideQuests().map((quest) => (
+                <Link key={quest.id} to="/quests" className="quest-card side">
+                  <h4>{quest.title}</h4>
+                  {quest.description && <p>{truncateText(quest.description, 60)}</p>}
+                </Link>
+              ))}
             </div>
-          </>
-        ) : (
-          <div className="empty-section">
-            <Icon name="quests" size={48} />
-            <p>No active quests at the moment.</p>
           </div>
         )}
       </section>
 
-      {/* Inventory Section */}
+      {/* ========================================
+       * INVENTORY
+       * ======================================== */}
       <section className="section inventory-section">
-        <InventoryDisplay limit={10} showHeader={true} />
+        <InventoryDisplay limit={12} showHeader={true} />
       </section>
 
-      {/* Achievements Section */}
+      {/* ========================================
+       * ACHIEVEMENTS
+       * ======================================== */}
       <section className="section achievements-section">
-        <AchievementsDisplay limit={10} showHeader={true} />
+        <AchievementsDisplay limit={6} showHeader={true} />
       </section>
 
-      {/* Call to Action */}
+      {/* ========================================
+       * CONTACT SECTION
+       * ======================================== */}
       <section className="cta-section">
         <div className="cta-content">
           <Icon name="mail" size={48} />
           <h2>Ready to Start Your Quest?</h2>
           <p>
-            Let&apos;s collaborate on your next project or discuss opportunities.
-            I&apos;m always excited to embark on new adventures!
+            Let&apos;s collaborate on your next project or discuss opportunities. I&apos;m always
+            excited to embark on new adventures!
           </p>
-          <a href="mailto:your@email.com" className="cta-button">
+          <button onClick={handleContactClick} className="cta-button">
             <Icon name="mail" size={24} />
             <span>Contact Me</span>
-          </a>
+          </button>
         </div>
       </section>
+
+      {/* ========================================
+       * CONTACT POPUP (Placeholder)
+       * ======================================== */}
+      {showContactPopup && (
+        <div className="contact-popup-backdrop" onClick={handleCloseContactPopup}>
+          <div className="contact-popup" onClick={(e) => e.stopPropagation()}>
+            <button className="popup-close" onClick={handleCloseContactPopup}>
+              <Icon name="cross" size={24} />
+            </button>
+            <Icon name="construction" size={48} />
+            <h3>Coming Soon!</h3>
+            <p>The contact form will be available in a later phase.</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
