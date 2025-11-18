@@ -25,6 +25,7 @@ import {
   calculateModifier,
   formatModifier
 } from '../../services/characterStatsService'
+import { getCharacterSettings } from '../../services/characterSettingsService'
 import { logger } from '../../utils/logger'
 import Icon from '../../components/Icon'
 import Tag from '../../components/Tag'
@@ -33,39 +34,24 @@ import AchievementsDisplay from '../../components/AchievementsDisplay'
 import './Home.css'
 
 // ========================================
-// CONSTANTS
+// DEFAULT FALLBACK DATA
 // ========================================
 
-// Character info (would come from admin settings in future)
-const CHARACTER_INFO = {
-  name: 'Miriam Schouten',
-  title: 'Software Tester / Vibe Coder',
+// Default character info (used if database fetch fails)
+const DEFAULT_CHARACTER_INFO = {
+  display_name: 'Miriam Schouten',
+  subtitle: 'Software Tester / Vibe Coder',
   class: 'Software Tester / Vibe Coder',
   location: 'Ermelo, Netherlands',
-  currentQuest: 'Finding my IT spark',
-  birthday: '1995-03-14', // Format: YYYY-MM-DD
-  linkedinUrl: 'https://linkedin.com/in/yourprofile',
-  photoUrl: null // Will use placeholder if null
+  current_quest: 'Finding my IT spark',
+  birthday: '1995-03-14',
+  linkedin_url: 'https://linkedin.com/in/yourprofile',
+  profile_picture_url: null,
+  languages: [],
+  frameworks: [],
+  tools: [],
+  action_buttons: []
 }
-
-// Languages
-const LANGUAGES = [
-  { name: 'Dutch', level: 'Native' },
-  { name: 'English', level: 'Fluent' },
-  { name: 'Japanese', level: 'Intermediate' }
-]
-
-// Frameworks
-const FRAMEWORKS = [
-  { name: 'Node.js', tagId: null },
-  { name: 'React', tagId: null }
-]
-
-// Tools
-const TOOLS = [
-  { name: 'Claude AI', tagId: null },
-  { name: 'Mendix', tagId: null }
-]
 
 // ========================================
 // HOME PAGE COMPONENT
@@ -79,6 +65,7 @@ function Home() {
   const [stats, setStats] = useState(null)
   const [projects, setProjects] = useState([])
   const [quests, setQuests] = useState([])
+  const [characterSettings, setCharacterSettings] = useState(DEFAULT_CHARACTER_INFO)
   const [isLoading, setIsLoading] = useState(true)
   const [hoveredStat, setHoveredStat] = useState(null)
   const [showContactPopup, setShowContactPopup] = useState(false)
@@ -95,11 +82,12 @@ function Home() {
     try {
       setIsLoading(true)
 
-      // Fetch stats, pages, and quests in parallel
-      const [statsResult, pagesResult, questsResult] = await Promise.all([
+      // Fetch stats, pages, quests, and character settings in parallel
+      const [statsResult, pagesResult, questsResult, settingsResult] = await Promise.all([
         calculateCharacterStats(),
         getAllPages({ visibility: 'public' }),
-        getAllQuests({ visibility: 'public' })
+        getAllQuests({ visibility: 'public' }),
+        getCharacterSettings()
       ])
 
       // Set stats
@@ -122,6 +110,14 @@ function Home() {
         setQuests(questsResult.data)
       }
 
+      // Set character settings
+      if (settingsResult.error) {
+        logger.error('Error fetching character settings', settingsResult.error)
+        // Keep using default fallback data
+      } else if (settingsResult.data) {
+        setCharacterSettings(settingsResult.data)
+      }
+
       logger.info('Home page content loaded')
     } catch (err) {
       logger.error('Error fetching home content', err)
@@ -138,7 +134,7 @@ function Home() {
    * Calculate age (level) from birthday
    */
   const calculateAge = () => {
-    const birthday = new Date(CHARACTER_INFO.birthday)
+    const birthday = new Date(characterSettings.birthday)
     const today = new Date()
     let age = today.getFullYear() - birthday.getFullYear()
     const monthDiff = today.getMonth() - birthday.getMonth()
@@ -154,7 +150,7 @@ function Home() {
    * Calculate progress to next birthday (level up)
    */
   const calculateBirthdayProgress = () => {
-    const birthday = new Date(CHARACTER_INFO.birthday)
+    const birthday = new Date(characterSettings.birthday)
     const today = new Date()
 
     // Get this year's birthday
@@ -217,7 +213,7 @@ function Home() {
   // ========================================
 
   const handleLinkedInClick = () => {
-    window.open(CHARACTER_INFO.linkedinUrl, '_blank', 'noopener,noreferrer')
+    window.open(characterSettings.linkedin_url, '_blank', 'noopener,noreferrer')
   }
 
   const handleContactClick = () => {
@@ -302,8 +298,8 @@ function Home() {
        * ======================================== */}
       <section className="hero-section character-hero">
         <div className="character-portrait">
-          {CHARACTER_INFO.photoUrl ? (
-            <img src={CHARACTER_INFO.photoUrl} alt={CHARACTER_INFO.name} />
+          {characterSettings.profile_picture_url ? (
+            <img src={characterSettings.profile_picture_url} alt={characterSettings.display_name} />
           ) : (
             <div className="portrait-placeholder">
               <Icon name="character" size={100} />
@@ -316,8 +312,8 @@ function Home() {
         </div>
 
         <div className="character-info">
-          <h1 className="character-name">{CHARACTER_INFO.name}</h1>
-          <p className="character-title">{CHARACTER_INFO.title}</p>
+          <h1 className="character-name">{characterSettings.display_name}</h1>
+          <p className="character-title">{characterSettings.subtitle}</p>
 
           <div className="xp-bar">
             <div className="xp-label">Progress to Level {age + 1}</div>
@@ -327,10 +323,11 @@ function Home() {
             <div className="xp-percentage">{birthdayProgress}%</div>
           </div>
 
-          <p className="character-description">
-            A passionate developer on a quest to build amazing digital experiences. Always learning,
-            always growing, always ready for the next adventure.
-          </p>
+          {characterSettings.description && (
+            <p className="character-description">
+              {characterSettings.description}
+            </p>
+          )}
 
           <div className="character-actions">
             <button className="action-button linkedin" onClick={handleLinkedInClick}>
@@ -341,6 +338,16 @@ function Home() {
               <Icon name="mail" size={20} />
               <span>Send Message</span>
             </button>
+            {characterSettings.action_buttons && characterSettings.action_buttons.map((button, index) => (
+              <button
+                key={index}
+                className="action-button custom"
+                onClick={() => window.open(button.url, '_blank', 'noopener,noreferrer')}
+              >
+                <Icon name={button.icon || 'star'} size={20} />
+                <span>{button.label}</span>
+              </button>
+            ))}
           </div>
         </div>
       </section>
@@ -353,21 +360,21 @@ function Home() {
           <Icon name="crown" size={32} />
           <div>
             <span className="info-label">Class</span>
-            <span className="info-value">{CHARACTER_INFO.class}</span>
+            <span className="info-value">{characterSettings.class}</span>
           </div>
         </div>
         <div className="info-card">
           <Icon name="map" size={32} />
           <div>
             <span className="info-label">Location</span>
-            <span className="info-value">{CHARACTER_INFO.location}</span>
+            <span className="info-value">{characterSettings.location}</span>
           </div>
         </div>
         <div className="info-card">
           <Icon name="quests" size={32} />
           <div>
             <span className="info-label">Current Quest</span>
-            <span className="info-value">{CHARACTER_INFO.currentQuest}</span>
+            <span className="info-value">{characterSettings.current_quest}</span>
           </div>
         </div>
       </section>
@@ -412,12 +419,17 @@ function Home() {
             Languages
           </h3>
           <ul className="skills-list">
-            {LANGUAGES.map((lang) => (
-              <li key={lang.name} className="skill-item">
-                <span className="skill-name">{lang.name}</span>
-                <span className="skill-level">{lang.level}</span>
+            {characterSettings.languages && characterSettings.languages.length > 0 ? (
+              characterSettings.languages.map((lang, index) => (
+                <li key={index} className="skill-item">
+                  <span className="skill-name">{lang}</span>
+                </li>
+              ))
+            ) : (
+              <li className="skill-item empty">
+                <span className="skill-name">No languages added</span>
               </li>
-            ))}
+            )}
           </ul>
         </div>
 
@@ -427,11 +439,17 @@ function Home() {
             Frameworks
           </h3>
           <ul className="skills-list">
-            {FRAMEWORKS.map((fw) => (
-              <li key={fw.name} className="skill-item">
-                <span className="skill-name">{fw.name}</span>
+            {characterSettings.frameworks && characterSettings.frameworks.length > 0 ? (
+              characterSettings.frameworks.map((fw, index) => (
+                <li key={index} className="skill-item">
+                  <span className="skill-name">{fw}</span>
+                </li>
+              ))
+            ) : (
+              <li className="skill-item empty">
+                <span className="skill-name">No frameworks added</span>
               </li>
-            ))}
+            )}
           </ul>
         </div>
 
@@ -441,11 +459,17 @@ function Home() {
             Tools
           </h3>
           <ul className="skills-list">
-            {TOOLS.map((tool) => (
-              <li key={tool.name} className="skill-item">
-                <span className="skill-name">{tool.name}</span>
+            {characterSettings.tools && characterSettings.tools.length > 0 ? (
+              characterSettings.tools.map((tool, index) => (
+                <li key={index} className="skill-item">
+                  <span className="skill-name">{tool}</span>
+                </li>
+              ))
+            ) : (
+              <li className="skill-item empty">
+                <span className="skill-name">No tools added</span>
               </li>
-            ))}
+            )}
           </ul>
         </div>
       </section>

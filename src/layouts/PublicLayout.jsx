@@ -15,6 +15,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Icon from '../components/Icon'
+import { getCharacterSettings } from '../services/characterSettingsService'
 import './PublicLayout.css'
 
 // ========================================
@@ -28,7 +29,22 @@ function PublicLayout({ children }) {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [displayName, setDisplayName] = useState('Portfolio Miriam Schouten')
   const location = useLocation()
+
+  // ========================================
+  // FETCH CHARACTER NAME
+  // ========================================
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const { data } = await getCharacterSettings()
+      if (data?.display_name) {
+        setDisplayName(`Portfolio ${data.display_name}`)
+      }
+    }
+    fetchSettings()
+  }, [])
 
   // ========================================
   // SCROLL DETECTION
@@ -76,7 +92,7 @@ function PublicLayout({ children }) {
           {/* Logo/Brand */}
           <Link to="/" className="nav-brand">
             <Icon name="crown" size={32} />
-            <span className="brand-text">Portfolio Miriam Schouten</span>
+            <span className="brand-text">{displayName}</span>
           </Link>
 
           {/* Desktop Navigation */}
