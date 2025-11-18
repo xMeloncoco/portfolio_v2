@@ -323,8 +323,8 @@
 
 .stat-block {
   position: relative;
-  background: var(--color-bg-tertiary);
-  border: 2px solid var(--color-border);
+  background: transparent;
+  border: none;
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
   text-align: center;
@@ -341,9 +341,9 @@
 
 .stat-block:hover,
 .stat-block.hovered {
-  border-color: var(--color-secondary);
+  background: rgba(255, 215, 0, 0.05);
+  border-radius: var(--radius-md);
   transform: translateY(-3px);
-  box-shadow: var(--glow-secondary);
   z-index: 10;
   overflow: visible;
 }
@@ -600,7 +600,7 @@
 .quest-stat {
   text-align: center;
   padding: var(--spacing-md);
-  background: var(--color-bg-tertiary);
+  background: transparent;
   border-radius: var(--radius-md);
 }
 
@@ -637,7 +637,7 @@
 
 .main-quests-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-md);
 }
 
@@ -947,18 +947,12 @@
     grid-template-columns: 1fr;
   }
 
+  .main-quests-grid {
+    grid-template-columns: 1fr;
+  }
+
   .quest-stats {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .inventory-grid {
-    grid-template-columns: repeat(6, 1fr);
-    gap: var(--spacing-xs);
-  }
-
-  .inventory-item-box {
-    min-height: 80px;
-    padding: var(--spacing-xs);
   }
 }
 
@@ -990,24 +984,6 @@
 
   .stat-block {
     padding: var(--spacing-xs);
-  }
-
-  .inventory-grid {
-    gap: 4px;
-  }
-
-  .inventory-item-box {
-    min-height: 60px;
-    padding: 4px;
-  }
-
-  .item-box-icon svg {
-    width: 24px;
-    height: 24px;
-  }
-
-  .item-box-name {
-    font-size: 0.5rem;
   }
 }
 
