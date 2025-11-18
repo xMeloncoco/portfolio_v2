@@ -44,11 +44,6 @@ export async function getAllPages(options = {}) {
         page_tags (
           tag_id,
           tags (id, name, color)
-        ),
-        page_connections (
-          id,
-          connected_to_type,
-          connected_to_id
         )
       `)
       .order('updated_at', { ascending: false })
@@ -73,9 +68,25 @@ export async function getAllPages(options = {}) {
       return { data: [], error: error.message }
     }
 
+    // Fetch page_connections separately for all pages
+    const pageIds = data.map(p => p.id)
+    const { data: allConnections } = await supabase
+      .from('page_connections')
+      .select('*')
+      .in('page_id', pageIds)
+
+    // Group connections by page_id
+    const connectionsByPage = {}
+    allConnections?.forEach(conn => {
+      if (!connectionsByPage[conn.page_id]) {
+        connectionsByPage[conn.page_id] = []
+      }
+      connectionsByPage[conn.page_id].push(conn)
+    })
+
     // Fetch related quests and projects for all connections
     const transformedData = await Promise.all(data.map(async (page) => {
-      const connections = page.page_connections || []
+      const connections = connectionsByPage[page.id] || []
       const quests = []
       const projects = []
 
@@ -131,11 +142,6 @@ export async function getPageById(pageId) {
           tag_id,
           tags (id, name, color)
         ),
-        page_connections (
-          id,
-          connected_to_type,
-          connected_to_id
-        ),
         devlog_items (
           id, title, status, sort_order
         )
@@ -148,12 +154,17 @@ export async function getPageById(pageId) {
       return { data: null, error: error.message }
     }
 
+    // Fetch page_connections separately
+    const { data: connections } = await supabase
+      .from('page_connections')
+      .select('*')
+      .eq('page_id', pageId)
+
     // Fetch related quests and projects
-    const connections = data.page_connections || []
     const quests = []
     const projects = []
 
-    for (const conn of connections) {
+    for (const conn of (connections || [])) {
       if (conn.connected_to_type === 'quest') {
         const { data: quest } = await supabase
           .from('quests')
