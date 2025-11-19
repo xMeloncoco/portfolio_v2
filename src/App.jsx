@@ -34,6 +34,7 @@ import QuestForm from './pages/QuestForm'
 import QuestView from './pages/QuestView'
 import Issues from './pages/Issues'
 import IssueForm from './pages/IssueForm'
+import Inbox from './pages/Inbox'
 import Inventory from './pages/Inventory'
 import InventoryForm from './pages/InventoryForm'
 import Skills from './pages/Skills'
@@ -322,6 +323,18 @@ function App() {
             <ProtectedRoute>
               <AdminLayout>
                 <IssueForm />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Inbox Management */}
+        <Route
+          path="/admin/inbox"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Inbox />
               </AdminLayout>
             </ProtectedRoute>
           }

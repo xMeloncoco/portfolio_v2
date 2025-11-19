@@ -69,6 +69,12 @@ const NAV_ITEMS = [
     description: 'Track bugs and improvements'
   },
   {
+    path: '/admin/inbox',
+    icon: 'mail',
+    label: 'Inbox',
+    description: 'View and manage contact form messages'
+  },
+  {
     path: '/admin/inventory',
     icon: 'treasure-chest',
     label: 'Inventory',

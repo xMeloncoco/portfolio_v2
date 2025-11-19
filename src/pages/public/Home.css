@@ -999,6 +999,49 @@
   }
 }
 
+/* ========================================
+ * SUCCESS TOAST
+ * ======================================== */
+
+.success-toast {
+  position: fixed;
+  top: var(--spacing-xl);
+  right: var(--spacing-xl);
+  z-index: var(--z-modal);
+
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  background: var(--color-success);
+  color: white;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xl);
+
+  animation: slideInToast 0.3s ease-out;
+}
+
+.success-toast p {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+@keyframes slideInToast {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ========================================
+ * ANIMATIONS
+ * ======================================== */
+
 @keyframes fadeIn {
   from {
     opacity: 0;

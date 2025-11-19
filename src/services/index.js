@@ -24,6 +24,7 @@ export * as devlogIssuesService from './devlogIssuesService'
 // Specialized services
 export * as inventoryService from './inventoryService'
 export * as characterStatsService from './characterStatsService'
+export * as contactService from './contactService'
 
 // Complex query services
 export * as portfolioQueries from './portfolioQueries'
@@ -98,3 +99,18 @@ export {
   getPortfolioStatistics,
   getProjectTree
 } from './portfolioQueries'
+
+export {
+  // Contact messages
+  submitMessage,
+  getAllMessages,
+  getMessageById,
+  updateMessageStatus,
+  markAsRead,
+  markAsReplied,
+  deleteMessage,
+  getUnreadCount,
+  getInboxStatistics,
+  getAllCategories,
+  getAllStatuses
+} from './contactService'
