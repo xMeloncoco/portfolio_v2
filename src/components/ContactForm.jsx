@@ -383,11 +383,6 @@ function ContactForm({ isOpen, onClose, onSuccess }) {
                   </option>
                 ))}
               </select>
-              {formData.category && (
-                <p className="category-description">
-                  {categories.find(c => c.value === formData.category)?.description}
-                </p>
-              )}
               {errors.category && <p className="error-message">{errors.category}</p>}
             </div>
 
