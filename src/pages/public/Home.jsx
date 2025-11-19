@@ -31,6 +31,7 @@ import Icon from '../../components/Icon'
 import Tag from '../../components/Tag'
 import InventoryDisplay from '../../components/InventoryDisplay'
 import AchievementsDisplay from '../../components/AchievementsDisplay'
+import ContactForm from '../../components/ContactForm'
 import './Home.css'
 
 // ========================================
@@ -69,6 +70,7 @@ function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [hoveredStat, setHoveredStat] = useState(null)
   const [showContactPopup, setShowContactPopup] = useState(false)
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
 
   // ========================================
   // DATA FETCHING
@@ -218,10 +220,19 @@ function Home() {
 
   const handleContactClick = () => {
     setShowContactPopup(true)
+    setShowSuccessMessage(false)
   }
 
   const handleCloseContactPopup = () => {
     setShowContactPopup(false)
+  }
+
+  const handleContactSuccess = () => {
+    setShowSuccessMessage(true)
+    // Hide success message after 5 seconds
+    setTimeout(() => {
+      setShowSuccessMessage(false)
+    }, 5000)
   }
 
   // ========================================
@@ -656,20 +667,23 @@ function Home() {
       </section>
 
       {/* ========================================
-       * CONTACT POPUP (Placeholder)
+       * SUCCESS MESSAGE
        * ======================================== */}
-      {showContactPopup && (
-        <div className="contact-popup-backdrop" onClick={handleCloseContactPopup}>
-          <div className="contact-popup" onClick={(e) => e.stopPropagation()}>
-            <button className="popup-close" onClick={handleCloseContactPopup}>
-              <Icon name="cross" size={24} />
-            </button>
-            <Icon name="construction" size={48} />
-            <h3>Coming Soon!</h3>
-            <p>The contact form will be available in a later phase.</p>
-          </div>
+      {showSuccessMessage && (
+        <div className="success-toast">
+          <Icon name="done" size={24} />
+          <p>Message sent successfully! I&apos;ll get back to you soon.</p>
         </div>
       )}
+
+      {/* ========================================
+       * CONTACT FORM
+       * ======================================== */}
+      <ContactForm
+        isOpen={showContactPopup}
+        onClose={handleCloseContactPopup}
+        onSuccess={handleContactSuccess}
+      />
     </div>
   )
 }

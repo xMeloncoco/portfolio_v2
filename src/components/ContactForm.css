@@ -1,0 +1,434 @@
+/**
+ * ========================================
+ * CONTACT FORM STYLES
+ * ========================================
+ * Styles for the contact form modal component
+ */
+
+/* ========================================
+ * BACKDROP
+ * ======================================== */
+
+.contact-form-backdrop {
+  /* Full viewport coverage */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  /* Dark overlay */
+  background-color: rgba(0, 0, 0, 0.8);
+
+  /* Center modal content */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* High z-index */
+  z-index: var(--z-modal-backdrop);
+
+  /* Animation */
+  animation: fadeInBackdrop 0.2s ease-out;
+
+  /* Padding for small screens */
+  padding: var(--spacing-md);
+  overflow-y: auto;
+}
+
+@keyframes fadeInBackdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ========================================
+ * MODAL CONTENT BOX
+ * ======================================== */
+
+.contact-form-modal {
+  /* Dimensions */
+  width: 100%;
+  max-width: 600px;
+
+  /* Styling */
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+
+  /* Shadow */
+  box-shadow: var(--shadow-xl), var(--glow-primary);
+
+  /* Animation */
+  animation: slideInModal 0.3s ease-out;
+
+  /* Above backdrop */
+  z-index: var(--z-modal);
+
+  /* Margin for scrolling */
+  margin: var(--spacing-lg) auto;
+}
+
+@keyframes slideInModal {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ========================================
+ * MODAL HEADER
+ * ======================================== */
+
+.contact-form-header {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  position: relative;
+
+  /* Padding */
+  padding: var(--spacing-xl);
+
+  /* Border */
+  border-bottom: 2px solid var(--color-border);
+}
+
+.contact-form-header h2 {
+  /* Typography */
+  font-size: var(--font-size-2xl);
+  color: var(--color-heading);
+  text-shadow: var(--glow-secondary);
+  margin: 0;
+  flex: 1;
+}
+
+.contact-form-close {
+  /* Position */
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+
+  /* Styling */
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+
+  /* Transitions */
+  transition: all var(--transition-base);
+}
+
+.contact-form-close:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.contact-form-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+ * SUCCESS/ERROR MESSAGES
+ * ======================================== */
+
+.contact-form-success,
+.contact-form-error {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  /* Padding */
+  padding: var(--spacing-md) var(--spacing-xl);
+  margin: var(--spacing-lg) var(--spacing-xl);
+
+  /* Border and styling */
+  border-radius: var(--radius-sm);
+
+  /* Animation */
+  animation: slideInMessage 0.3s ease-out;
+}
+
+@keyframes slideInMessage {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.contact-form-success {
+  background: rgba(46, 213, 115, 0.15);
+  border: 2px solid var(--color-success);
+  color: var(--color-success);
+}
+
+.contact-form-error {
+  background: rgba(255, 74, 110, 0.15);
+  border: 2px solid var(--color-error);
+  color: var(--color-error);
+}
+
+.contact-form-success p,
+.contact-form-error p {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ========================================
+ * FORM
+ * ======================================== */
+
+.contact-form {
+  /* Padding */
+  padding: var(--spacing-xl);
+
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ========================================
+ * FORM GROUPS
+ * ======================================== */
+
+.form-group {
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.form-group label {
+  /* Typography */
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-group .required {
+  color: var(--color-error);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  /* Styling */
+  background: var(--color-bg-darker);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+
+  /* Typography */
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+
+  /* Padding */
+  padding: var(--spacing-sm) var(--spacing-md);
+
+  /* Transitions */
+  transition: all var(--transition-base);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+.form-group input:disabled,
+.form-group select:disabled,
+.form-group textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+  border-color: var(--color-error);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: var(--line-height-relaxed);
+}
+
+.form-group select {
+  cursor: pointer;
+}
+
+/* Category description */
+.category-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Error message */
+.error-message {
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.error-message::before {
+  content: '⚠';
+}
+
+/* ========================================
+ * FORM FOOTER
+ * ======================================== */
+
+.contact-form-footer {
+  /* Layout */
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+
+  /* Padding */
+  padding-top: var(--spacing-md);
+
+  /* Border */
+  border-top: 2px solid var(--color-border);
+  margin-top: var(--spacing-md);
+}
+
+/* ========================================
+ * BUTTONS
+ * ======================================== */
+
+.button {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+
+  /* Dimensions */
+  padding: var(--spacing-sm) var(--spacing-lg);
+
+  /* Typography */
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-primary);
+
+  /* Border and styling */
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+
+  /* Transitions */
+  transition: all var(--transition-base);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button--secondary {
+  background: transparent;
+  border: 2px solid var(--color-text-muted);
+  color: var(--color-text-primary);
+}
+
+.button--secondary:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-text-primary);
+}
+
+.button--primary {
+  background: var(--color-secondary);
+  border: 2px solid var(--color-secondary-light);
+  color: var(--color-primary-dark);
+}
+
+.button--primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-primary);
+}
+
+.button--primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* ========================================
+ * LOADING SPINNER
+ * ======================================== */
+
+.loading-spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(0, 0, 0, 0.3);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+ * RESPONSIVE ADJUSTMENTS
+ * ======================================== */
+
+@media (max-width: 768px) {
+  .contact-form-modal {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    min-height: 100vh;
+  }
+
+  .contact-form-backdrop {
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-form-header {
+    padding: var(--spacing-lg);
+  }
+
+  .contact-form {
+    padding: var(--spacing-lg);
+    gap: var(--spacing-md);
+  }
+
+  .contact-form-footer {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .button {
+    width: 100%;
+  }
+}
