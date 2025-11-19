@@ -281,6 +281,13 @@
   background-color: var(--color-bg-darker);
 }
 
+/* When a category is selected, highlight with yellow */
+.form-group select:not([value=""]):valid,
+.form-group select.has-value {
+  background-color: rgba(212, 175, 55, 0.1);
+  border-color: var(--color-secondary);
+}
+
 .form-group select option {
   background-color: var(--color-bg-darker);
   color: var(--color-text-primary);
