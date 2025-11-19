@@ -110,9 +110,8 @@ ALTER TABLE contact_messages
     'invite_to_party',
     'seeking_knowledge',
     'report_bug',
-    'trade_offer',
-    'request_backup',
-    'guild_recruitment'
+    'guild_recruitment',
+    'general'
   ));
 
 -- ========================================

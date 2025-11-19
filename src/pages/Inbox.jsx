@@ -37,9 +37,8 @@ const CATEGORY_CONFIG = {
   invite_to_party: { icon: 'users', color: '#9b59b6' },
   seeking_knowledge: { icon: 'inspect-code', color: '#f39c12' },
   report_bug: { icon: 'bug', color: '#e74c3c' },
-  trade_offer: { icon: 'treasure-chest', color: '#2ecc71' },
-  request_backup: { icon: 'shield', color: '#e67e22' },
-  guild_recruitment: { icon: 'users', color: '#1abc9c' }
+  guild_recruitment: { icon: 'users', color: '#1abc9c' },
+  general: { icon: 'mail', color: '#95a5a6' }
 }
 
 const STATUS_CONFIG = {
