@@ -466,7 +466,7 @@ function CharacterStats() {
             </h3>
             <div className="quest-cards main-quests">
               {getMainQuests().map((quest) => (
-                <Link key={quest.id} to="/quests" className="quest-card main">
+                <Link key={quest.id} to={`/quests/${quest.id}`} className="quest-card main">
                   <h4>{quest.title}</h4>
                   {quest.description && (
                     <p>{quest.description.substring(0, 100)}...</p>
@@ -487,7 +487,7 @@ function CharacterStats() {
             </h3>
             <div className="quest-cards side-quests">
               {getSideQuests().map((quest) => (
-                <Link key={quest.id} to="/quests" className="quest-card side">
+                <Link key={quest.id} to={`/quests/${quest.id}`} className="quest-card side">
                   <h4>{quest.title}</h4>
                   {quest.description && (
                     <p>{quest.description.substring(0, 60)}...</p>

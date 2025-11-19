@@ -579,7 +579,7 @@ function Home() {
                 const percentage = total > 0 ? Math.round((completed / total) * 100) : 0
 
                 return (
-                  <Link key={quest.id} to="/quests" className="quest-card main">
+                  <Link key={quest.id} to={`/quests/${quest.id}`} className="quest-card main">
                     <h4>{quest.title}</h4>
                     {quest.description && (
                       <p className="quest-description">
@@ -613,7 +613,7 @@ function Home() {
             </h3>
             <div className="quest-cards side-quests-grid">
               {getSideQuests().map((quest) => (
-                <Link key={quest.id} to="/quests" className="quest-card side">
+                <Link key={quest.id} to={`/quests/${quest.id}`} className="quest-card side">
                   <h4>{quest.title}</h4>
                   {quest.description && <p>{truncateText(quest.description, 60)}</p>}
                 </Link>
