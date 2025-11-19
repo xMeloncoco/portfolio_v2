@@ -279,6 +279,8 @@
   cursor: pointer;
   /* Ensure dropdown options have dark background */
   background-color: var(--color-bg-darker);
+  /* Force color scheme to work better across browsers */
+  color-scheme: dark;
 }
 
 /* When a category is selected, highlight with yellow */
@@ -288,10 +290,29 @@
   border-color: var(--color-secondary);
 }
 
+/* Force dropdown options to have proper styling */
 .form-group select option {
-  background-color: var(--color-bg-darker);
-  color: var(--color-text-primary);
+  background-color: var(--color-bg-darker) !important;
+  background: var(--color-bg-darker) !important;
+  color: var(--color-text-primary) !important;
   padding: var(--spacing-sm);
+}
+
+/* Ensure proper contrast for option hover/selection */
+.form-group select option:hover,
+.form-group select option:focus,
+.form-group select option:checked {
+  background-color: rgba(212, 175, 55, 0.2) !important;
+  background: rgba(212, 175, 55, 0.2) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Firefox-specific fixes */
+@-moz-document url-prefix() {
+  .form-group select option {
+    background-color: #1a1a2e !important;
+    color: #e0e0e0 !important;
+  }
 }
 
 /* Category description */
