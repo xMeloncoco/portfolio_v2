@@ -379,7 +379,7 @@ function ContactForm({ isOpen, onClose, onSuccess }) {
                 <option value="">Select a quest type...</option>
                 {categories.map(cat => (
                   <option key={cat.value} value={cat.value}>
-                    {cat.label}
+                    {cat.label} - {cat.description}
                   </option>
                 ))}
               </select>

@@ -277,6 +277,14 @@
 
 .form-group select {
   cursor: pointer;
+  /* Ensure dropdown options have dark background */
+  background-color: var(--color-bg-darker);
+}
+
+.form-group select option {
+  background-color: var(--color-bg-darker);
+  color: var(--color-text-primary);
+  padding: var(--spacing-sm);
 }
 
 /* Category description */

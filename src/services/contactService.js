@@ -44,9 +44,8 @@ export const MESSAGE_CATEGORY_LABELS = {
   invite_to_party: '🎉 Invite to Party',
   seeking_knowledge: '📚 Seeking Knowledge',
   report_bug: '🐛 Report a Bug',
-  trade_offer: '💎 Trade Offer',
-  request_backup: '🛡️ Request Backup',
-  guild_recruitment: '👥 Guild Recruitment'
+  guild_recruitment: '👥 Guild Recruitment',
+  general: '💬 Just Saying Hi'
 }
 
 export const MESSAGE_CATEGORY_DESCRIPTIONS = {
@@ -54,9 +53,8 @@ export const MESSAGE_CATEGORY_DESCRIPTIONS = {
   invite_to_party: 'Collaboration requests',
   seeking_knowledge: 'Questions about my portfolio or me',
   report_bug: 'Feedback or issues with the site',
-  trade_offer: 'Exchange ideas or resources',
-  request_backup: 'Need help with something',
-  guild_recruitment: 'Team or partnership opportunities'
+  guild_recruitment: 'Team or partnership opportunities',
+  general: 'General message or just want to say hi'
 }
 
 // ========================================
