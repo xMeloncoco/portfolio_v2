@@ -21,6 +21,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Icon from './Icon'
+import CustomSelect from './CustomSelect'
 import { submitMessage, getAllCategories, isValidEmail } from '../services/contactService'
 import './ContactForm.css'
 
@@ -367,22 +368,17 @@ function ContactForm({ isOpen, onClose, onSuccess }) {
               <label htmlFor="category">
                 Quest Type <span className="required">*</span>
               </label>
-              <select
+              <CustomSelect
                 id="category"
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={errors.category ? 'error' : ''}
+                options={categories}
+                placeholder="Select a quest type..."
                 disabled={isSubmitting}
-              >
-                <option value="">Select a quest type...</option>
-                {categories.map(cat => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label} - {cat.description}
-                  </option>
-                ))}
-              </select>
+                error={!!errors.category}
+              />
               {errors.category && <p className="error-message">{errors.category}</p>}
             </div>
 
