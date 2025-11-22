@@ -238,7 +238,12 @@ function ContactForm({ isOpen, onClose, onSuccess }) {
       const { data, error } = await submitMessage(formData)
 
       if (error) {
-        setSubmitError(error)
+        // Check if it's a database setup error
+        if (error.includes('404') || error.includes('not found') || error.includes('schema cache')) {
+          setSubmitError('Database not set up yet. Please run the database migration in Supabase first. See DATABASE_SETUP_GUIDE.md for instructions.')
+        } else {
+          setSubmitError(error)
+        }
         setIsSubmitting(false)
         return
       }
@@ -257,7 +262,13 @@ function ContactForm({ isOpen, onClose, onSuccess }) {
         onClose()
       }, 2000)
     } catch (err) {
-      setSubmitError('An unexpected error occurred. Please try again.')
+      // Check if it's a network/database error
+      const errorMessage = err.message || String(err)
+      if (errorMessage.includes('404') || errorMessage.includes('not found') || errorMessage.includes('schema cache')) {
+        setSubmitError('Database not set up yet. Please run the database migration in Supabase first. See DATABASE_SETUP_GUIDE.md for instructions.')
+      } else {
+        setSubmitError('An unexpected error occurred. Please try again.')
+      }
       setIsSubmitting(false)
     }
   }
