@@ -123,9 +123,8 @@
   max-height: 300px;
   overflow-y: auto;
 
-  /* Styling */
-  background: var(--color-bg-darker);
-  background-color: var(--color-bg-darker);
+  /* Styling - SOLID OPAQUE BACKGROUND (no transparency) */
+  background-color: #1a1d2e; /* Solid dark blue background */
   border: 2px solid var(--color-secondary);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-lg), 0 0 20px rgba(212, 175, 55, 0.3);
@@ -173,8 +172,8 @@
   display: block;
   padding: var(--spacing-sm) var(--spacing-md);
 
-  /* Solid background */
-  background-color: var(--color-bg-darker);
+  /* SOLID OPAQUE BACKGROUND (no transparency) */
+  background-color: #1a1d2e;
 
   /* Typography */
   font-family: var(--font-primary);
@@ -190,22 +189,21 @@
 
 .custom-select__option:hover,
 .custom-select__option.focused {
-  /* Layer yellow on top of dark background for visibility */
-  background: linear-gradient(rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.2)), var(--color-bg-darker);
-  background-color: #2a2a3e; /* Fallback solid dark color */
+  /* SOLID OPAQUE BACKGROUND - lighter shade for hover */
+  background-color: #2a2f4a;
 }
 
 .custom-select__option.selected {
-  /* Layer yellow on top of dark background for visibility */
-  background: linear-gradient(rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.15)), var(--color-bg-darker);
-  background-color: #252535; /* Fallback solid dark color */
+  /* SOLID OPAQUE BACKGROUND - with yellow tint for selected state */
+  background-color: #2e3348;
+  border-left: 3px solid var(--color-secondary);
+  padding-left: calc(var(--spacing-md) - 3px);
   font-weight: var(--font-weight-semibold);
 }
 
 .custom-select__option:active {
-  /* Layer yellow on top of dark background for visibility */
-  background: linear-gradient(rgba(212, 175, 55, 0.3), rgba(212, 175, 55, 0.3)), var(--color-bg-darker);
-  background-color: #2f2f48; /* Fallback solid dark color */
+  /* SOLID OPAQUE BACKGROUND - darker shade for active state */
+  background-color: #232842;
 }
 
 /* ========================================
