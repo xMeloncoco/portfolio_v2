@@ -60,11 +60,11 @@ CREATE INDEX IF NOT EXISTS idx_contact_messages_created_at ON contact_messages(c
 -- ========================================
 ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 
--- Policy: Allow anonymous users to insert messages (contact form submissions)
-CREATE POLICY "Allow anonymous insert on contact_messages"
+-- Policy: Allow anyone to insert messages (contact form submissions)
+-- Note: Removed "TO anon" to allow all users (anonymous or authenticated) to submit
+CREATE POLICY "Allow public insert on contact_messages"
   ON contact_messages
   FOR INSERT
-  TO anon
   WITH CHECK (true);
 
 -- Policy: Allow authenticated users (admin) to view all messages
