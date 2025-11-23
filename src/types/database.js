@@ -63,19 +63,14 @@
 /**
  * @typedef {Object} Quest
  * @property {string} id - UUID primary key
- * @property {string|null} project_id - Optional parent project UUID
- * @property {string|null} parent_quest_id - Optional parent quest UUID (for subquests)
- * @property {string} name - Quest title
+ * @property {string} title - Quest title
  * @property {QuestType} quest_type - main, side, or future
- * @property {Visibility} visibility - Public or private
- * @property {string|null} short_description - Brief description
- * @property {string|null} long_description - Full description
  * @property {QuestStatus} status - Current quest status
- * @property {string|null} started_date - ISO date string
- * @property {string|null} finished_date - ISO date string
+ * @property {string|null} description - Quest description
+ * @property {Visibility} visibility - Public or private
+ * @property {string|null} project_id - Foreign key to parent project (NULLABLE)
  * @property {string} created_at - ISO timestamp
  * @property {string} updated_at - ISO timestamp
- * @property {string|null} project_page_id - Legacy link to project page
  */
 
 /**
