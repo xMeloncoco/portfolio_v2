@@ -425,52 +425,82 @@ function Inbox() {
       {showMessageModal && selectedMessage && (
         <div className="message-modal-backdrop" onClick={() => setShowMessageModal(false)}>
           <div className="message-modal" onClick={(e) => e.stopPropagation()}>
+            {/* Close Button */}
+            <button
+              className="modal-close-button"
+              onClick={() => setShowMessageModal(false)}
+              aria-label="Close message"
+            >
+              <Icon name="cross" size={24} />
+            </button>
+
+            {/* Header: Sender Info */}
             <div className="message-modal-header">
-              <div>
-                <h2>{selectedMessage.subject}</h2>
-                <div className="message-modal-meta">
-                  <span>
-                    <Icon name="user" size={16} />
-                    {selectedMessage.name}
-                  </span>
-                  <span>
-                    <Icon name="mail" size={16} />
-                    {selectedMessage.email}
-                  </span>
-                  <span>
-                    <Icon name="calendar" size={16} />
-                    {new Date(selectedMessage.created_at).toLocaleString()}
-                  </span>
+              <div className="sender-info">
+                <div className="sender-icon">
+                  <Icon name={CATEGORY_CONFIG[selectedMessage.category]?.icon || 'mail'} size={28} />
+                </div>
+                <div className="sender-details">
+                  <h2 className="sender-name">{selectedMessage.name}</h2>
+                  <div className="sender-meta">
+                    <span className="sender-email">
+                      <Icon name="mail" size={14} />
+                      {selectedMessage.email}
+                    </span>
+                    <span className="sender-date">
+                      <Icon name="calendar" size={14} />
+                      {new Date(selectedMessage.created_at).toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
                 </div>
               </div>
-              <button
-                className="modal-close-button"
-                onClick={() => setShowMessageModal(false)}
-              >
-                <Icon name="cross" size={24} />
-              </button>
             </div>
 
-            <div className="message-modal-badges">
+            {/* Subject Line with Status Badge */}
+            <div className="message-modal-subject">
+              <div className="subject-row">
+                <span className="subject-label">Subject:</span>
+                <h3 className="subject-text">{selectedMessage.subject}</h3>
+              </div>
               <span
                 className="status-badge"
-                style={{ borderColor: STATUS_CONFIG[selectedMessage.status]?.color }}
+                style={{
+                  borderColor: STATUS_CONFIG[selectedMessage.status]?.color,
+                  color: STATUS_CONFIG[selectedMessage.status]?.color
+                }}
               >
                 {STATUS_CONFIG[selectedMessage.status]?.label}
               </span>
+            </div>
+
+            {/* Category Badge */}
+            <div className="message-modal-category">
               <span
                 className="category-badge"
-                style={{ borderColor: CATEGORY_CONFIG[selectedMessage.category]?.color }}
+                style={{
+                  borderColor: CATEGORY_CONFIG[selectedMessage.category]?.color,
+                  color: CATEGORY_CONFIG[selectedMessage.category]?.color
+                }}
               >
+                <Icon name={CATEGORY_CONFIG[selectedMessage.category]?.icon || 'mail'} size={14} />
                 {MESSAGE_CATEGORY_LABELS[selectedMessage.category]}
               </span>
             </div>
 
+            {/* Message Content (Scrollable) */}
             <div className="message-modal-body">
-              <h3>Message:</h3>
-              <p>{selectedMessage.message}</p>
+              <div className="message-content-wrapper">
+                <p className="message-text">{selectedMessage.message}</p>
+              </div>
             </div>
 
+            {/* Footer: Action Buttons */}
             <div className="message-modal-footer">
               <button
                 className="button button--danger"
