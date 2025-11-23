@@ -15,6 +15,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Icon from '../components/Icon'
+import ContactForm from '../components/ContactForm'
 import { getCharacterSettings } from '../services/characterSettingsService'
 import './PublicLayout.css'
 
@@ -30,6 +31,8 @@ function PublicLayout({ children }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [displayName, setDisplayName] = useState('Portfolio Miriam Schouten')
+  const [showContactForm, setShowContactForm] = useState(false)
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const location = useLocation()
 
   // ========================================
@@ -75,10 +78,31 @@ function PublicLayout({ children }) {
 
   const navItems = [
     { path: '/', label: 'Home', icon: 'home' },
-    { path: '/blog', label: 'Blog', icon: 'writing' },
+    { path: '/blog', label: 'Posts', icon: 'writing' },
     { path: '/projects', label: 'Projects', icon: 'castle' },
     { path: '/quests', label: 'Quests', icon: 'quests' }
   ]
+
+  // ========================================
+  // CONTACT FORM HANDLERS
+  // ========================================
+
+  const handleContactClick = () => {
+    setShowContactForm(true)
+    setShowSuccessMessage(false)
+  }
+
+  const handleCloseContactForm = () => {
+    setShowContactForm(false)
+  }
+
+  const handleContactSuccess = () => {
+    setShowSuccessMessage(true)
+    // Hide success message after 5 seconds
+    setTimeout(() => {
+      setShowSuccessMessage(false)
+    }, 5000)
+  }
 
   // ========================================
   // RENDER
@@ -152,39 +176,52 @@ function PublicLayout({ children }) {
       {/* Footer */}
       <footer className="public-footer">
         <div className="footer-container">
-          <div className="footer-brand">
-            <Icon name="crown" size={28} />
-            <span>Portfolio</span>
-          </div>
+          {/* Contact Me Button */}
+          <button className="footer-contact-button" onClick={handleContactClick}>
+            <Icon name="mail" size={20} />
+            <span>Contact Me</span>
+          </button>
 
-          <div className="footer-links">
+          {/* Navigation Links */}
+          <nav className="footer-links">
             <Link to="/">Home</Link>
-            <Link to="/blog">Blog</Link>
+            <Link to="/blog">Posts</Link>
             <Link to="/projects">Projects</Link>
             <Link to="/quests">Quests</Link>
-          </div>
+          </nav>
 
-          <div className="footer-social">
-            <a href="#" title="GitHub" aria-label="GitHub">
-              <Icon name="web" size={24} />
-            </a>
-            <a href="#" title="LinkedIn" aria-label="LinkedIn">
-              <Icon name="web" size={24} />
-            </a>
-            <a href="#" title="Email" aria-label="Email">
-              <Icon name="mail" size={24} />
-            </a>
-          </div>
-
+          {/* Copyright */}
           <div className="footer-copyright">
-            <p>&copy; {new Date().getFullYear()} Your Name. All rights reserved.</p>
-            <p className="footer-theme">
-              <Icon name="theme" size={16} />
-              <span>Built with RPG vibes</span>
+            <p>
+              &copy; 2025 Miriam Schouten. Icons by{' '}
+              <a
+                href="https://icons8.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icons8-link"
+              >
+                icons8
+              </a>
+              .
             </p>
           </div>
         </div>
       </footer>
+
+      {/* Contact Form */}
+      <ContactForm
+        isOpen={showContactForm}
+        onClose={handleCloseContactForm}
+        onSuccess={handleContactSuccess}
+      />
+
+      {/* Success Message Toast */}
+      {showSuccessMessage && (
+        <div className="success-toast">
+          <Icon name="done" size={24} />
+          <p>Message sent successfully! I&apos;ll get back to you soon.</p>
+        </div>
+      )}
     </div>
   )
 }
