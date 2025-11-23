@@ -25,6 +25,7 @@ import {
   getAllSeverityLevels
 } from '../services/issuesService'
 import { getAllQuests } from '../services/questsService'
+import { getAllProjects } from '../services/projectsService'
 import { logger } from '../utils/logger'
 import Icon from '../components/Icon'
 import './IssueForm.css'
@@ -71,6 +72,7 @@ function IssueForm() {
 
   // Available options
   const [availableQuests, setAvailableQuests] = useState([])
+  const [availableProjects, setAvailableProjects] = useState([])
   const [issueStatuses] = useState(getAllIssueStatuses())
   const [severityLevels] = useState(getAllSeverityLevels())
 
@@ -94,10 +96,11 @@ function IssueForm() {
   }, [id])
 
   /**
-   * Fetch available quests for attachment
+   * Fetch available quests and projects for attachment
    */
   useEffect(() => {
     fetchQuests()
+    fetchProjects()
   }, [])
 
   /**
@@ -152,6 +155,24 @@ function IssueForm() {
       }
     } catch (err) {
       logger.error('Unexpected error fetching quests', err)
+    }
+  }
+
+  /**
+   * Fetch all available projects
+   */
+  const fetchProjects = async () => {
+    try {
+      const { data, error: fetchError } = await getAllProjects()
+
+      if (fetchError) {
+        logger.error('Error fetching projects', fetchError)
+      } else {
+        setAvailableProjects(data || [])
+        logger.info(`Loaded ${data?.length || 0} projects for attachment`)
+      }
+    } catch (err) {
+      logger.error('Unexpected error fetching projects', err)
     }
   }
 
@@ -210,7 +231,7 @@ function IssueForm() {
 
     // Attachment is required
     if (!formData.attached_to_id) {
-      errors.attached_to_id = 'Please select a quest to attach the issue to'
+      errors.attached_to_id = 'Please select a quest or project to attach the issue to'
     }
 
     // Severity required for bugs
@@ -447,35 +468,93 @@ function IssueForm() {
         {/* Attachment Section */}
         <div className="form-section">
           <h2 className="section-title">
-            <Icon name="quests" size={24} />
+            <Icon name="link" size={24} />
             Attach To
           </h2>
 
+          {/* Attachment Type Selector */}
+          <div className="form-group">
+            <label className="form-label">
+              Attach To Type <span className="required">*</span>
+            </label>
+            <div className="type-selector">
+              <button
+                type="button"
+                className={`type-option ${formData.attached_to_type === 'quest' ? 'selected' : ''}`}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, attached_to_type: 'quest', attached_to_id: '' }))
+                  setValidationErrors(prev => ({ ...prev, attached_to_id: undefined }))
+                }}
+              >
+                <Icon name="quests" size={32} />
+                <span className="type-label">Quest</span>
+                <span className="type-description">Attach to a quest</span>
+              </button>
+              <button
+                type="button"
+                className={`type-option ${formData.attached_to_type === 'project' ? 'selected' : ''}`}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, attached_to_type: 'project', attached_to_id: '' }))
+                  setValidationErrors(prev => ({ ...prev, attached_to_id: undefined }))
+                }}
+              >
+                <Icon name="castle" size={32} />
+                <span className="type-label">Project</span>
+                <span className="type-description">Attach to a project</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Quest/Project Selector */}
           <div className="form-group">
             <label htmlFor="attached_to_id" className="form-label">
-              Quest <span className="required">*</span>
+              {formData.attached_to_type === 'quest' ? 'Quest' : 'Project'} <span className="required">*</span>
             </label>
 
-            {availableQuests.length === 0 ? (
-              <div className="no-quests-message">
-                <Icon name="quests" size={32} />
-                <p>No quests available. Create quests first to attach issues.</p>
-              </div>
+            {formData.attached_to_type === 'quest' ? (
+              availableQuests.length === 0 ? (
+                <div className="no-quests-message">
+                  <Icon name="quests" size={32} />
+                  <p>No quests available. Create quests first to attach issues.</p>
+                </div>
+              ) : (
+                <select
+                  id="attached_to_id"
+                  name="attached_to_id"
+                  value={formData.attached_to_id}
+                  onChange={handleChange}
+                  className={`form-select ${validationErrors.attached_to_id ? 'error' : ''}`}
+                >
+                  <option value="">Select a quest...</option>
+                  {availableQuests.map((quest) => (
+                    <option key={quest.id} value={quest.id}>
+                      {quest.title} ({quest.quest_type})
+                    </option>
+                  ))}
+                </select>
+              )
             ) : (
-              <select
-                id="attached_to_id"
-                name="attached_to_id"
-                value={formData.attached_to_id}
-                onChange={handleChange}
-                className={`form-select ${validationErrors.attached_to_id ? 'error' : ''}`}
-              >
-                <option value="">Select a quest...</option>
-                {availableQuests.map((quest) => (
-                  <option key={quest.id} value={quest.id}>
-                    {quest.title} ({quest.quest_type})
-                  </option>
-                ))}
-              </select>
+              availableProjects.length === 0 ? (
+                <div className="no-quests-message">
+                  <Icon name="castle" size={32} />
+                  <p>No projects available. Create projects first to attach issues.</p>
+                </div>
+              ) : (
+                <select
+                  id="attached_to_id"
+                  name="attached_to_id"
+                  value={formData.attached_to_id}
+                  onChange={handleChange}
+                  className={`form-select ${validationErrors.attached_to_id ? 'error' : ''}`}
+                >
+                  <option value="">Select a project...</option>
+                  {availableProjects.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.title}
+                    </option>
+                  ))}
+                </select>
+              )
             )}
             {validationErrors.attached_to_id && (
               <span className="error-message">{validationErrors.attached_to_id}</span>

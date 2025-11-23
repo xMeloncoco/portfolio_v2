@@ -25,6 +25,7 @@ import {
   deleteSubQuest,
   STATUS_DISPLAY_NAMES
 } from '../services/questsService'
+import { getAllProjects } from '../services/projectsService'
 import { logger } from '../utils/logger'
 import Icon from '../components/Icon'
 import TagSelector from '../components/TagSelector'
@@ -77,11 +78,15 @@ function QuestForm() {
     title: '',
     quest_type: 'side',
     status: 'not_started',
-    description: ''
+    description: '',
+    project_id: null
   })
 
   // Tags
   const [selectedTags, setSelectedTags] = useState([])
+
+  // Projects
+  const [availableProjects, setAvailableProjects] = useState([])
 
   // Sub-quests
   const [subQuests, setSubQuests] = useState([])
@@ -108,6 +113,13 @@ function QuestForm() {
   }, [id])
 
   /**
+   * Fetch available projects for linking
+   */
+  useEffect(() => {
+    fetchProjects()
+  }, [])
+
+  /**
    * Load quest data for editing
    */
   const fetchQuestData = async () => {
@@ -128,7 +140,8 @@ function QuestForm() {
           title: data.title || '',
           quest_type: data.quest_type || 'side',
           status: data.status || 'not_started',
-          description: data.description || ''
+          description: data.description || '',
+          project_id: data.project_id || null
         })
 
         // Set selected tags
@@ -148,6 +161,24 @@ function QuestForm() {
       logger.error('Unexpected error fetching quest', err)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  /**
+   * Fetch all available projects
+   */
+  const fetchProjects = async () => {
+    try {
+      const { data, error: fetchError } = await getAllProjects()
+
+      if (fetchError) {
+        logger.error('Error fetching projects', fetchError)
+      } else {
+        setAvailableProjects(data || [])
+        logger.info(`Loaded ${data?.length || 0} projects for linking`)
+      }
+    } catch (err) {
+      logger.error('Unexpected error fetching projects', err)
     }
   }
 
@@ -315,7 +346,8 @@ function QuestForm() {
         title: formData.title.trim(),
         quest_type: formData.quest_type,
         status: formData.status,
-        description: formData.description
+        description: formData.description,
+        project_id: formData.project_id || null
       }
 
       // Add tag IDs
@@ -521,6 +553,35 @@ function QuestForm() {
               <span className="label-hint">(Search or create new tags)</span>
             </label>
             <TagSelector selectedTags={selectedTags} onTagsChange={handleTagsChange} />
+          </div>
+        </div>
+
+        {/* Project Linking Section */}
+        <div className="form-section">
+          <h2 className="section-title">
+            <Icon name="castle" size={24} />
+            Link to Project
+          </h2>
+
+          <div className="form-group">
+            <label htmlFor="project_id" className="form-label">
+              Project
+              <span className="label-hint">(Optional - Link this quest to a project)</span>
+            </label>
+            <select
+              id="project_id"
+              name="project_id"
+              value={formData.project_id || ''}
+              onChange={handleChange}
+              className="form-select"
+            >
+              <option value="">No Project</option>
+              {availableProjects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.title}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
