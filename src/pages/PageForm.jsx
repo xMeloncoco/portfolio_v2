@@ -186,6 +186,11 @@ function PageForm() {
           setSelectedQuestIds(data.quests.map((q) => q.id))
         }
 
+        // Set selected projects
+        if (data.projects && Array.isArray(data.projects)) {
+          setSelectedProjectIds(data.projects.map((p) => p.id))
+        }
+
         logger.info('Page data loaded successfully')
       }
     } catch (err) {
