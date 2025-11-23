@@ -649,24 +649,6 @@ function Home() {
       </section>
 
       {/* ========================================
-       * CONTACT SECTION
-       * ======================================== */}
-      <section className="cta-section">
-        <div className="cta-content">
-          <Icon name="mail" size={48} />
-          <h2>Ready to Start Your Quest?</h2>
-          <p>
-            Let&apos;s collaborate on your next project or discuss opportunities. I&apos;m always
-            excited to embark on new adventures!
-          </p>
-          <button onClick={handleContactClick} className="cta-button">
-            <Icon name="mail" size={24} />
-            <span>Contact Me</span>
-          </button>
-        </div>
-      </section>
-
-      {/* ========================================
        * SUCCESS MESSAGE
        * ======================================== */}
       {showSuccessMessage && (
