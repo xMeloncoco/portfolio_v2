@@ -221,9 +221,10 @@ export async function createQuest(questData, tagIds = []) {
       cleanQuestData.description = questData.description.trim()
     }
 
-    // Include project_id if provided
-    if (questData.project_id) {
-      cleanQuestData.project_id = questData.project_id
+    // Always include project_id if it's in the data (can be null to unlink)
+    // Using 'in' operator to check if property exists, allowing null values
+    if ('project_id' in questData) {
+      cleanQuestData.project_id = questData.project_id || null
     }
 
     // Insert the quest
