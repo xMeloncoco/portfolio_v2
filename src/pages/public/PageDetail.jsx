@@ -15,7 +15,8 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getPageById } from '../../services/pagesService'
+import { getPageById, getAllPages } from '../../services/pagesService'
+import { getAllIssues } from '../../services/issuesService'
 import { logger } from '../../utils/logger'
 import Icon from '../../components/Icon'
 import Tag from '../../components/Tag'
@@ -29,7 +30,7 @@ const PAGE_TYPES = {
   blog: { label: 'Blog', icon: 'writing', color: '#3498db' },
   devlog: { label: 'Devlog', icon: 'logbook', color: '#9b59b6' },
   notes: { label: 'Notes', icon: 'parchment', color: '#f39c12' },
-  project: { label: 'Project', icon: 'castle', color: '#2ecc71' }
+  project: { label: 'Project', icon: 'castle', color: '#d4af37' }
 }
 
 const PROJECT_STATUS_LABELS = {
@@ -59,6 +60,10 @@ function PageDetail() {
   const [page, setPage] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [devlogs, setDevlogs] = useState([])
+  const [issues, setIssues] = useState([])
+  const [linkedQuestIssues, setLinkedQuestIssues] = useState([])
+  const [showLinkedQuestIssues, setShowLinkedQuestIssues] = useState(false)
 
   // ========================================
   // DATA FETCHING
@@ -70,6 +75,16 @@ function PageDetail() {
   useEffect(() => {
     fetchPage()
   }, [id])
+
+  /**
+   * Fetch additional data when page is loaded
+   */
+  useEffect(() => {
+    if (page && page.page_type === 'project') {
+      fetchDevlogs()
+      fetchIssues()
+    }
+  }, [page])
 
   /**
    * Load page data
@@ -101,6 +116,82 @@ function PageDetail() {
       logger.error('Unexpected error fetching page', err)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  /**
+   * Fetch devlogs attached to this project or linked quests
+   */
+  const fetchDevlogs = async () => {
+    try {
+      logger.debug('Fetching devlogs for project...')
+
+      // Fetch devlogs that are connected to this project or its linked quests
+      const { data, error: fetchError } = await getAllPages({
+        pageType: 'devlog',
+        visibility: 'public'
+      })
+
+      if (fetchError) {
+        logger.error('Error fetching devlogs', fetchError)
+        return
+      }
+
+      // Filter devlogs that are connected to this project or its quests
+      const questIds = page.quests?.map(q => q.id) || []
+      const relatedDevlogs = data.filter(devlog => {
+        // Check if devlog is connected to this project
+        const connectedToProject = devlog.projects?.some(p => p.id === page.id)
+        // Check if devlog is connected to any of the linked quests
+        const connectedToQuest = devlog.quests?.some(q => questIds.includes(q.id))
+        return connectedToProject || connectedToQuest
+      })
+
+      setDevlogs(relatedDevlogs)
+      logger.info(`Fetched ${relatedDevlogs.length} related devlogs`)
+    } catch (err) {
+      logger.error('Error fetching devlogs', err)
+    }
+  }
+
+  /**
+   * Fetch issues for this project and linked quests
+   */
+  const fetchIssues = async () => {
+    try {
+      logger.debug('Fetching issues for project...')
+
+      // Fetch issues attached to this project
+      const { data: projectIssues, error: projectError } = await getAllIssues({
+        attachedToType: 'project',
+        attachedToId: id
+      })
+
+      if (projectError) {
+        logger.error('Error fetching project issues', projectError)
+      } else {
+        setIssues(projectIssues || [])
+      }
+
+      // Fetch issues from linked quests
+      const questIds = page.quests?.map(q => q.id) || []
+      if (questIds.length > 0) {
+        const allLinkedIssues = []
+        for (const questId of questIds) {
+          const { data: questIssues, error: questError } = await getAllIssues({
+            attachedToType: 'quest',
+            attachedToId: questId
+          })
+          if (!questError && questIssues) {
+            allLinkedIssues.push(...questIssues)
+          }
+        }
+        setLinkedQuestIssues(allLinkedIssues)
+      }
+
+      logger.info(`Fetched ${projectIssues?.length || 0} project issues and ${linkedQuestIssues.length} quest issues`)
+    } catch (err) {
+      logger.error('Error fetching issues', err)
     }
   }
 
@@ -211,14 +302,6 @@ function PageDetail() {
       {/* Article Header */}
       <article className="page-article">
         <header className="article-header">
-          <div
-            className="article-type"
-            style={{ backgroundColor: typeConfig.color }}
-          >
-            <Icon name={typeConfig.icon} size={20} />
-            <span>{typeConfig.label}</span>
-          </div>
-
           <h1>{page.title}</h1>
 
           <div className="article-meta">
@@ -270,39 +353,126 @@ function PageDetail() {
           dangerouslySetInnerHTML={{ __html: renderContent(page.content) }}
         />
 
-        {/* Linked Quests */}
+        {/* Linked Quests (Public Only) */}
         {page.quests && page.quests.length > 0 && (
           <div className="linked-quests-box">
             <h3>
               <Icon name="quests" size={24} />
-              Related Quests
+              Linked Quests
             </h3>
             <div className="quests-links">
-              {page.quests.map((quest) => (
-                <Link key={quest.id} to="/quests" className="quest-link">
-                  <Icon name="quests" size={18} />
-                  <span>{quest.title}</span>
+              {page.quests
+                .filter((quest) => quest.visibility === 'public')
+                .map((quest) => (
+                  <Link key={quest.id} to={`/quests/${quest.id}`} className="quest-link">
+                    <Icon name="quests" size={18} />
+                    <span>{quest.title}</span>
+                  </Link>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* Devlogs */}
+        {devlogs.length > 0 && (
+          <div className="devlogs-box">
+            <h3>
+              <Icon name="logbook" size={24} />
+              Development Logs
+            </h3>
+            <div className="devlogs-list">
+              {devlogs.map((devlog) => (
+                <Link key={devlog.id} to={`/page/${devlog.id}`} className="devlog-link">
+                  <div className="devlog-icon">
+                    <Icon name="logbook" size={20} />
+                  </div>
+                  <div className="devlog-info">
+                    <h4>{devlog.title}</h4>
+                    <span className="devlog-date">{formatDate(devlog.updated_at)}</span>
+                  </div>
                 </Link>
               ))}
             </div>
           </div>
         )}
-      </article>
 
-      {/* Related Content CTA */}
-      <div className="related-cta">
-        <h3>Continue Reading</h3>
-        <div className="cta-links">
-          <Link to="/blog" className="cta-link">
-            <Icon name="writing" size={24} />
-            <span>More Blog Posts</span>
-          </Link>
-          <Link to="/projects" className="cta-link">
-            <Icon name="castle" size={24} />
-            <span>View Projects</span>
-          </Link>
-        </div>
-      </div>
+        {/* Issues */}
+        {(issues.length > 0 || linkedQuestIssues.length > 0) && (
+          <div className="issues-box">
+            <div className="issues-header">
+              <h3>
+                <Icon name="bug" size={24} />
+                Issues
+              </h3>
+              {linkedQuestIssues.length > 0 && (
+                <button
+                  className="toggle-button"
+                  onClick={() => setShowLinkedQuestIssues(!showLinkedQuestIssues)}
+                >
+                  <Icon name={showLinkedQuestIssues ? 'check-box' : 'box'} size={18} />
+                  <span>Show quest issues ({linkedQuestIssues.length})</span>
+                </button>
+              )}
+            </div>
+
+            {/* Project Issues */}
+            {issues.length > 0 && (
+              <div className="issues-section">
+                <h4 className="issues-section-title">Project Issues ({issues.length})</h4>
+                <div className="issues-list">
+                  {issues.map((issue) => (
+                    <div key={issue.id} className={`issue-item ${issue.issue_type}`}>
+                      <div className="issue-header-row">
+                        <Icon name={issue.issue_type === 'bug' ? 'bug' : 'star'} size={16} />
+                        <span className="issue-title">{issue.title}</span>
+                        <span className={`issue-status status-${issue.status}`}>
+                          {issue.status.replace('_', ' ')}
+                        </span>
+                      </div>
+                      {issue.description && (
+                        <p className="issue-description">{issue.description}</p>
+                      )}
+                      {issue.issue_type === 'bug' && issue.severity && (
+                        <span className={`severity-badge severity-${issue.severity}`}>
+                          {issue.severity}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Linked Quest Issues (Toggle) */}
+            {showLinkedQuestIssues && linkedQuestIssues.length > 0 && (
+              <div className="issues-section">
+                <h4 className="issues-section-title">Quest Issues ({linkedQuestIssues.length})</h4>
+                <div className="issues-list">
+                  {linkedQuestIssues.map((issue) => (
+                    <div key={issue.id} className={`issue-item ${issue.issue_type}`}>
+                      <div className="issue-header-row">
+                        <Icon name={issue.issue_type === 'bug' ? 'bug' : 'star'} size={16} />
+                        <span className="issue-title">{issue.title}</span>
+                        <span className={`issue-status status-${issue.status}`}>
+                          {issue.status.replace('_', ' ')}
+                        </span>
+                      </div>
+                      {issue.description && (
+                        <p className="issue-description">{issue.description}</p>
+                      )}
+                      {issue.issue_type === 'bug' && issue.severity && (
+                        <span className={`severity-badge severity-${issue.severity}`}>
+                          {issue.severity}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </article>
     </div>
   )
 }
