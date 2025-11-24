@@ -13,7 +13,7 @@
 
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getAllPages } from '../../services/pagesService'
+import { getAllProjects } from '../../services/projectsService'
 import { logger } from '../../utils/logger'
 import Icon from '../../components/Icon'
 import Tag from '../../components/Tag'
@@ -25,7 +25,7 @@ import './Projects.css'
 
 const PROJECT_STATUS_LABELS = {
   planning: { label: 'Planning', color: '#95a5a6' },
-  in_progress: { label: 'In Progress', color: '#3498db' },
+  active: { label: 'Active', color: '#3498db' },
   on_hold: { label: 'On Hold', color: '#f39c12' },
   completed: { label: 'Completed', color: '#2ecc71' },
   archived: { label: 'Archived', color: '#7f8c8d' }
@@ -55,21 +55,19 @@ function Projects() {
   }, [])
 
   /**
-   * Load public project pages
+   * Load public projects
    */
   const fetchProjects = async () => {
     try {
       setIsLoading(true)
 
-      const { data, error } = await getAllPages({ visibility: 'public' })
+      const { data, error } = await getAllProjects({ visibility: 'public', includePrivate: false })
 
       if (error) {
         logger.error('Error fetching projects', error)
       } else if (data) {
-        // Filter to only project type
-        const projectPages = data.filter((p) => p.page_type === 'project')
-        setProjects(projectPages)
-        logger.info(`Loaded ${projectPages.length} projects`)
+        setProjects(data)
+        logger.info(`Loaded ${data.length} projects`)
       }
     } catch (err) {
       logger.error('Unexpected error fetching projects', err)
@@ -145,13 +143,13 @@ function Projects() {
       {!isLoading && projects.length > 0 && (
         <div className="projects-grid-public">
           {projects.map((project) => {
-            const statusConfig = PROJECT_STATUS_LABELS[project.project_status] ||
+            const statusConfig = PROJECT_STATUS_LABELS[project.status] ||
                                PROJECT_STATUS_LABELS.planning
 
             return (
               <Link
                 key={project.id}
-                to={`/page/${project.id}`}
+                to={`/project/${project.slug}`}
                 className="project-card-public"
               >
                 <div className="project-card-header">
@@ -167,7 +165,7 @@ function Projects() {
                 </div>
 
                 <h3>{project.title}</h3>
-                <p>{truncateText(project.content)}</p>
+                <p>{truncateText(project.description)}</p>
 
                 {project.tags && project.tags.length > 0 && (
                   <div className="project-tags-public">
@@ -178,11 +176,11 @@ function Projects() {
                 )}
 
                 <div className="project-meta-public">
-                  {project.project_start_date && (
+                  {project.start_date && (
                     <span className="project-date-range">
                       <Icon name="time" size={14} />
-                      {formatDate(project.project_start_date)}
-                      {project.project_end_date && ` - ${formatDate(project.project_end_date)}`}
+                      {formatDate(project.start_date)}
+                      {project.end_date && ` - ${formatDate(project.end_date)}`}
                     </span>
                   )}
                 </div>

@@ -133,12 +133,6 @@ function PublicLayout({ children }) {
             ))}
           </div>
 
-          {/* Admin Link */}
-          <Link to="/admin" className="admin-link desktop-only">
-            <Icon name="lock" size={18} />
-            <span>Admin</span>
-          </Link>
-
           {/* Mobile Menu Toggle */}
           <button
             className="mobile-menu-toggle"
@@ -162,10 +156,6 @@ function PublicLayout({ children }) {
                 <span>{item.label}</span>
               </Link>
             ))}
-            <Link to="/admin" className="nav-link admin-mobile">
-              <Icon name="lock" size={24} />
-              <span>Admin</span>
-            </Link>
           </div>
         )}
       </nav>

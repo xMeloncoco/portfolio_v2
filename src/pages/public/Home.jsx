@@ -18,7 +18,7 @@
 
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getAllPages } from '../../services/pagesService'
+import { getAllProjects } from '../../services/projectsService'
 import { getAllQuests } from '../../services/questsService'
 import {
   calculateCharacterStats,
@@ -84,10 +84,10 @@ function Home() {
     try {
       setIsLoading(true)
 
-      // Fetch stats, pages, quests, and character settings in parallel
-      const [statsResult, pagesResult, questsResult, settingsResult] = await Promise.all([
+      // Fetch stats, projects, quests, and character settings in parallel
+      const [statsResult, projectsResult, questsResult, settingsResult] = await Promise.all([
         calculateCharacterStats(),
-        getAllPages({ visibility: 'public' }),
+        getAllProjects({ visibility: 'public', includePrivate: false }),
         getAllQuests({ visibility: 'public' }),
         getCharacterSettings()
       ])
@@ -99,12 +99,9 @@ function Home() {
         setStats(statsResult.data)
       }
 
-      // Set projects (sorted by updated_at, latest first)
-      if (pagesResult.data) {
-        const projectList = pagesResult.data
-          .filter((p) => p.page_type === 'project')
-          .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-        setProjects(projectList)
+      // Set projects (already sorted by updated_at DESC from service)
+      if (projectsResult.data) {
+        setProjects(projectsResult.data)
       }
 
       // Set quests
@@ -505,13 +502,13 @@ function Home() {
         ) : projects.length > 0 ? (
           <div className="projects-grid">
             {projects.slice(0, 2).map((project) => (
-              <Link key={project.id} to={`/page/${project.id}`} className="project-card">
+              <Link key={project.id} to={`/project/${project.slug}`} className="project-card">
                 <div className="project-icon">
                   <Icon name="castle" size={48} />
                 </div>
                 <h3>{project.title}</h3>
                 <div className="project-hover-description">
-                  <p>{truncateText(project.content, 200)}</p>
+                  <p>{truncateText(project.description || '', 200)}</p>
                 </div>
                 {project.tags && project.tags.length > 0 && (
                   <div className="project-tags">
