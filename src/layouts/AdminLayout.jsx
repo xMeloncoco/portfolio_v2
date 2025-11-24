@@ -51,16 +51,28 @@ const NAV_ITEMS = [
     description: 'Edit character stats (Phase 8)'
   },
   {
-    path: '/admin/pages',
-    icon: 'parchment',
-    label: 'Pages',
-    description: 'Manage pages (Phase 2)'
+    path: '/admin/projects',
+    icon: 'castle',
+    label: 'Projects',
+    description: 'Manage projects'
+  },
+  {
+    path: '/admin/devlogs',
+    icon: 'logbook',
+    label: 'Devlogs',
+    description: 'Development logs and session notes'
   },
   {
     path: '/admin/quests',
     icon: 'adventure',
     label: 'Quests',
     description: 'Manage quests (Phase 3)'
+  },
+  {
+    path: '/admin/pages',
+    icon: 'parchment',
+    label: 'Blog & Notes',
+    description: 'Manage blog posts and notes'
   },
   {
     path: '/admin/issues',
