@@ -208,18 +208,15 @@ function DevlogForm() {
   }
 
   /**
-   * Handle quest selection
-   * @param {Event} e - Change event
+   * Handle quest checkbox toggle
+   * @param {string} questId - Quest ID to toggle
    */
-  const handleQuestSelection = (e) => {
-    const options = e.target.options
-    const selected = []
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].selected) {
-        selected.push(options[i].value)
-      }
+  const handleQuestToggle = (questId) => {
+    if (selectedQuests.includes(questId)) {
+      setSelectedQuests(selectedQuests.filter(id => id !== questId))
+    } else {
+      setSelectedQuests([...selectedQuests, questId])
     }
-    setSelectedQuests(selected)
   }
 
   /**
@@ -479,24 +476,26 @@ function DevlogForm() {
 
           {/* Quest Links */}
           <div className="form-group">
-            <label htmlFor="quests" className="form-label">
+            <label className="form-label">
               Link to Quests
-              <span className="label-hint">(Optional - hold Ctrl/Cmd to select multiple)</span>
+              <span className="label-hint">(Optional)</span>
             </label>
-            <select
-              id="quests"
-              multiple
-              value={selectedQuests}
-              onChange={handleQuestSelection}
-              className="form-select-multiple"
-              size={Math.min(availableQuests.length, 8)}
-            >
-              {availableQuests.map((quest) => (
-                <option key={quest.id} value={quest.id}>
-                  {quest.title}
-                </option>
-              ))}
-            </select>
+            <div className="checkbox-list">
+              {availableQuests.length === 0 ? (
+                <p className="empty-message">No quests available</p>
+              ) : (
+                availableQuests.map((quest) => (
+                  <label key={quest.id} className="checkbox-item">
+                    <input
+                      type="checkbox"
+                      checked={selectedQuests.includes(quest.id)}
+                      onChange={() => handleQuestToggle(quest.id)}
+                    />
+                    <span className="checkbox-label">{quest.title}</span>
+                  </label>
+                ))
+              )}
+            </div>
             {selectedQuests.length > 0 && (
               <span className="field-hint">
                 {selectedQuests.length} quest{selectedQuests.length !== 1 ? 's' : ''} selected
@@ -513,7 +512,7 @@ function DevlogForm() {
           </h2>
           <TagSelector
             selectedTags={selectedTags}
-            onChange={handleTagsChange}
+            onTagsChange={handleTagsChange}
           />
         </div>
 
