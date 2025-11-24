@@ -543,7 +543,7 @@ function ProjectForm() {
           </h2>
           <TagSelector
             selectedTags={selectedTags}
-            onChange={handleTagsChange}
+            onTagsChange={handleTagsChange}
           />
         </div>
 
