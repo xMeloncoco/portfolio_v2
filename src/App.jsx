@@ -48,6 +48,7 @@ import ThemeSettings from './pages/ThemeSettings'
 import Home from './pages/public/Home'
 import Blog from './pages/public/Blog'
 import PublicProjects from './pages/public/Projects'
+import ProjectDetail from './pages/public/ProjectDetail'
 import PublicQuests from './pages/public/PublicQuests'
 import PublicQuestView from './pages/public/PublicQuestView'
 import PageDetail from './pages/public/PageDetail'
@@ -97,6 +98,16 @@ function App() {
           element={
             <PublicLayout>
               <PublicProjects />
+            </PublicLayout>
+          }
+        />
+
+        {/* Project Detail */}
+        <Route
+          path="/project/:slug"
+          element={
+            <PublicLayout>
+              <ProjectDetail />
             </PublicLayout>
           }
         />
