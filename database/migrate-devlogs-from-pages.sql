@@ -116,18 +116,14 @@ SELECT COUNT(*) as migrated_devlogs FROM devlogs;
 -- ========================================
 -- STEP 6: LINK DEVLOGS TO PROJECTS
 -- ========================================
--- Use page_connections to determine which project each devlog belongs to
+-- NOTE: page_connections table doesn't exist in this database
+-- Devlogs will be migrated with project_id = NULL
+-- You can manually link devlogs to projects through the admin UI later
 
-UPDATE public.devlogs d
-SET project_id = (
-  SELECT pc.connected_to_id
-  FROM page_connections pc
-  WHERE pc.page_id = d.id
-    AND pc.connected_to_type = 'project'
-  LIMIT 1
-);
+-- If you have a way to determine project relationships, update them here manually:
+-- UPDATE public.devlogs SET project_id = 'project-uuid' WHERE id = 'devlog-uuid';
 
--- Verify project links
+-- Verify current state (should show 0 initially)
 SELECT
   COUNT(*) as devlogs_with_projects
 FROM devlogs
