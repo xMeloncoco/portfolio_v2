@@ -10,8 +10,10 @@ import { useParams, useNavigate } from 'react-router-dom'
 import {
   getProjectById,
   createProject,
-  updateProject
+  updateProject,
+  getProjectQuests
 } from '../services/projectsService'
+import { getAllQuests, updateQuest } from '../services/questsService'
 import { logger } from '../utils/logger'
 import Icon from '../components/Icon'
 import TagSelector from '../components/TagSelector'
@@ -72,6 +74,11 @@ function ProjectForm() {
   // Tags
   const [selectedTags, setSelectedTags] = useState([])
 
+  // Quests
+  const [availableQuests, setAvailableQuests] = useState([])
+  const [selectedQuests, setSelectedQuests] = useState([])
+  const [initialQuestIds, setInitialQuestIds] = useState([]) // Track original quest links
+
   // UI state
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -91,6 +98,13 @@ function ProjectForm() {
       fetchProjectData()
     }
   }, [id])
+
+  /**
+   * Fetch all available quests
+   */
+  useEffect(() => {
+    fetchQuests()
+  }, [])
 
   /**
    * Auto-generate slug from title
@@ -143,6 +157,15 @@ function ProjectForm() {
           setSelectedTags(data.tags)
         }
 
+        // Fetch quests linked to this project
+        const { data: quests, error: questError } = await getProjectQuests(id)
+        if (!questError && quests) {
+          const questIds = quests.map(q => q.id)
+          setSelectedQuests(questIds)
+          setInitialQuestIds(questIds) // Track for updates
+          logger.info(`Loaded ${questIds.length} linked quests`)
+        }
+
         logger.info('Project data loaded successfully')
       }
     } catch (err) {
@@ -150,6 +173,24 @@ function ProjectForm() {
       logger.error('Unexpected error fetching project', err)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  /**
+   * Fetch all available quests
+   */
+  const fetchQuests = async () => {
+    try {
+      const { data, error: fetchError } = await getAllQuests()
+
+      if (fetchError) {
+        logger.error('Error fetching quests', fetchError)
+      } else {
+        setAvailableQuests(data || [])
+        logger.info(`Loaded ${data?.length || 0} quests for linking`)
+      }
+    } catch (err) {
+      logger.error('Unexpected error fetching quests', err)
     }
   }
 
@@ -190,6 +231,18 @@ function ProjectForm() {
    */
   const handleTagsChange = (tags) => {
     setSelectedTags(tags)
+  }
+
+  /**
+   * Handle quest checkbox toggle
+   * @param {string} questId - Quest ID to toggle
+   */
+  const handleQuestToggle = (questId) => {
+    if (selectedQuests.includes(questId)) {
+      setSelectedQuests(selectedQuests.filter(id => id !== questId))
+    } else {
+      setSelectedQuests([...selectedQuests, questId])
+    }
   }
 
   /**
@@ -294,6 +347,29 @@ function ProjectForm() {
         setError(result.error)
         logger.error(`Error ${isEditing ? 'updating' : 'creating'} project`, result.error)
         return
+      }
+
+      const projectId = isEditing ? id : result.data?.id
+
+      // Update quest links
+      if (projectId) {
+        // Determine which quests need to be linked/unlinked
+        const questsToLink = selectedQuests.filter(qId => !initialQuestIds.includes(qId))
+        const questsToUnlink = initialQuestIds.filter(qId => !selectedQuests.includes(qId))
+
+        // Link new quests to this project
+        for (const questId of questsToLink) {
+          await updateQuest(questId, { project_id: projectId }, [])
+          logger.info(`Linked quest ${questId} to project ${projectId}`)
+        }
+
+        // Unlink removed quests from this project
+        for (const questId of questsToUnlink) {
+          await updateQuest(questId, { project_id: null }, [])
+          logger.info(`Unlinked quest ${questId} from project ${projectId}`)
+        }
+
+        logger.info(`Updated ${questsToLink.length} quest links, removed ${questsToUnlink.length}`)
       }
 
       logger.info(`Project ${isEditing ? 'updated' : 'created'} successfully`)
@@ -545,6 +621,41 @@ function ProjectForm() {
             selectedTags={selectedTags}
             onTagsChange={handleTagsChange}
           />
+        </div>
+
+        {/* Quests Section */}
+        <div className="form-section">
+          <h2 className="section-title">
+            <Icon name="quests" size={24} />
+            Link Quests to this Project
+          </h2>
+          <div className="form-group">
+            <label className="form-label">
+              Select Quests
+              <span className="label-hint">(Optional)</span>
+            </label>
+            <div className="checkbox-list">
+              {availableQuests.length === 0 ? (
+                <p className="empty-message">No quests available</p>
+              ) : (
+                availableQuests.map((quest) => (
+                  <label key={quest.id} className="checkbox-item">
+                    <input
+                      type="checkbox"
+                      checked={selectedQuests.includes(quest.id)}
+                      onChange={() => handleQuestToggle(quest.id)}
+                    />
+                    <span className="checkbox-label">{quest.title}</span>
+                  </label>
+                ))
+              )}
+            </div>
+            {selectedQuests.length > 0 && (
+              <span className="field-hint">
+                {selectedQuests.length} quest{selectedQuests.length !== 1 ? 's' : ''} will be linked to this project
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Form Actions */}
