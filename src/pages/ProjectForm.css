@@ -1,0 +1,60 @@
+/**
+ * ========================================
+ * PROJECT FORM STYLES
+ * ========================================
+ * Reuses QuestForm styles with project-specific overrides
+ */
+
+/* Import base form styles from QuestForm */
+@import './QuestForm.css';
+
+/* ========================================
+ * PROJECT-SPECIFIC OVERRIDES
+ * ======================================== */
+
+.project-form-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  animation: fadeIn 0.4s ease-out;
+}
+
+.project-form-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.project-form-header h1 {
+  margin: 0;
+  text-shadow: var(--glow-primary);
+}
+
+.project-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/* Form row for side-by-side inputs */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Field hint text */
+.field-hint {
+  display: block;
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}

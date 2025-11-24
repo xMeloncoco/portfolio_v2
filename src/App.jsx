@@ -26,6 +26,10 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import AdminDashboard from './pages/AdminDashboard'
 import CharacterStats from './pages/CharacterStats'
+import Projects from './pages/Projects'
+import ProjectForm from './pages/ProjectForm'
+import Devlogs from './pages/Devlogs'
+import DevlogForm from './pages/DevlogForm'
 import Pages from './pages/Pages'
 import PageForm from './pages/PageForm'
 import PageView from './pages/PageView'
@@ -43,7 +47,7 @@ import ThemeSettings from './pages/ThemeSettings'
 // Import public pages
 import Home from './pages/public/Home'
 import Blog from './pages/public/Blog'
-import Projects from './pages/public/Projects'
+import PublicProjects from './pages/public/Projects'
 import PublicQuests from './pages/public/PublicQuests'
 import PublicQuestView from './pages/public/PublicQuestView'
 import PageDetail from './pages/public/PageDetail'
@@ -92,7 +96,7 @@ function App() {
           path="/projects"
           element={
             <PublicLayout>
-              <Projects />
+              <PublicProjects />
             </PublicLayout>
           }
         />
@@ -191,6 +195,78 @@ function App() {
             <ProtectedRoute>
               <AdminLayout>
                 <CharacterStats />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Projects Management */}
+        <Route
+          path="/admin/projects"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Projects />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Create New Project */}
+        <Route
+          path="/admin/projects/new"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <ProjectForm />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Edit Project */}
+        <Route
+          path="/admin/projects/:id/edit"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <ProjectForm />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Devlogs Management */}
+        <Route
+          path="/admin/devlogs"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Devlogs />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Create New Devlog */}
+        <Route
+          path="/admin/devlogs/new"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <DevlogForm />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Edit Devlog */}
+        <Route
+          path="/admin/devlogs/:id/edit"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <DevlogForm />
               </AdminLayout>
             </ProtectedRoute>
           }

@@ -1,0 +1,88 @@
+/**
+ * ========================================
+ * DEVLOG FORM STYLES
+ * ========================================
+ * Reuses QuestForm styles with devlog-specific overrides
+ */
+
+/* Import base form styles from QuestForm */
+@import './QuestForm.css';
+
+/* ========================================
+ * DEVLOG-SPECIFIC OVERRIDES
+ * ======================================== */
+
+.devlog-form-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  animation: fadeIn 0.4s ease-out;
+}
+
+.devlog-form-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.devlog-form-header h1 {
+  margin: 0;
+  text-shadow: var(--glow-primary);
+}
+
+.devlog-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/* Form row for side-by-side inputs */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Field hint text */
+.field-hint {
+  display: block;
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Multiple select for quests */
+.form-select-multiple {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-select-multiple:focus {
+  outline: none;
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(var(--color-secondary-rgb), 0.1);
+}
+
+.form-select-multiple option {
+  padding: var(--spacing-xs);
+}
+
+.form-select-multiple option:checked {
+  background: var(--color-secondary);
+  color: white;
+}
