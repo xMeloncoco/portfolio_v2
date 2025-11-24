@@ -148,19 +148,14 @@ SELECT COUNT(*) as migrated_devlog_tags FROM devlog_tags;
 -- ========================================
 -- STEP 8: MIGRATE QUEST LINKS
 -- ========================================
+-- NOTE: page_connections table doesn't exist in this database
+-- Devlog-to-quest links will need to be created manually through the admin UI
 
-INSERT INTO public.devlog_quests (devlog_id, quest_id, created_at)
-SELECT
-  pc.page_id as devlog_id,
-  pc.connected_to_id as quest_id,
-  pc.created_at
-FROM page_connections pc
-INNER JOIN pages p ON pc.page_id = p.id
-WHERE p.page_type = 'devlog'
-  AND pc.connected_to_type = 'quest'
-ON CONFLICT (devlog_id, quest_id) DO NOTHING;
+-- If you have quest links stored elsewhere, add them here manually:
+-- INSERT INTO public.devlog_quests (devlog_id, quest_id)
+-- VALUES ('devlog-uuid', 'quest-uuid');
 
--- Verify quest links
+-- Verify quest links (should show 0 initially)
 SELECT COUNT(*) as devlog_quest_links FROM devlog_quests;
 
 -- ========================================
@@ -302,6 +297,9 @@ WHERE devlog_id IN (SELECT id FROM devlogs);
 -- DROP TABLE IF EXISTS pages_devlogs_backup;
 -- DELETE FROM pages WHERE page_type = 'archived_devlog';
 -- DELETE FROM page_tags WHERE page_id IN (SELECT id FROM devlogs);
--- DELETE FROM page_connections WHERE page_id IN (SELECT id FROM devlogs);
 
-RAISE NOTICE 'Devlog migration completed! Review verification queries above.';
+-- ========================================
+-- MIGRATION COMPLETE
+-- ========================================
+-- Review the verification queries above to ensure the migration was successful.
+-- Devlogs can now be managed at /admin/devlogs
