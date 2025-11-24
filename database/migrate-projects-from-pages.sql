@@ -9,7 +9,88 @@
 -- ========================================
 
 -- ========================================
--- STEP 1: BACKUP CURRENT DATA
+-- STEP 1: CREATE PROJECTS TABLE AND JUNCTION TABLES
+-- ========================================
+
+-- Create projects table if it doesn't exist
+CREATE TABLE IF NOT EXISTS public.projects (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  description TEXT,
+  slug TEXT UNIQUE NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('planning', 'active', 'completed', 'on_hold', 'archived')),
+  visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('public', 'private')),
+  external_link TEXT,
+  start_date DATE,
+  end_date DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create indexes for projects
+CREATE INDEX IF NOT EXISTS idx_projects_status ON public.projects(status);
+CREATE INDEX IF NOT EXISTS idx_projects_visibility ON public.projects(visibility);
+CREATE INDEX IF NOT EXISTS idx_projects_slug ON public.projects(slug);
+CREATE INDEX IF NOT EXISTS idx_projects_created_at ON public.projects(created_at DESC);
+
+-- Add updated_at trigger
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_projects_updated_at
+  BEFORE UPDATE ON public.projects
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- Create project_tags junction table
+CREATE TABLE IF NOT EXISTS public.project_tags (
+  project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE,
+  tag_id UUID REFERENCES public.tags(id) ON DELETE CASCADE,
+  PRIMARY KEY (project_id, tag_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_project_tags_project_id ON public.project_tags(project_id);
+CREATE INDEX IF NOT EXISTS idx_project_tags_tag_id ON public.project_tags(tag_id);
+
+-- Add RLS policies for projects
+ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY IF NOT EXISTS "Allow public read on public projects"
+  ON public.projects
+  FOR SELECT
+  TO anon, authenticated
+  USING (visibility = 'public');
+
+CREATE POLICY IF NOT EXISTS "Allow authenticated full access to projects"
+  ON public.projects
+  FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+-- Add RLS policies for project_tags
+ALTER TABLE public.project_tags ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY IF NOT EXISTS "Allow public read on project_tags"
+  ON public.project_tags
+  FOR SELECT
+  TO anon, authenticated
+  USING (true);
+
+CREATE POLICY IF NOT EXISTS "Allow authenticated manage project_tags"
+  ON public.project_tags
+  FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+-- ========================================
+-- STEP 2: BACKUP CURRENT DATA
 -- ========================================
 
 -- Create a backup of pages that are projects
@@ -20,7 +101,7 @@ SELECT * FROM pages WHERE page_type = 'project';
 SELECT COUNT(*) as backed_up_projects FROM pages_projects_backup;
 
 -- ========================================
--- STEP 2: MIGRATE DATA FROM PAGES TO PROJECTS
+-- STEP 3: MIGRATE DATA FROM PAGES TO PROJECTS
 -- ========================================
 
 -- Insert projects from pages into projects table
@@ -61,7 +142,7 @@ ON CONFLICT (id) DO UPDATE SET
 SELECT COUNT(*) as migrated_projects FROM projects;
 
 -- ========================================
--- STEP 3: MIGRATE TAGS FROM PAGE_TAGS TO PROJECT_TAGS
+-- STEP 4: MIGRATE TAGS FROM PAGE_TAGS TO PROJECT_TAGS
 -- ========================================
 
 -- Copy tags for project pages to project_tags
@@ -78,7 +159,7 @@ ON CONFLICT (project_id, tag_id) DO NOTHING;
 SELECT COUNT(*) as migrated_project_tags FROM project_tags;
 
 -- ========================================
--- STEP 4: UPDATE PAGE_CONNECTIONS
+-- STEP 5: UPDATE PAGE_CONNECTIONS
 -- ========================================
 -- Update any page_connections that reference projects
 -- (Note: This assumes you want to keep devlogs linked to projects)
@@ -87,7 +168,7 @@ SELECT COUNT(*) as migrated_project_tags FROM project_tags;
 -- Devlogs in pages can link to projects via page_connections
 
 -- ========================================
--- STEP 5: REMOVE PROJECTS FROM PAGES TABLE
+-- STEP 6: REMOVE PROJECTS FROM PAGES TABLE
 -- ========================================
 
 -- Option A: Delete project pages (DESTRUCTIVE - only if you're sure!)
@@ -101,7 +182,7 @@ SET
 WHERE page_type = 'project';
 
 -- ========================================
--- STEP 6: UPDATE PAGE_TYPE ENUM (Optional)
+-- STEP 7: UPDATE PAGE_TYPE ENUM (Optional)
 -- ========================================
 -- If you want to prevent new projects being created in pages
 
@@ -113,12 +194,10 @@ SELECT DISTINCT page_type FROM pages;
 --   CHECK (page_type IN ('blog', 'devlog', 'notes'));
 
 -- ========================================
--- STEP 7: ADD EXTERNAL_LINK TO PROJECTS (if needed)
+-- STEP 8: MIGRATE EXTERNAL_LINK (if exists in pages)
 -- ========================================
 
--- Add external_link column to projects table (if you want this feature)
-ALTER TABLE public.projects
-ADD COLUMN IF NOT EXISTS external_link TEXT;
+-- NOTE: External link column already created in STEP 1
 
 -- Migrate external_link from pages
 UPDATE public.projects p
@@ -129,13 +208,10 @@ WHERE p.id = pg.id
   AND pg.external_link IS NOT NULL;
 
 -- ========================================
--- STEP 8: ADD START/END DATES TO PROJECTS (if needed)
+-- STEP 9: MIGRATE START/END DATES (if exists in pages)
 -- ========================================
 
--- Add date columns
-ALTER TABLE public.projects
-ADD COLUMN IF NOT EXISTS start_date DATE,
-ADD COLUMN IF NOT EXISTS end_date DATE;
+-- NOTE: Date columns already created in STEP 1
 
 -- Migrate dates from pages
 UPDATE public.projects p
@@ -199,5 +275,9 @@ LIMIT 5;
 -- 2. Delete archived project pages
 -- DELETE FROM pages WHERE page_type = 'archived_project';
 
-RAISE NOTICE 'Migration completed! Review the verification queries above.';
-RAISE NOTICE 'DO NOT run cleanup until you verify everything works!';
+-- ========================================
+-- MIGRATION COMPLETE
+-- ========================================
+-- Review the verification queries above to ensure the migration was successful.
+-- Projects can now be managed at /admin/projects
+-- DO NOT run cleanup until you verify everything works!
