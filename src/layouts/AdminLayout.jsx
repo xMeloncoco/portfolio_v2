@@ -152,12 +152,12 @@ function AdminLayout({ children }) {
    * Handle logout
    * Clears authentication and redirects to login
    */
-  const handleLogout = () => {
+  const handleLogout = async () => {
     logger.info('Logout initiated')
 
     try {
-      // Clear authentication
-      logout()
+      // Clear authentication (now async)
+      await logout()
 
       // Redirect to login page
       navigate('/admin/login')

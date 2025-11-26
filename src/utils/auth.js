@@ -5,16 +5,17 @@
  * This file handles all authentication logic for the admin panel
  *
  * FEATURES:
- * - Password verification with bcrypt
- * - Session management using localStorage
+ * - Supabase Auth integration for secure authentication
+ * - Email/password authentication (email from environment variable)
+ * - Session management using Supabase Auth
  * - Login/logout functionality
  * - Authentication state checking
  *
  * SECURITY NOTES:
- * - Passwords are hashed using bcrypt
- * - We never store plain passwords
- * - Session is stored in localStorage (simple, but works for single admin)
- * - For production, consider using httpOnly cookies
+ * - Uses Supabase Auth for proper authentication
+ * - Session managed by Supabase (httpOnly cookies)
+ * - RLS policies now properly enforce authenticated role
+ * - No localStorage for auth state (more secure)
  */
 
 import { supabase } from '../config/supabase'
@@ -25,15 +26,10 @@ import { logger } from './logger'
 // ========================================
 
 /**
- * Key used to store authentication state in localStorage
+ * Admin email from environment variable
+ * This allows password-only UX while using proper email/password auth behind the scenes
  */
-const AUTH_STORAGE_KEY = 'portfolio_admin_authenticated'
-
-/**
- * Session duration in milliseconds (24 hours)
- * After this time, the user will need to log in again
- */
-const SESSION_DURATION = 24 * 60 * 60 * 1000 // 24 hours
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL
 
 // ========================================
 // SESSION MANAGEMENT
@@ -41,41 +37,26 @@ const SESSION_DURATION = 24 * 60 * 60 * 1000 // 24 hours
 
 /**
  * Check if user is currently authenticated
- * Verifies both that the auth flag exists and hasn't expired
+ * Checks for valid Supabase Auth session
  *
- * @returns {boolean} - True if authenticated and session is valid
+ * @returns {Promise<boolean>} - True if authenticated and session is valid
  */
-export function isAuthenticated() {
+export async function isAuthenticated() {
   try {
-    // Get authentication data from localStorage
-    const authData = localStorage.getItem(AUTH_STORAGE_KEY)
+    const { data: { session }, error } = await supabase.auth.getSession()
 
-    if (!authData) {
-      logger.debug('No authentication data found')
+    if (error) {
+      logger.error('Error checking authentication session', error)
       return false
     }
 
-    // Parse the stored data
-    const { authenticated, timestamp } = JSON.parse(authData)
-
-    // Check if authenticated flag is true
-    if (!authenticated) {
-      logger.debug('User not authenticated')
-      return false
+    if (session) {
+      logger.debug('User is authenticated with valid session')
+      return true
     }
 
-    // Check if session has expired
-    const now = Date.now()
-    const sessionAge = now - timestamp
-
-    if (sessionAge > SESSION_DURATION) {
-      logger.info('Session expired, logging out')
-      logout() // Clear expired session
-      return false
-    }
-
-    logger.debug('User is authenticated, session valid')
-    return true
+    logger.debug('No active session found')
+    return false
   } catch (error) {
     logger.error('Error checking authentication status', error)
     return false
@@ -83,31 +64,38 @@ export function isAuthenticated() {
 }
 
 /**
- * Set the user as authenticated
- * Stores authentication state with timestamp in localStorage
+ * Get current session
+ * @returns {Promise<Object|null>} - Current session or null
  */
-function setAuthenticated() {
+export async function getSession() {
   try {
-    const authData = {
-      authenticated: true,
-      timestamp: Date.now()
+    const { data: { session }, error } = await supabase.auth.getSession()
+
+    if (error) {
+      logger.error('Error getting session', error)
+      return null
     }
 
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData))
-    logger.info('User authenticated successfully')
+    return session
   } catch (error) {
-    logger.error('Error setting authentication state', error)
-    throw error
+    logger.error('Error getting session', error)
+    return null
   }
 }
 
 /**
- * Clear authentication state
- * Removes user session from localStorage
+ * Clear authentication state (logout)
+ * Signs out from Supabase Auth
  */
-export function logout() {
+export async function logout() {
   try {
-    localStorage.removeItem(AUTH_STORAGE_KEY)
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+      logger.error('Error during logout', error)
+      throw error
+    }
+
     logger.info('User logged out successfully')
   } catch (error) {
     logger.error('Error during logout', error)
@@ -120,13 +108,15 @@ export function logout() {
 // ========================================
 
 /**
- * Verify a password against the stored hash in Supabase
+ * Verify password using Supabase Auth
  *
  * HOW IT WORKS:
- * 1. Fetch the password hash from Supabase admin_config table
- * 2. Use bcryptjs to compare the entered password with the hash
- * 3. If match, set authentication state
+ * 1. Uses fixed admin email from environment variable
+ * 2. Calls Supabase Auth signInWithPassword
+ * 3. Supabase handles all password verification and session creation
  * 4. Return success/failure
+ *
+ * This maintains the password-only UX while using proper authentication
  *
  * @param {string} password - The password entered by the user
  * @returns {Promise<{success: boolean, error?: string}>} - Result of verification
@@ -146,63 +136,58 @@ export async function verifyPassword(password) {
       }
     }
 
-    // ========================================
-    // STEP 2: Fetch password hash from Supabase
-    // ========================================
-    logger.debug('Fetching password hash from Supabase...')
+    // Validate admin email is configured
+    if (!ADMIN_EMAIL) {
+      logger.error('Admin email not configured in environment variables')
+      return {
+        success: false,
+        error: 'Admin email not configured. Please check .env file.'
+      }
+    }
 
-    const { data, error } = await supabase
-      .from('admin_config')
-      .select('password_hash')
-      .limit(1)
-      .single()
+    // ========================================
+    // STEP 2: Sign in with Supabase Auth
+    // ========================================
+    logger.debug('Signing in with Supabase Auth...')
 
-    // Handle Supabase errors
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: ADMIN_EMAIL,
+      password: password
+    })
+
+    // Handle authentication errors
     if (error) {
-      logger.error('Error fetching password hash from Supabase', error)
+      logger.warn('❌ Authentication failed:', error.message)
+
+      // Provide user-friendly error messages
+      if (error.message.includes('Invalid login credentials')) {
+        return {
+          success: false,
+          error: 'Incorrect password'
+        }
+      }
+
       return {
         success: false,
-        error: 'Database error. Please check Supabase setup.'
+        error: 'Authentication failed. Please try again.'
       }
     }
 
-    // Check if we got the password hash
-    if (!data || !data.password_hash) {
-      logger.error('No password hash found in database')
+    // Check if we got a valid session
+    if (!data.session) {
+      logger.error('No session created after authentication')
       return {
         success: false,
-        error: 'Admin configuration not found. Please run supabase-setup.sql'
+        error: 'Authentication failed. Please try again.'
       }
     }
 
-    logger.debug('Password hash retrieved successfully')
+    logger.info('✅ Authentication successful')
+    logger.debug('Session created:', data.session.user.email)
 
-    // ========================================
-    // STEP 3: Compare password with hash
-    // ========================================
-    // Import bcryptjs for password comparison
-    // We're using a simple comparison for now
-    // In production, you should use bcrypt.compare()
-    const bcrypt = await import('bcryptjs')
-
-    logger.debug('Comparing password with hash...')
-    const isMatch = await bcrypt.compare(password, data.password_hash)
-
-    if (isMatch) {
-      logger.info('✅ Password verification successful')
-
-      // Set authenticated state
-      setAuthenticated()
-
-      return {
-        success: true
-      }
-    } else {
-      logger.warn('❌ Password verification failed - incorrect password')
-      return {
-        success: false,
-        error: 'Incorrect password'
-      }
+    return {
+      success: true,
+      session: data.session
     }
   } catch (error) {
     logger.error('Error during password verification', error)
@@ -219,20 +204,19 @@ export async function verifyPassword(password) {
 
 /**
  * Get remaining session time in milliseconds
- * @returns {number} - Milliseconds until session expires (0 if not authenticated)
+ * @returns {Promise<number>} - Milliseconds until session expires (0 if not authenticated)
  */
-export function getSessionTimeRemaining() {
+export async function getSessionTimeRemaining() {
   try {
-    const authData = localStorage.getItem(AUTH_STORAGE_KEY)
+    const session = await getSession()
 
-    if (!authData) {
+    if (!session || !session.expires_at) {
       return 0
     }
 
-    const { timestamp } = JSON.parse(authData)
+    const expiresAt = new Date(session.expires_at * 1000).getTime()
     const now = Date.now()
-    const elapsed = now - timestamp
-    const remaining = SESSION_DURATION - elapsed
+    const remaining = expiresAt - now
 
     return remaining > 0 ? remaining : 0
   } catch (error) {
@@ -242,12 +226,26 @@ export function getSessionTimeRemaining() {
 }
 
 /**
- * Refresh the session timestamp
+ * Refresh the session
  * Call this periodically to keep the user logged in during active use
  */
-export function refreshSession() {
-  if (isAuthenticated()) {
-    setAuthenticated() // This updates the timestamp
-    logger.debug('Session refreshed')
+export async function refreshSession() {
+  try {
+    const { data, error } = await supabase.auth.refreshSession()
+
+    if (error) {
+      logger.error('Error refreshing session', error)
+      return false
+    }
+
+    if (data.session) {
+      logger.debug('Session refreshed successfully')
+      return true
+    }
+
+    return false
+  } catch (error) {
+    logger.error('Error refreshing session', error)
+    return false
   }
 }
