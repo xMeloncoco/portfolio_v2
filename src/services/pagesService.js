@@ -8,12 +8,10 @@
  * - CRUD operations for pages
  * - Tag management for pages
  * - Quest and project linking (polymorphic connections)
- * - Devlog item management
  * - Filtering and sorting
  *
  * PAGE TYPES:
  * - blog: Blog posts and articles
- * - devlog: Development logs with to-do lists
  * - notes: Quick notes and ideas
  */
 
@@ -140,9 +138,6 @@ export async function getPageById(pageId) {
         page_tags (
           tag_id,
           tags (id, name, color)
-        ),
-        devlog_items (
-          id, title, status, sort_order
         )
       `)
       .eq('id', pageId)
@@ -186,8 +181,7 @@ export async function getPageById(pageId) {
       ...data,
       tags: data.page_tags?.map(pt => pt.tags) || [],
       quests,
-      projects,
-      devlog_items: data.devlog_items?.sort((a, b) => a.sort_order - b.sort_order) || []
+      projects
     }
 
     logger.info(`Fetched page: ${pageId}`)
@@ -432,109 +426,6 @@ export async function deletePage(pageId) {
     return { success: true, error: null }
   } catch (err) {
     logger.error('Unexpected error deleting page', err)
-    return { success: false, error: err.message }
-  }
-}
-
-// ========================================
-// DEVLOG ITEM OPERATIONS
-// ========================================
-
-/**
- * Add a devlog item to a page
- * @param {string} pageId - The page UUID
- * @param {string} title - The item title
- * @param {string} [status='todo'] - The item status
- * @returns {Promise<{data: Object|null, error: string|null}>}
- */
-export async function addDevlogItem(pageId, title, status = 'todo') {
-  try {
-    logger.debug(`Adding devlog item to page: ${pageId}`)
-
-    // Get the next sort order
-    const { data: existingItems } = await supabase
-      .from('devlog_items')
-      .select('sort_order')
-      .eq('page_id', pageId)
-      .order('sort_order', { ascending: false })
-      .limit(1)
-
-    const nextOrder = existingItems && existingItems.length > 0
-      ? existingItems[0].sort_order + 1
-      : 0
-
-    const { data, error } = await supabase
-      .from('devlog_items')
-      .insert([{ page_id: pageId, title, status, sort_order: nextOrder }])
-      .select()
-      .single()
-
-    if (error) {
-      logger.error('Error adding devlog item', error)
-      return { data: null, error: error.message }
-    }
-
-    logger.info(`Devlog item added: ${data.id}`)
-    return { data, error: null }
-  } catch (err) {
-    logger.error('Unexpected error adding devlog item', err)
-    return { data: null, error: err.message }
-  }
-}
-
-/**
- * Update a devlog item
- * @param {string} itemId - The item UUID
- * @param {Object} itemData - The updated item data
- * @returns {Promise<{data: Object|null, error: string|null}>}
- */
-export async function updateDevlogItem(itemId, itemData) {
-  try {
-    logger.debug(`Updating devlog item: ${itemId}`)
-
-    const { data, error } = await supabase
-      .from('devlog_items')
-      .update(itemData)
-      .eq('id', itemId)
-      .select()
-      .single()
-
-    if (error) {
-      logger.error('Error updating devlog item', error)
-      return { data: null, error: error.message }
-    }
-
-    logger.info(`Devlog item updated: ${itemId}`)
-    return { data, error: null }
-  } catch (err) {
-    logger.error('Unexpected error updating devlog item', err)
-    return { data: null, error: err.message }
-  }
-}
-
-/**
- * Delete a devlog item
- * @param {string} itemId - The item UUID
- * @returns {Promise<{success: boolean, error: string|null}>}
- */
-export async function deleteDevlogItem(itemId) {
-  try {
-    logger.debug(`Deleting devlog item: ${itemId}`)
-
-    const { error } = await supabase
-      .from('devlog_items')
-      .delete()
-      .eq('id', itemId)
-
-    if (error) {
-      logger.error('Error deleting devlog item', error)
-      return { success: false, error: error.message }
-    }
-
-    logger.info(`Devlog item deleted: ${itemId}`)
-    return { success: true, error: null }
-  } catch (err) {
-    logger.error('Unexpected error deleting devlog item', err)
     return { success: false, error: err.message }
   }
 }

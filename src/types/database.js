@@ -20,7 +20,7 @@
  */
 
 /**
- * @typedef {'blog' | 'devlog' | 'notes'} PageType
+ * @typedef {'blog' | 'notes'} PageType
  */
 
 /**

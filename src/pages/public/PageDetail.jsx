@@ -27,7 +27,6 @@ import './PageDetail.css'
 
 const PAGE_TYPES = {
   blog: { label: 'Blog', icon: 'writing', color: '#3498db' },
-  devlog: { label: 'Devlog', icon: 'logbook', color: '#9b59b6' },
   notes: { label: 'Notes', icon: 'parchment', color: '#f39c12' }
 }
 

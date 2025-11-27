@@ -2,7 +2,7 @@
  * ========================================
  * PAGES MANAGEMENT PAGE (Admin)
  * ========================================
- * List view for managing all pages (blogs, devlogs, notes, projects)
+ * List view for managing all pages (blogs, notes)
  *
  * FEATURES:
  * - List all pages with sorting by last updated
@@ -32,9 +32,7 @@ import './Pages.css'
  */
 const PAGE_TYPES = {
   blog: { label: 'Blog', icon: 'writing', color: '#3498db' },
-  devlog: { label: 'Devlog', icon: 'logbook', color: '#9b59b6' },
-  notes: { label: 'Notes', icon: 'parchment', color: '#f39c12' },
-  project: { label: 'Project', icon: 'castle', color: '#2ecc71' }
+  notes: { label: 'Notes', icon: 'parchment', color: '#f39c12' }
 }
 
 // ========================================
@@ -235,7 +233,7 @@ function Pages() {
           <Icon name="parchment" size={48} />
           <div>
             <h1>Pages</h1>
-            <p className="pages-subtitle">Manage your blogs, devlogs, notes, and projects</p>
+            <p className="pages-subtitle">Manage your blogs and notes</p>
           </div>
         </div>
 
