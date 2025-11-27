@@ -6,12 +6,11 @@
  *
  * FEATURES:
  * - Title input with validation
- * - Page type selector (Blog, Devlog, Notes, Project)
+ * - Page type selector (Blog, Devlog, Notes)
  * - Visibility toggle (Public/Private)
  * - Content editor (textarea with markdown support)
  * - Tag selector with create capability
- * - Quest linking (optional)
- * - Project-specific fields (status, dates)
+ * - Quest and project linking (optional)
  * - Form validation
  * - Auto-save indicator
  */
@@ -38,7 +37,6 @@ import './PageForm.css'
  * Page type options
  */
 const PAGE_TYPES = [
-  { value: 'project', label: 'Project', icon: 'castle', description: 'Project documentation with status tracking' },
   { value: 'devlog', label: 'Devlog', icon: 'logbook', description: 'Development logs with to-do lists' },
   { value: 'blog', label: 'Blog', icon: 'writing', description: 'General blog posts and articles' },
   { value: 'notes', label: 'Notes', icon: 'parchment', description: 'Quick notes and references' }
@@ -50,17 +48,6 @@ const PAGE_TYPES = [
 const VISIBILITY_OPTIONS = [
   { value: 'private', label: 'Private', icon: 'lock', description: 'Only visible in admin' },
   { value: 'public', label: 'Public', icon: 'web', description: 'Visible to everyone' }
-]
-
-/**
- * Project status options
- */
-const PROJECT_STATUSES = [
-  { value: 'planning', label: 'Planning' },
-  { value: 'in_progress', label: 'In Progress' },
-  { value: 'on_hold', label: 'On Hold' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'archived', label: 'Archived' }
 ]
 
 // ========================================
@@ -85,11 +72,7 @@ function PageForm() {
     title: '',
     page_type: 'notes',
     visibility: 'private',
-    content: '',
-    project_status: 'planning',
-    project_start_date: '',
-    project_end_date: '',
-    external_link: ''
+    content: ''
   })
 
   // Tags, quests, and projects
@@ -169,11 +152,7 @@ function PageForm() {
           title: data.title || '',
           page_type: data.page_type || 'notes',
           visibility: data.visibility || 'private',
-          content: data.content || '',
-          project_status: data.project_status || 'planning',
-          project_start_date: data.project_start_date || '',
-          project_end_date: data.project_end_date || '',
-          external_link: data.external_link || ''
+          content: data.content || ''
         })
 
         // Set selected tags
@@ -584,17 +563,6 @@ function PageForm() {
       errors.content = 'Content is too long (max 100,000 characters)'
     }
 
-    // Project date validation
-    if (formData.page_type === 'project') {
-      if (formData.project_start_date && formData.project_end_date) {
-        const start = new Date(formData.project_start_date)
-        const end = new Date(formData.project_end_date)
-        if (end < start) {
-          errors.project_end_date = 'End date must be after start date'
-        }
-      }
-    }
-
     setValidationErrors(errors)
     return Object.keys(errors).length === 0
   }
@@ -622,14 +590,6 @@ function PageForm() {
         page_type: formData.page_type,
         visibility: formData.visibility,
         content: formData.content
-      }
-
-      // Add project-specific fields if project type
-      if (formData.page_type === 'project') {
-        pageData.project_status = formData.project_status
-        pageData.project_start_date = formData.project_start_date || null
-        pageData.project_end_date = formData.project_end_date || null
-        pageData.external_link = formData.external_link || null
       }
 
       // Add tag IDs, quest IDs, and project IDs
@@ -967,88 +927,6 @@ function PageForm() {
             <span className="char-count">{formData.content.length} characters</span>
           </div>
         </div>
-
-        {/* Project-Specific Fields */}
-        {formData.page_type === 'project' && (
-          <div className="form-section">
-            <h2 className="section-title">
-              <Icon name="castle" size={24} />
-              Project Details
-            </h2>
-
-            <div className="form-row">
-              {/* Project Status */}
-              <div className="form-group">
-                <label htmlFor="project_status" className="form-label">
-                  Project Status
-                </label>
-                <select
-                  id="project_status"
-                  name="project_status"
-                  value={formData.project_status}
-                  onChange={handleChange}
-                  className="form-select"
-                >
-                  {PROJECT_STATUSES.map((status) => (
-                    <option key={status.value} value={status.value}>
-                      {status.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Start Date */}
-              <div className="form-group">
-                <label htmlFor="project_start_date" className="form-label">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  id="project_start_date"
-                  name="project_start_date"
-                  value={formData.project_start_date}
-                  onChange={handleChange}
-                  className="form-input"
-                />
-              </div>
-
-              {/* End Date */}
-              <div className="form-group">
-                <label htmlFor="project_end_date" className="form-label">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  id="project_end_date"
-                  name="project_end_date"
-                  value={formData.project_end_date}
-                  onChange={handleChange}
-                  className={`form-input ${validationErrors.project_end_date ? 'error' : ''}`}
-                />
-                {validationErrors.project_end_date && (
-                  <span className="error-message">{validationErrors.project_end_date}</span>
-                )}
-              </div>
-            </div>
-
-            {/* External Link */}
-            <div className="form-group">
-              <label htmlFor="external_link" className="form-label">
-                External Link
-                <span className="label-hint">(Live project URL)</span>
-              </label>
-              <input
-                type="url"
-                id="external_link"
-                name="external_link"
-                value={formData.external_link}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="https://your-project.com"
-              />
-            </div>
-          </div>
-        )}
 
         {/* Tags Section */}
         <div className="form-section">

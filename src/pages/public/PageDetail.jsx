@@ -8,8 +8,7 @@
  * - Full page content rendering
  * - Markdown support
  * - Tags display
- * - Linked quests
- * - Project details (if project type)
+ * - Linked quests and projects
  * - Back navigation
  */
 
@@ -29,16 +28,7 @@ import './PageDetail.css'
 const PAGE_TYPES = {
   blog: { label: 'Blog', icon: 'writing', color: '#3498db' },
   devlog: { label: 'Devlog', icon: 'logbook', color: '#9b59b6' },
-  notes: { label: 'Notes', icon: 'parchment', color: '#f39c12' },
-  project: { label: 'Project', icon: 'castle', color: '#d4af37' }
-}
-
-const PROJECT_STATUS_LABELS = {
-  planning: 'Planning',
-  in_progress: 'In Progress',
-  on_hold: 'On Hold',
-  completed: 'Completed',
-  archived: 'Archived'
+  notes: { label: 'Notes', icon: 'parchment', color: '#f39c12' }
 }
 
 // ========================================
@@ -75,16 +65,6 @@ function PageDetail() {
   useEffect(() => {
     fetchPage()
   }, [id])
-
-  /**
-   * Fetch additional data when page is loaded
-   */
-  useEffect(() => {
-    if (page && page.page_type === 'project') {
-      fetchDevlogs()
-      fetchIssues()
-    }
-  }, [page])
 
   /**
    * Load page data
@@ -320,32 +300,6 @@ function PageDetail() {
             </div>
           )}
         </header>
-
-        {/* Project Info */}
-        {page.page_type === 'project' && (
-          <div className="project-info-box">
-            <h3>
-              <Icon name="castle" size={24} />
-              Project Details
-            </h3>
-            <div className="project-details-grid">
-              <div className="detail-item">
-                <span className="detail-label">Status</span>
-                <span className="detail-value">
-                  {PROJECT_STATUS_LABELS[page.project_status] || 'N/A'}
-                </span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Started</span>
-                <span className="detail-value">{formatDate(page.project_start_date)}</span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Completed</span>
-                <span className="detail-value">{formatDate(page.project_end_date)}</span>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Content */}
         <div

@@ -20,7 +20,7 @@
  */
 
 /**
- * @typedef {'blog' | 'devlog' | 'notes' | 'project'} PageType
+ * @typedef {'blog' | 'devlog' | 'notes'} PageType
  */
 
 /**
@@ -77,15 +77,12 @@
  * @typedef {Object} Page
  * @property {string} id - UUID primary key
  * @property {string} title - Page title
- * @property {PageType} page_type - blog, devlog, notes, or project
+ * @property {PageType} page_type - blog, devlog, or notes
  * @property {string|null} content - HTML/Markdown content
  * @property {string|null} slug - URL-friendly identifier
  * @property {Visibility} visibility - Public or private
  * @property {string} created_at - ISO timestamp
  * @property {string} updated_at - ISO timestamp
- * @property {string|null} project_status - For project pages only
- * @property {string|null} project_start_date - For project pages only
- * @property {string|null} project_end_date - For project pages only
  */
 
 /**

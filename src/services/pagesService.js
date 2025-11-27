@@ -15,7 +15,6 @@
  * - blog: Blog posts and articles
  * - devlog: Development logs with to-do lists
  * - notes: Quick notes and ideas
- * - project: Full project pages with status tracking
  */
 
 import { supabase } from '../config/supabase'
@@ -210,9 +209,6 @@ export async function getPageById(pageId) {
  * @param {string} [pageData.page_type='notes'] - Page type
  * @param {string} [pageData.content=''] - Page content
  * @param {string} [pageData.visibility='private'] - Visibility
- * @param {string} [pageData.project_status] - For project pages
- * @param {string} [pageData.project_start_date] - For project pages
- * @param {string} [pageData.project_end_date] - For project pages
  * @param {Array} [pageData.tagIds=[]] - Array of tag UUIDs
  * @param {Array} [pageData.questIds=[]] - Array of quest UUIDs
  * @param {Array} [pageData.projectIds=[]] - Array of project UUIDs
@@ -235,10 +231,7 @@ export async function createPage(pageData) {
       title: pageFields.title.trim(),
       page_type: pageFields.page_type || 'notes',
       content: pageFields.content || '',
-      visibility: pageFields.visibility || 'private',
-      project_status: pageFields.project_status || null,
-      project_start_date: pageFields.project_start_date || null,
-      project_end_date: pageFields.project_end_date || null
+      visibility: pageFields.visibility || 'private'
     }
 
     // Insert the page

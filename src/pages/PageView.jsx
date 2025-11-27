@@ -9,9 +9,8 @@
  * - Render content (with markdown support)
  * - Show visibility status
  * - Display tags
- * - Show linked quests
+ * - Show linked quests and projects
  * - Created/updated timestamps
- * - Project-specific info (status, dates)
  * - Edit and delete actions
  * - Back to list navigation
  */
@@ -37,19 +36,7 @@ import './PageView.css'
 const PAGE_TYPES = {
   blog: { label: 'Blog', icon: 'writing', color: '#3498db' },
   devlog: { label: 'Devlog', icon: 'logbook', color: '#9b59b6' },
-  notes: { label: 'Notes', icon: 'parchment', color: '#f39c12' },
-  project: { label: 'Project', icon: 'castle', color: '#2ecc71' }
-}
-
-/**
- * Project status labels
- */
-const PROJECT_STATUS_LABELS = {
-  planning: 'Planning',
-  in_progress: 'In Progress',
-  on_hold: 'On Hold',
-  completed: 'Completed',
-  archived: 'Archived'
+  notes: { label: 'Notes', icon: 'parchment', color: '#f39c12' }
 }
 
 // ========================================
@@ -389,32 +376,6 @@ function PageView() {
             {page.tags.map((tag) => (
               <Tag key={tag.id} name={tag.name} color={tag.color} size="normal" />
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* Project Details */}
-      {page.page_type === 'project' && (
-        <div className="project-details-section">
-          <h3>
-            <Icon name="castle" size={24} />
-            Project Details
-          </h3>
-          <div className="project-info-grid">
-            <div className="project-info-item">
-              <span className="info-label">Status</span>
-              <span className="info-value status">
-                {PROJECT_STATUS_LABELS[page.project_status] || page.project_status || 'N/A'}
-              </span>
-            </div>
-            <div className="project-info-item">
-              <span className="info-label">Start Date</span>
-              <span className="info-value">{formatDate(page.project_start_date)}</span>
-            </div>
-            <div className="project-info-item">
-              <span className="info-label">End Date</span>
-              <span className="info-value">{formatDate(page.project_end_date)}</span>
-            </div>
           </div>
         </div>
       )}
