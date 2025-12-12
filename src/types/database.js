@@ -20,7 +20,7 @@
  */
 
 /**
- * @typedef {'blog' | 'devlog' | 'notes'} PageType
+ * @typedef {'blog' | 'notes'} PageType
  */
 
 /**
@@ -29,18 +29,6 @@
 
 /**
  * @typedef {'project' | 'quest'} ConnectionType
- */
-
-/**
- * @typedef {'bug' | 'improvement'} IssueType
- */
-
-/**
- * @typedef {'critical' | 'major' | 'minor'} IssueSeverity
- */
-
-/**
- * @typedef {'open' | 'in_progress' | 'blocked' | 'done' | 'postponed' | 'cancelled'} IssueStatus
  */
 
 // ========================================
@@ -77,7 +65,7 @@
  * @typedef {Object} Page
  * @property {string} id - UUID primary key
  * @property {string} title - Page title
- * @property {PageType} page_type - blog, devlog, or notes
+ * @property {PageType} page_type - blog or notes
  * @property {string|null} content - HTML/Markdown content
  * @property {string|null} slug - URL-friendly identifier
  * @property {Visibility} visibility - Public or private
@@ -92,31 +80,6 @@
  * @property {ConnectionType} connected_to_type - 'project' or 'quest'
  * @property {string} connected_to_id - UUID of project or quest
  * @property {string} created_at - ISO timestamp
- */
-
-/**
- * @typedef {Object} Issue
- * @property {string} id - UUID primary key
- * @property {ConnectionType} attached_to_type - 'project' or 'quest'
- * @property {string} attached_to_id - UUID of project or quest
- * @property {IssueType} issue_type - 'bug' or 'improvement'
- * @property {IssueSeverity|null} severity - Required for bugs, null for improvements
- * @property {string} title - Issue title
- * @property {string|null} description - Issue description
- * @property {IssueStatus} status - Current issue status
- * @property {string} created_at - ISO timestamp
- * @property {string} updated_at - ISO timestamp
- */
-
-/**
- * @typedef {Object} DevlogIssue
- * @property {string} id - UUID primary key
- * @property {string} devlog_id - Reference to pages.id (devlog page)
- * @property {string} issue_id - Reference to issues.id
- * @property {IssueStatus|null} status_change - Status set in this devlog session
- * @property {string|null} work_notes - Notes about work done in this devlog
- * @property {string} created_at - ISO timestamp
- * @property {string} updated_at - ISO timestamp
  */
 
 /**
@@ -154,59 +117,9 @@
  * @typedef {Page & { tags?: Tag[], connections?: PageConnection[] }} PageWithRelations
  */
 
-/**
- * @typedef {Issue & { devlog_history?: DevlogIssue[] }} IssueWithHistory
- */
-
-/**
- * @typedef {DevlogIssue & { issue?: Issue }} DevlogIssueWithDetails
- */
-
 // ========================================
 // DISPLAY CONSTANTS
 // ========================================
-
-/**
- * Issue status sort order for display
- * Lower number = higher priority in list
- */
-export const ISSUE_STATUS_ORDER = {
-  in_progress: 1,
-  blocked: 2,
-  postponed: 3,
-  open: 4,
-  done: 5,
-  cancelled: 6
-};
-
-/**
- * Issue status display names
- */
-export const ISSUE_STATUS_LABELS = {
-  open: 'Open',
-  in_progress: 'In Progress',
-  blocked: 'Blocked',
-  done: 'Done',
-  postponed: 'Postponed',
-  cancelled: 'Cancelled'
-};
-
-/**
- * Issue severity display names and colors
- */
-export const ISSUE_SEVERITY_CONFIG = {
-  critical: { label: 'Critical', color: '#ff4444' },
-  major: { label: 'Major', color: '#ffaa00' },
-  minor: { label: 'Minor', color: '#88ccff' }
-};
-
-/**
- * Issue type display names
- */
-export const ISSUE_TYPE_LABELS = {
-  bug: 'Bug',
-  improvement: 'Improvement'
-};
 
 /**
  * Project status display names (RPG themed)
@@ -235,59 +148,7 @@ export const QUEST_STATUS_LABELS = {
   future: 'Future Quest'
 };
 
-/**
- * Check if an issue status is considered "complete"
- * @param {IssueStatus} status
- * @returns {boolean}
- */
-export const isIssueComplete = (status) => {
-  return status === 'done' || status === 'cancelled';
-};
-
-/**
- * Sort issues by status order
- * @param {Issue[]} issues
- * @returns {Issue[]}
- */
-export const sortIssuesByStatus = (issues) => {
-  return [...issues].sort((a, b) => {
-    const orderA = ISSUE_STATUS_ORDER[a.status] || 999;
-    const orderB = ISSUE_STATUS_ORDER[b.status] || 999;
-    return orderA - orderB;
-  });
-};
-
-/**
- * Group issues by their status category
- * @param {Issue[]} issues
- * @returns {{ active: Issue[], complete: Issue[] }}
- */
-export const groupIssuesByCompletion = (issues) => {
-  const active = [];
-  const complete = [];
-
-  issues.forEach(issue => {
-    if (isIssueComplete(issue.status)) {
-      complete.push(issue);
-    } else {
-      active.push(issue);
-    }
-  });
-
-  return {
-    active: sortIssuesByStatus(active),
-    complete: sortIssuesByStatus(complete)
-  };
-};
-
 export default {
-  ISSUE_STATUS_ORDER,
-  ISSUE_STATUS_LABELS,
-  ISSUE_SEVERITY_CONFIG,
-  ISSUE_TYPE_LABELS,
   PROJECT_STATUS_LABELS,
-  QUEST_STATUS_LABELS,
-  isIssueComplete,
-  sortIssuesByStatus,
-  groupIssuesByCompletion
+  QUEST_STATUS_LABELS
 };

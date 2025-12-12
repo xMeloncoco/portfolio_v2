@@ -18,9 +18,7 @@
 import { supabase } from '../config/supabase'
 import { logger } from '../utils/logger'
 import { getProjectById, getProjectQuests, getProjectStatistics } from './projectsService'
-import { getProjectIssues, getQuestIssues } from './issuesService'
 import { getProjectAllPages, getPagesConnectedToQuest } from './pageConnectionsService'
-import { getDevlogIssuesSectioned } from './devlogIssuesService'
 
 // ========================================
 // PROJECT VIEW QUERIES
@@ -40,13 +38,11 @@ export async function getProjectViewData(projectId) {
     const [
       projectResult,
       questsResult,
-      issuesResult,
       pagesResult,
       statsResult
     ] = await Promise.all([
       getProjectById(projectId),
       getProjectQuests(projectId),
-      getProjectIssues(projectId, { includeCascaded: true }),
       getProjectAllPages(projectId, { includeCascaded: true }),
       getProjectStatistics(projectId)
     ])
@@ -101,15 +97,6 @@ export async function getProjectViewData(projectId) {
     const viewData = {
       project: projectResult.data,
       quests: questsResult.data || [],
-      issues: {
-        all: issuesResult.data || [],
-        direct: issuesResult.data?.filter(i =>
-          i.attached_to_type === 'project' && i.attached_to_id === projectId
-        ) || [],
-        from_quests: issuesResult.data?.filter(i =>
-          i.attached_to_type === 'quest'
-        ) || []
-      },
       pages: pagesByType,
       child_projects: transformedChildren,
       statistics: statsResult.data || {}
@@ -234,11 +221,8 @@ export async function getQuestViewData(questId) {
       .eq('parent_quest_id', questId)
       .order('updated_at', { ascending: false })
 
-    // Fetch issues and pages
-    const [issuesResult, pagesResult] = await Promise.all([
-      getQuestIssues(questId),
-      getPagesConnectedToQuest(questId)
-    ])
+    // Fetch pages
+    const pagesResult = await getPagesConnectedToQuest(questId)
 
     // Organize pages by type
     const pagesByType = {
@@ -295,7 +279,6 @@ export async function getQuestViewData(questId) {
           }
         }
       }) || [],
-      issues: issuesResult.data || [],
       pages: pagesByType
     }
 
@@ -405,8 +388,7 @@ export async function getDevlogViewData(devlogId) {
       logger.warn('Error fetching devlog connections', connError)
     }
 
-    // Get issue sections for each connection
-    let issueSections = {}
+    // Get attachment details for each connection
     let attachedTo = null
 
     if (connections && connections.length > 0) {
@@ -433,14 +415,6 @@ export async function getDevlogViewData(devlogId) {
           .single()
         attachedTo.details = quest
       }
-
-      // Get sectioned issues
-      const { data: sections } = await getDevlogIssuesSectioned(
-        devlogId,
-        primaryConnection.connected_to_type,
-        primaryConnection.connected_to_id
-      )
-      issueSections = sections || {}
     }
 
     const viewData = {
@@ -449,8 +423,7 @@ export async function getDevlogViewData(devlogId) {
         tags: devlog.page_tags?.map(pt => pt.tags) || []
       },
       attached_to: attachedTo,
-      connections: connections || [],
-      issue_sections: issueSections
+      connections: connections || []
     }
 
     logger.info(`Fetched complete view data for devlog: ${devlogId}`)
@@ -478,14 +451,11 @@ export async function getDashboardData() {
     const [
       projectsCount,
       questsCount,
-      issuesCount,
       recentProjects,
-      recentQuests,
-      activeIssues
+      recentQuests
     ] = await Promise.all([
       supabase.from('projects').select('id', { count: 'exact', head: true }),
       supabase.from('quests').select('id', { count: 'exact', head: true }).is('parent_quest_id', null),
-      supabase.from('issues').select('id', { count: 'exact', head: true }),
       supabase.from('projects')
         .select('id, title, slug, status, visibility, updated_at')
         .order('updated_at', { ascending: false })
@@ -494,46 +464,18 @@ export async function getDashboardData() {
         .select('id, name, status, quest_type, updated_at')
         .is('parent_quest_id', null)
         .order('updated_at', { ascending: false })
-        .limit(5),
-      supabase.from('issues')
-        .select('id, title, issue_type, severity, status, updated_at')
-        .not('status', 'in', '("done","cancelled")')
-        .order('updated_at', { ascending: false })
-        .limit(10)
+        .limit(5)
     ])
-
-    // Get issue breakdown
-    const { data: allIssues } = await supabase
-      .from('issues')
-      .select('status, issue_type, severity')
-
-    const issueBreakdown = {
-      by_status: {},
-      by_type: { bug: 0, improvement: 0 },
-      by_severity: { critical: 0, major: 0, minor: 0 }
-    }
-
-    allIssues?.forEach(issue => {
-      issueBreakdown.by_status[issue.status] = (issueBreakdown.by_status[issue.status] || 0) + 1
-      issueBreakdown.by_type[issue.issue_type]++
-      if (issue.severity) {
-        issueBreakdown.by_severity[issue.severity]++
-      }
-    })
 
     const dashboard = {
       counts: {
         projects: projectsCount.count || 0,
-        quests: questsCount.count || 0,
-        issues: issuesCount.count || 0,
-        active_issues: activeIssues.data?.length || 0
+        quests: questsCount.count || 0
       },
       recent: {
         projects: recentProjects.data || [],
         quests: recentQuests.data || []
-      },
-      active_issues: activeIssues.data || [],
-      issue_breakdown: issueBreakdown
+      }
     }
 
     logger.info('Fetched dashboard data')
@@ -545,10 +487,10 @@ export async function getDashboardData() {
 }
 
 /**
- * Search across all content (projects, quests, pages, issues)
+ * Search across all content (projects, quests, pages)
  * @param {string} searchTerm - Search query
  * @param {Object} [options] - Search options
- * @param {Array<string>} [options.types] - Types to search: ['projects', 'quests', 'pages', 'issues']
+ * @param {Array<string>} [options.types] - Types to search: ['projects', 'quests', 'pages']
  * @param {number} [options.limit=10] - Max results per type
  * @returns {Promise<{data: Object, error: string|null}>}
  */
@@ -556,7 +498,7 @@ export async function searchPortfolio(searchTerm, options = {}) {
   try {
     logger.info(`Searching portfolio for: ${searchTerm}`)
 
-    const types = options.types || ['projects', 'quests', 'pages', 'issues']
+    const types = options.types || ['projects', 'quests', 'pages']
     const limit = options.limit || 10
     const results = {}
 
@@ -592,16 +534,6 @@ export async function searchPortfolio(searchTerm, options = {}) {
       )
     }
 
-    if (types.includes('issues')) {
-      searchPromises.push(
-        supabase.from('issues')
-          .select('id, title, description, issue_type, status')
-          .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
-          .limit(limit)
-          .then(res => { results.issues = res.data || [] })
-      )
-    }
-
     await Promise.all(searchPromises)
 
     const totalResults = Object.values(results).reduce((sum, arr) => sum + arr.length, 0)
@@ -630,12 +562,10 @@ export async function getPortfolioStatistics() {
     const [
       projects,
       quests,
-      issues,
       pages
     ] = await Promise.all([
       supabase.from('projects').select('id, status, visibility, created_at'),
       supabase.from('quests').select('id, status, quest_type, visibility').is('parent_quest_id', null),
-      supabase.from('issues').select('id, status, issue_type, severity'),
       supabase.from('pages').select('id, page_type, visibility')
     ])
 
@@ -651,14 +581,6 @@ export async function getPortfolioStatistics() {
         by_type: { main: 0, side: 0, future: 0 },
         completed: quests.data?.filter(q => q.status === 'finished').length || 0,
         in_progress: quests.data?.filter(q => q.status === 'in_progress').length || 0
-      },
-      issues: {
-        total: issues.data?.length || 0,
-        bugs: issues.data?.filter(i => i.issue_type === 'bug').length || 0,
-        improvements: issues.data?.filter(i => i.issue_type === 'improvement').length || 0,
-        critical_bugs: issues.data?.filter(i => i.issue_type === 'bug' && i.severity === 'critical').length || 0,
-        open_issues: issues.data?.filter(i => !['done', 'cancelled'].includes(i.status)).length || 0,
-        resolution_rate: 0
       },
       pages: {
         total: pages.data?.length || 0,
@@ -678,12 +600,6 @@ export async function getPortfolioStatistics() {
     pages.data?.forEach(p => {
       stats.pages.by_type[p.page_type]++
     })
-
-    // Calculate issue resolution rate
-    if (issues.data?.length > 0) {
-      const resolved = issues.data.filter(i => i.status === 'done').length
-      stats.issues.resolution_rate = Math.round((resolved / issues.data.length) * 100)
-    }
 
     logger.info('Fetched portfolio statistics')
     return { data: stats, error: null }

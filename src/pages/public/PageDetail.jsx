@@ -15,7 +15,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getPageById, getAllPages } from '../../services/pagesService'
-import { getAllIssues } from '../../services/issuesService'
 import { logger } from '../../utils/logger'
 import Icon from '../../components/Icon'
 import Tag from '../../components/Tag'
@@ -51,9 +50,6 @@ function PageDetail() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [devlogs, setDevlogs] = useState([])
-  const [issues, setIssues] = useState([])
-  const [linkedQuestIssues, setLinkedQuestIssues] = useState([])
-  const [showLinkedQuestIssues, setShowLinkedQuestIssues] = useState(false)
 
   // ========================================
   // DATA FETCHING
@@ -131,47 +127,6 @@ function PageDetail() {
       logger.info(`Fetched ${relatedDevlogs.length} related devlogs`)
     } catch (err) {
       logger.error('Error fetching devlogs', err)
-    }
-  }
-
-  /**
-   * Fetch issues for this project and linked quests
-   */
-  const fetchIssues = async () => {
-    try {
-      logger.debug('Fetching issues for project...')
-
-      // Fetch issues attached to this project
-      const { data: projectIssues, error: projectError } = await getAllIssues({
-        attachedToType: 'project',
-        attachedToId: id
-      })
-
-      if (projectError) {
-        logger.error('Error fetching project issues', projectError)
-      } else {
-        setIssues(projectIssues || [])
-      }
-
-      // Fetch issues from linked quests
-      const questIds = page.quests?.map(q => q.id) || []
-      if (questIds.length > 0) {
-        const allLinkedIssues = []
-        for (const questId of questIds) {
-          const { data: questIssues, error: questError } = await getAllIssues({
-            attachedToType: 'quest',
-            attachedToId: questId
-          })
-          if (!questError && questIssues) {
-            allLinkedIssues.push(...questIssues)
-          }
-        }
-        setLinkedQuestIssues(allLinkedIssues)
-      }
-
-      logger.info(`Fetched ${projectIssues?.length || 0} project issues and ${linkedQuestIssues.length} quest issues`)
-    } catch (err) {
-      logger.error('Error fetching issues', err)
     }
   }
 
@@ -350,82 +305,6 @@ function PageDetail() {
           </div>
         )}
 
-        {/* Issues */}
-        {(issues.length > 0 || linkedQuestIssues.length > 0) && (
-          <div className="issues-box">
-            <div className="issues-header">
-              <h3>
-                <Icon name="bug" size={24} />
-                Issues
-              </h3>
-              {linkedQuestIssues.length > 0 && (
-                <button
-                  className="toggle-button"
-                  onClick={() => setShowLinkedQuestIssues(!showLinkedQuestIssues)}
-                >
-                  <Icon name={showLinkedQuestIssues ? 'check-box' : 'box'} size={18} />
-                  <span>Show quest issues ({linkedQuestIssues.length})</span>
-                </button>
-              )}
-            </div>
-
-            {/* Project Issues */}
-            {issues.length > 0 && (
-              <div className="issues-section">
-                <h4 className="issues-section-title">Project Issues ({issues.length})</h4>
-                <div className="issues-list">
-                  {issues.map((issue) => (
-                    <div key={issue.id} className={`issue-item ${issue.issue_type}`}>
-                      <div className="issue-header-row">
-                        <Icon name={issue.issue_type === 'bug' ? 'bug' : 'star'} size={16} />
-                        <span className="issue-title">{issue.title}</span>
-                        <span className={`issue-status status-${issue.status}`}>
-                          {issue.status.replace('_', ' ')}
-                        </span>
-                      </div>
-                      {issue.description && (
-                        <p className="issue-description">{issue.description}</p>
-                      )}
-                      {issue.issue_type === 'bug' && issue.severity && (
-                        <span className={`severity-badge severity-${issue.severity}`}>
-                          {issue.severity}
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Linked Quest Issues (Toggle) */}
-            {showLinkedQuestIssues && linkedQuestIssues.length > 0 && (
-              <div className="issues-section">
-                <h4 className="issues-section-title">Quest Issues ({linkedQuestIssues.length})</h4>
-                <div className="issues-list">
-                  {linkedQuestIssues.map((issue) => (
-                    <div key={issue.id} className={`issue-item ${issue.issue_type}`}>
-                      <div className="issue-header-row">
-                        <Icon name={issue.issue_type === 'bug' ? 'bug' : 'star'} size={16} />
-                        <span className="issue-title">{issue.title}</span>
-                        <span className={`issue-status status-${issue.status}`}>
-                          {issue.status.replace('_', ' ')}
-                        </span>
-                      </div>
-                      {issue.description && (
-                        <p className="issue-description">{issue.description}</p>
-                      )}
-                      {issue.issue_type === 'bug' && issue.severity && (
-                        <span className={`severity-badge severity-${issue.severity}`}>
-                          {issue.severity}
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
       </article>
     </div>
   )

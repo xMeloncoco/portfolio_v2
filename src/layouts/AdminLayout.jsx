@@ -57,12 +57,6 @@ const NAV_ITEMS = [
     description: 'Manage projects'
   },
   {
-    path: '/admin/devlogs',
-    icon: 'logbook',
-    label: 'Devlogs',
-    description: 'Development logs and session notes'
-  },
-  {
     path: '/admin/quests',
     icon: 'adventure',
     label: 'Quests',
@@ -73,12 +67,6 @@ const NAV_ITEMS = [
     icon: 'parchment',
     label: 'Blog & Notes',
     description: 'Manage blog posts and notes'
-  },
-  {
-    path: '/admin/issues',
-    icon: 'bug',
-    label: 'Issues',
-    description: 'Track bugs and improvements'
   },
   {
     path: '/admin/inbox',
@@ -97,12 +85,6 @@ const NAV_ITEMS = [
     icon: 'skills',
     label: 'Skills',
     description: 'Manage skills (Later phase)'
-  },
-  {
-    path: '/admin/theme',
-    icon: 'theme',
-    label: 'Theme',
-    description: 'Theme settings (Later phase)'
   }
 ]
 

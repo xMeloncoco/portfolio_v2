@@ -2,10 +2,10 @@
  * ========================================
  * PUBLIC BLOG PAGE
  * ========================================
- * Lists all public blog posts and devlogs
+ * Lists all public blog posts and notes
  *
  * FEATURES:
- * - Filter by type (Blog/Devlog)
+ * - Filter by type (Blog/Notes)
  * - Tag filtering
  * - Sorted by date
  * - Responsive grid layout
@@ -54,7 +54,7 @@ function Blog() {
   }, [posts, filterType, selectedTag])
 
   /**
-   * Load public blog posts and devlogs
+   * Load public blog posts and notes
    */
   const fetchPosts = async () => {
     try {
@@ -65,9 +65,9 @@ function Blog() {
       if (error) {
         logger.error('Error fetching posts', error)
       } else if (data) {
-        // Filter to only blog and devlog types
+        // Filter to only blog and notes types
         const blogPosts = data.filter(
-          (p) => p.page_type === 'blog' || p.page_type === 'devlog'
+          (p) => p.page_type === 'blog' || p.page_type === 'notes'
         )
         setPosts(blogPosts)
 
@@ -159,7 +159,7 @@ function Blog() {
         <div className="blog-title-section">
           <Icon name="writing" size={48} />
           <div>
-            <h1>Blog & Devlogs</h1>
+            <h1>Blog & Notes</h1>
             <p>Follow my journey and learn from my experiences</p>
           </div>
         </div>
@@ -182,11 +182,11 @@ function Blog() {
             Blog
           </button>
           <button
-            className={`filter-btn ${filterType === 'devlog' ? 'active' : ''}`}
-            onClick={() => setFilterType('devlog')}
+            className={`filter-btn ${filterType === 'notes' ? 'active' : ''}`}
+            onClick={() => setFilterType('notes')}
           >
-            <Icon name="logbook" size={18} />
-            Devlog
+            <Icon name="parchment" size={18} />
+            Notes
           </button>
         </div>
 
@@ -261,10 +261,10 @@ function Blog() {
                   }}
                 >
                   <Icon
-                    name={post.page_type === 'blog' ? 'writing' : 'logbook'}
+                    name={post.page_type === 'blog' ? 'writing' : 'parchment'}
                     size={20}
                   />
-                  <span>{post.page_type === 'blog' ? 'Blog' : 'Devlog'}</span>
+                  <span>{post.page_type === 'blog' ? 'Blog' : 'Notes'}</span>
                 </div>
                 <span className="post-date">
                   <Icon name="time" size={16} />

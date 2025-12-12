@@ -28,21 +28,16 @@ import AdminDashboard from './pages/AdminDashboard'
 import CharacterStats from './pages/CharacterStats'
 import Projects from './pages/Projects'
 import ProjectForm from './pages/ProjectForm'
-import Devlogs from './pages/Devlogs'
-import DevlogForm from './pages/DevlogForm'
 import Pages from './pages/Pages'
 import PageForm from './pages/PageForm'
 import PageView from './pages/PageView'
 import Quests from './pages/Quests'
 import QuestForm from './pages/QuestForm'
 import QuestView from './pages/QuestView'
-import Issues from './pages/Issues'
-import IssueForm from './pages/IssueForm'
 import Inbox from './pages/Inbox'
 import Inventory from './pages/Inventory'
 import InventoryForm from './pages/InventoryForm'
 import Skills from './pages/Skills'
-import ThemeSettings from './pages/ThemeSettings'
 
 // Import public pages
 import Home from './pages/public/Home'
@@ -247,42 +242,6 @@ function App() {
           }
         />
 
-        {/* Devlogs Management */}
-        <Route
-          path="/admin/devlogs"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <Devlogs />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Create New Devlog */}
-        <Route
-          path="/admin/devlogs/new"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <DevlogForm />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Edit Devlog */}
-        <Route
-          path="/admin/devlogs/:id/edit"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <DevlogForm />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
         {/* Pages Management */}
         <Route
           path="/admin/pages"
@@ -379,42 +338,6 @@ function App() {
           }
         />
 
-        {/* Issues Management */}
-        <Route
-          path="/admin/issues"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <Issues />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Create New Issue */}
-        <Route
-          path="/admin/issues/new"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <IssueForm />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Edit Issue */}
-        <Route
-          path="/admin/issues/:id/edit"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <IssueForm />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
         {/* Inbox Management */}
         <Route
           path="/admin/inbox"
@@ -470,18 +393,6 @@ function App() {
             <ProtectedRoute>
               <AdminLayout>
                 <Skills />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Theme Settings */}
-        <Route
-          path="/admin/theme"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <ThemeSettings />
               </AdminLayout>
             </ProtectedRoute>
           }

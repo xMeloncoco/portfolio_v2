@@ -5,7 +5,7 @@
  * Central export for all database services
  *
  * Usage:
- * import { projectsService, issuesService } from '../services'
+ * import { projectsService, questsService } from '../services'
  * or
  * import * as services from '../services'
  */
@@ -14,12 +14,10 @@
 export * as projectsService from './projectsService'
 export * as questsService from './questsService'
 export * as pagesService from './pagesService'
-export * as issuesService from './issuesService'
 export * as tagsService from './tagsService'
 
 // Relationship services
 export * as pageConnectionsService from './pageConnectionsService'
-export * as devlogIssuesService from './devlogIssuesService'
 
 // Specialized services
 export * as inventoryService from './inventoryService'
@@ -57,18 +55,6 @@ export {
   deleteSubQuest
 } from './questsService'
 
-export {
-  // Issues
-  getAllIssues,
-  getIssueById,
-  createIssue,
-  updateIssue,
-  updateIssueStatus,
-  deleteIssue,
-  getProjectIssues,
-  getQuestIssues,
-  getIssueHistory
-} from './issuesService'
 
 export {
   // Page connections
@@ -80,14 +66,6 @@ export {
   getProjectDevlogs
 } from './pageConnectionsService'
 
-export {
-  // Devlog issues
-  linkIssueToDevlog,
-  unlinkIssueFromDevlog,
-  getDevlogIssues,
-  getDevlogIssuesSectioned,
-  getIssueDevlogHistory
-} from './devlogIssuesService'
 
 export {
   // Portfolio queries

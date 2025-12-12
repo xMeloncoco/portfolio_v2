@@ -22,7 +22,6 @@ import {
   toggleSubQuestCompletion,
   STATUS_DISPLAY_NAMES
 } from '../services/questsService'
-import { getSubquestDevlogHistory } from '../services/devlogSubquestsService'
 import { logger } from '../utils/logger'
 import Icon from '../components/Icon'
 import Tag from '../components/Tag'
@@ -78,10 +77,6 @@ function QuestView() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Devlogs
-  const [devlogs, setDevlogs] = useState([])
-  const [devlogsLoading, setDevlogsLoading] = useState(false)
-
   // ========================================
   // DATA FETCHING
   // ========================================
@@ -111,11 +106,6 @@ function QuestView() {
       } else if (data) {
         setQuest(data)
         logger.info('Quest data loaded successfully')
-
-        // Fetch devlogs for this quest's subquests
-        if (data.sub_quests && data.sub_quests.length > 0) {
-          fetchDevlogs(data.sub_quests)
-        }
       } else {
         setError('Quest not found')
         logger.warn(`Quest not found: ${id}`)
@@ -125,66 +115,6 @@ function QuestView() {
       logger.error('Unexpected error fetching quest', err)
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  /**
-   * Fetch devlogs for all subquests
-   * @param {Array} subquests - Array of subquest objects
-   */
-  const fetchDevlogs = async (subquests) => {
-    try {
-      setDevlogsLoading(true)
-      logger.info('Fetching devlogs for quest subquests...')
-
-      // Fetch devlog history for each subquest
-      const devlogPromises = subquests.map((subquest) =>
-        getSubquestDevlogHistory(subquest.id)
-      )
-
-      const results = await Promise.all(devlogPromises)
-
-      // Consolidate all devlogs and remove duplicates
-      const allDevlogs = []
-      const devlogMap = new Map()
-
-      results.forEach((result) => {
-        if (result.data && Array.isArray(result.data)) {
-          result.data.forEach((devlogEntry) => {
-            if (devlogEntry.pages) {
-              const devlogId = devlogEntry.pages.id
-
-              if (!devlogMap.has(devlogId)) {
-                devlogMap.set(devlogId, {
-                  id: devlogId,
-                  title: devlogEntry.pages.title,
-                  created_at: devlogEntry.pages.created_at,
-                  work_entries: []
-                })
-              }
-
-              // Add work entry to this devlog
-              devlogMap.get(devlogId).work_entries.push({
-                subquest_id: devlogEntry.subquest_id,
-                was_completed: devlogEntry.was_completed,
-                work_notes: devlogEntry.work_notes,
-                created_at: devlogEntry.created_at
-              })
-            }
-          })
-        }
-      })
-
-      // Convert map to array and sort by date (newest first)
-      const consolidatedDevlogs = Array.from(devlogMap.values())
-        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-
-      setDevlogs(consolidatedDevlogs)
-      logger.info(`Found ${consolidatedDevlogs.length} devlogs for quest`)
-    } catch (err) {
-      logger.error('Error fetching devlogs', err)
-    } finally {
-      setDevlogsLoading(false)
     }
   }
 
@@ -518,50 +448,6 @@ function QuestView() {
               </div>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* Devlogs */}
-      {devlogs.length > 0 && (
-        <div className="quest-devlogs-section">
-          <h3>
-            <Icon name="writing" size={24} />
-            Devlog Entries
-          </h3>
-          {devlogsLoading ? (
-            <div className="devlogs-loading">
-              <div className="loading-spinner"></div>
-              <p>Loading devlogs...</p>
-            </div>
-          ) : (
-            <div className="devlogs-list">
-              {devlogs.map((devlog) => (
-                <div
-                  key={devlog.id}
-                  className="devlog-item"
-                  onClick={() => navigate(`/admin/pages/${devlog.id}`)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyPress={(e) => e.key === 'Enter' && navigate(`/admin/pages/${devlog.id}`)}
-                >
-                  <div className="devlog-header">
-                    <Icon name="writing" size={20} />
-                    <span className="devlog-title">{devlog.title}</span>
-                    <span className="devlog-date">
-                      {formatDateTime(devlog.created_at)}
-                    </span>
-                  </div>
-                  <div className="devlog-work-summary">
-                    <Icon name="done" size={16} />
-                    <span>
-                      {devlog.work_entries.filter((e) => e.was_completed).length} objective(s) completed
-                    </span>
-                    <Icon name="chevron-right" size={16} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       )}
 
