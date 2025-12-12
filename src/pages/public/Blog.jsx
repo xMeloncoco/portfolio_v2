@@ -257,7 +257,7 @@ function Blog() {
                 <div
                   className="post-type-badge"
                   style={{
-                    backgroundColor: post.page_type === 'blog' ? '#3498db' : '#9b59b6'
+                    backgroundColor: post.page_type === 'blog' ? '#3498db' : '#f39c12'
                   }}
                 >
                   <Icon
