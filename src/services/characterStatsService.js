@@ -20,6 +20,7 @@
  */
 
 import { supabase } from '../config/supabase'
+import { getCharacterSettings } from './characterSettingsService'
 import { logger } from '../utils/logger'
 
 // ========================================
@@ -35,10 +36,11 @@ export async function calculateCharacterStats() {
     logger.info('Calculating character stats...')
 
     // Fetch all required data in parallel
-    const [questsResult, pagesResult, achievementsResult] = await Promise.all([
+    const [questsResult, pagesResult, achievementsResult, settingsResult] = await Promise.all([
       fetchQuestsData(),
       fetchPagesData(),
-      fetchAchievementsData()
+      fetchAchievementsData(),
+      getCharacterSettings()
     ])
 
     if (questsResult.error || pagesResult.error || achievementsResult.error) {
@@ -52,7 +54,7 @@ export async function calculateCharacterStats() {
     const rawStats = {
       str: calculateStrength(questsResult.data),
       int: calculateIntelligence(achievementsResult.data),
-      wis: calculateWisdom(pagesResult.data),
+      wis: calculateWisdom(settingsResult.data),
       dex: calculateDexterity(pagesResult.data),
       con: calculateConstitution(questsResult.data),
       cha: calculateCharisma(pagesResult.data)
@@ -80,8 +82,8 @@ export async function calculateCharacterStats() {
         name: 'Wisdom',
         score: convertToStatScore(rawStats.wis.value, 'wis'),
         rawValue: rawStats.wis.value,
-        description: 'Devlogs Written',
-        tooltip: 'Development logs documenting your journey. Wisdom comes from reflection and sharing knowledge.',
+        description: 'Skills Logged',
+        tooltip: 'Total languages, frameworks, and tools listed in your profile. Wisdom grows with the breadth of your knowledge.',
         details: rawStats.wis.details
       },
       dex: {
@@ -202,13 +204,16 @@ function calculateIntelligence(achievements) {
 }
 
 /**
- * WIS: Devlogs written
+ * WIS: Total skills logged (languages + frameworks + tools)
  */
-function calculateWisdom(pages) {
-  const devlogs = pages.filter((p) => p.page_type === 'devlog')
+function calculateWisdom(settings) {
+  const languages = settings?.languages?.length || 0
+  const frameworks = settings?.frameworks?.length || 0
+  const tools = settings?.tools?.length || 0
+  const total = languages + frameworks + tools
   return {
-    value: devlogs.length,
-    details: `${devlogs.length} devlogs documenting the journey`
+    value: total,
+    details: `${languages} languages, ${frameworks} frameworks, ${tools} tools`
   }
 }
 
