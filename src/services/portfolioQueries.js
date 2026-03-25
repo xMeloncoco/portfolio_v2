@@ -11,8 +11,7 @@
  *
  * CASCADING DISPLAY RULES:
  * - Project pages show ALL related content (direct + from quests)
- * - Quest pages show their subquests, devlogs, and issues
- * - Devlog pages show issue work history
+ * - Quest pages show their subquests and issues
  */
 
 import { supabase } from '../config/supabase'
@@ -53,7 +52,6 @@ export async function getProjectViewData(projectId) {
 
     // Organize pages by type
     const pagesByType = {
-      devlogs: [],
       blogs: [],
       notes: [],
       project_pages: []
@@ -61,9 +59,6 @@ export async function getProjectViewData(projectId) {
 
     pagesResult.data.forEach(page => {
       switch (page.page_type) {
-        case 'devlog':
-          pagesByType.devlogs.push(page)
-          break
         case 'blog':
           pagesByType.blogs.push(page)
           break
@@ -226,7 +221,6 @@ export async function getQuestViewData(questId) {
 
     // Organize pages by type
     const pagesByType = {
-      devlogs: [],
       blogs: [],
       notes: [],
       project_pages: []
@@ -234,9 +228,6 @@ export async function getQuestViewData(questId) {
 
     pagesResult.data?.forEach(page => {
       switch (page.page_type) {
-        case 'devlog':
-          pagesByType.devlogs.push(page)
-          break
         case 'blog':
           pagesByType.blogs.push(page)
           break
@@ -343,94 +334,6 @@ export async function getQuestBreadcrumb(questId) {
   } catch (err) {
     logger.error('Unexpected error building quest breadcrumb', err)
     return { data: [], error: err.message }
-  }
-}
-
-// ========================================
-// DEVLOG VIEW QUERIES
-// ========================================
-
-/**
- * Get complete devlog view data (for Devlog page display)
- * @param {string} devlogId - The devlog page UUID
- * @returns {Promise<{data: Object|null, error: string|null}>}
- */
-export async function getDevlogViewData(devlogId) {
-  try {
-    logger.info(`Fetching complete view data for devlog: ${devlogId}`)
-
-    // Get the devlog page
-    const { data: devlog, error: devlogError } = await supabase
-      .from('pages')
-      .select(`
-        *,
-        page_tags (
-          tag_id,
-          tags (id, name, color)
-        )
-      `)
-      .eq('id', devlogId)
-      .eq('page_type', 'devlog')
-      .single()
-
-    if (devlogError) {
-      logger.error('Error fetching devlog', devlogError)
-      return { data: null, error: devlogError.message }
-    }
-
-    // Get what the devlog is connected to
-    const { data: connections, error: connError } = await supabase
-      .from('page_connections')
-      .select('*')
-      .eq('page_id', devlogId)
-
-    if (connError) {
-      logger.warn('Error fetching devlog connections', connError)
-    }
-
-    // Get attachment details for each connection
-    let attachedTo = null
-
-    if (connections && connections.length > 0) {
-      // Take first connection as primary (devlogs should be exclusive)
-      const primaryConnection = connections[0]
-      attachedTo = {
-        type: primaryConnection.connected_to_type,
-        id: primaryConnection.connected_to_id
-      }
-
-      // Get details of what it's attached to
-      if (primaryConnection.connected_to_type === 'project') {
-        const { data: project } = await supabase
-          .from('projects')
-          .select('id, title, slug')
-          .eq('id', primaryConnection.connected_to_id)
-          .single()
-        attachedTo.details = project
-      } else if (primaryConnection.connected_to_type === 'quest') {
-        const { data: quest } = await supabase
-          .from('quests')
-          .select('id, name, project_id')
-          .eq('id', primaryConnection.connected_to_id)
-          .single()
-        attachedTo.details = quest
-      }
-    }
-
-    const viewData = {
-      devlog: {
-        ...devlog,
-        tags: devlog.page_tags?.map(pt => pt.tags) || []
-      },
-      attached_to: attachedTo,
-      connections: connections || []
-    }
-
-    logger.info(`Fetched complete view data for devlog: ${devlogId}`)
-    return { data: viewData, error: null }
-  } catch (err) {
-    logger.error('Unexpected error fetching devlog view data', err)
-    return { data: null, error: err.message }
   }
 }
 
@@ -584,7 +487,7 @@ export async function getPortfolioStatistics() {
       },
       pages: {
         total: pages.data?.length || 0,
-        by_type: { blog: 0, devlog: 0, notes: 0, project: 0 }
+        by_type: { blog: 0, notes: 0, project: 0 }
       }
     }
 
@@ -616,8 +519,6 @@ export default {
   // Quest views
   getQuestViewData,
   getQuestBreadcrumb,
-  // Devlog views
-  getDevlogViewData,
   // Dashboard
   getDashboardData,
   searchPortfolio,

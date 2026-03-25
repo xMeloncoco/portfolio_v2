@@ -14,7 +14,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getPageById, getAllPages } from '../../services/pagesService'
+import { getPageById } from '../../services/pagesService'
 import { logger } from '../../utils/logger'
 import Icon from '../../components/Icon'
 import Tag from '../../components/Tag'
@@ -26,7 +26,6 @@ import './PageDetail.css'
 
 const PAGE_TYPES = {
   blog: { label: 'Blog', icon: 'writing', color: '#3498db' },
-  devlog: { label: 'Devlog', icon: 'logbook', color: '#9b59b6' },
   notes: { label: 'Notes', icon: 'parchment', color: '#f39c12' }
 }
 
@@ -49,7 +48,6 @@ function PageDetail() {
   const [page, setPage] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [devlogs, setDevlogs] = useState([])
 
   // ========================================
   // DATA FETCHING
@@ -92,41 +90,6 @@ function PageDetail() {
       logger.error('Unexpected error fetching page', err)
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  /**
-   * Fetch devlogs attached to this project or linked quests
-   */
-  const fetchDevlogs = async () => {
-    try {
-      logger.debug('Fetching devlogs for project...')
-
-      // Fetch devlogs that are connected to this project or its linked quests
-      const { data, error: fetchError } = await getAllPages({
-        pageType: 'devlog',
-        visibility: 'public'
-      })
-
-      if (fetchError) {
-        logger.error('Error fetching devlogs', fetchError)
-        return
-      }
-
-      // Filter devlogs that are connected to this project or its quests
-      const questIds = page.quests?.map(q => q.id) || []
-      const relatedDevlogs = data.filter(devlog => {
-        // Check if devlog is connected to this project
-        const connectedToProject = devlog.projects?.some(p => p.id === page.id)
-        // Check if devlog is connected to any of the linked quests
-        const connectedToQuest = devlog.quests?.some(q => questIds.includes(q.id))
-        return connectedToProject || connectedToQuest
-      })
-
-      setDevlogs(relatedDevlogs)
-      logger.info(`Fetched ${relatedDevlogs.length} related devlogs`)
-    } catch (err) {
-      logger.error('Error fetching devlogs', err)
     }
   }
 
@@ -278,29 +241,6 @@ function PageDetail() {
                     <span>{quest.title}</span>
                   </Link>
                 ))}
-            </div>
-          </div>
-        )}
-
-        {/* Devlogs */}
-        {devlogs.length > 0 && (
-          <div className="devlogs-box">
-            <h3>
-              <Icon name="logbook" size={24} />
-              Development Logs
-            </h3>
-            <div className="devlogs-list">
-              {devlogs.map((devlog) => (
-                <Link key={devlog.id} to={`/page/${devlog.id}`} className="devlog-link">
-                  <div className="devlog-icon">
-                    <Icon name="logbook" size={20} />
-                  </div>
-                  <div className="devlog-info">
-                    <h4>{devlog.title}</h4>
-                    <span className="devlog-date">{formatDate(devlog.updated_at)}</span>
-                  </div>
-                </Link>
-              ))}
             </div>
           </div>
         )}

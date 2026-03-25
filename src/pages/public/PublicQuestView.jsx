@@ -2,7 +2,7 @@
  * ========================================
  * PUBLIC QUEST VIEW (Detail)
  * ========================================
- * Public view of quest details with sub-quests, pages, and devlogs
+ * Public view of quest details with sub-quests and pages
  *
  * FEATURES:
  * - Display quest title and type
@@ -11,7 +11,6 @@
  * - Read-only sub-quest list
  * - Tags display
  * - Linked pages
- * - Devlog entries
  */
 
 import { useState, useEffect } from 'react'
