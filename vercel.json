@@ -3,6 +3,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/spirit-island/(.*)",
+      "destination": "https://spirit-island-c5pb7l0my-miriams-projects-bca6872c.vercel.app/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
