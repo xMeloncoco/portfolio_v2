@@ -7,7 +7,7 @@
  * STATS MAPPING:
  * STR - Total quests completed
  * INT - Achievements/certifications earned
- * WIS - Devlogs written
+ * WIS - Skills logged (breadth of knowledge)
  * DEX - Projects completed in last year
  * CON - Abandoned quests (lower is better)
  * CHA - Projects with external links
@@ -35,14 +35,15 @@ export async function calculateCharacterStats() {
     logger.info('Calculating character stats...')
 
     // Fetch all required data in parallel
-    const [questsResult, pagesResult, achievementsResult] = await Promise.all([
+    const [questsResult, pagesResult, achievementsResult, skillsResult] = await Promise.all([
       fetchQuestsData(),
       fetchPagesData(),
-      fetchAchievementsData()
+      fetchAchievementsData(),
+      fetchSkillsData()
     ])
 
-    if (questsResult.error || pagesResult.error || achievementsResult.error) {
-      const errors = [questsResult.error, pagesResult.error, achievementsResult.error]
+    if (questsResult.error || pagesResult.error || achievementsResult.error || skillsResult.error) {
+      const errors = [questsResult.error, pagesResult.error, achievementsResult.error, skillsResult.error]
         .filter(Boolean)
         .join(', ')
       return { data: null, error: errors }
@@ -52,7 +53,7 @@ export async function calculateCharacterStats() {
     const rawStats = {
       str: calculateStrength(questsResult.data),
       int: calculateIntelligence(achievementsResult.data),
-      wis: calculateWisdom(pagesResult.data),
+      wis: calculateWisdom(skillsResult.data),
       dex: calculateDexterity(pagesResult.data),
       con: calculateConstitution(questsResult.data),
       cha: calculateCharisma(pagesResult.data)
@@ -80,8 +81,8 @@ export async function calculateCharacterStats() {
         name: 'Wisdom',
         score: convertToStatScore(rawStats.wis.value, 'wis'),
         rawValue: rawStats.wis.value,
-        description: 'Devlogs Written',
-        tooltip: 'Development logs documenting your journey. Wisdom comes from reflection and sharing knowledge.',
+        description: 'Skills Logged',
+        tooltip: 'Breadth of knowledge across different skills and technologies. Wisdom grows with the diversity of your expertise.',
         details: rawStats.wis.details
       },
       dex: {
@@ -158,6 +159,27 @@ async function fetchPagesData() {
 }
 
 /**
+ * Fetch skills data for stat calculations
+ */
+async function fetchSkillsData() {
+  try {
+    const { data, error } = await supabase
+      .from('skills')
+      .select('id, name')
+
+    if (error) {
+      // Skills table may not exist yet - gracefully return empty
+      logger.warn('Could not fetch skills for stats (table may not exist yet)', error)
+      return { data: [], error: null }
+    }
+    return { data: data || [], error: null }
+  } catch (err) {
+    logger.warn('Error fetching skills for stats', err)
+    return { data: [], error: null }
+  }
+}
+
+/**
  * Fetch achievements count
  */
 async function fetchAchievementsData() {
@@ -202,13 +224,12 @@ function calculateIntelligence(achievements) {
 }
 
 /**
- * WIS: Devlogs written
+ * WIS: Skills logged (breadth of knowledge)
  */
-function calculateWisdom(pages) {
-  const devlogs = pages.filter((p) => p.page_type === 'devlog')
+function calculateWisdom(skills) {
   return {
-    value: devlogs.length,
-    details: `${devlogs.length} devlogs documenting the journey`
+    value: skills.length,
+    details: `${skills.length} skills logged across your journey`
   }
 }
 
@@ -278,7 +299,7 @@ function convertToStatScore(rawValue, statType) {
       thresholds: [0, 1, 3, 5, 8, 10, 12, 15],
       scores: [8, 9, 10, 12, 13, 15, 16, 18]
     },
-    wis: { // Devlogs: 0=8, 3=10, 5=12, 10=15, 20+=18
+    wis: { // Skills: 0=8, 3=10, 5=12, 10=15, 20+=18
       thresholds: [0, 1, 3, 5, 8, 10, 15, 20],
       scores: [8, 9, 10, 12, 13, 15, 16, 18]
     },

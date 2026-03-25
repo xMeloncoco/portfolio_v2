@@ -11,8 +11,6 @@
  * - Cascade display logic support
  *
  * CONNECTION RULES:
- * - Devlogs should connect to EITHER a quest OR a project (exclusive)
- * - Other page types (blog, notes) can connect to multiple entities
  * - A page can be connected to both projects and quests if needed
  */
 
@@ -212,7 +210,7 @@ export async function getPageConnections(pageId) {
  * Get all pages connected to a project
  * @param {string} projectId - The project UUID
  * @param {Object} [options] - Filter options
- * @param {string} [options.pageType] - Filter by page type (blog, devlog, notes, project)
+ * @param {string} [options.pageType] - Filter by page type (blog, notes, project)
  * @returns {Promise<{data: Array, error: string|null}>}
  */
 export async function getPagesConnectedToProject(projectId, options = {}) {
@@ -305,71 +303,6 @@ export async function getPagesConnectedToQuest(questId, options = {}) {
 }
 
 /**
- * Get all devlogs for a project (including cascaded from quests)
- * @param {string} projectId - The project UUID
- * @param {Object} [options] - Filter options
- * @param {boolean} [options.includeCascaded=true] - Include devlogs from project's quests
- * @returns {Promise<{data: Array, error: string|null}>}
- */
-export async function getProjectDevlogs(projectId, options = {}) {
-  try {
-    logger.debug(`Fetching devlogs for project: ${projectId}`, options)
-
-    const includeCascaded = options.includeCascaded !== false
-
-    // Get devlogs directly connected to project
-    const { data: directDevlogs, error: directError } = await getPagesConnectedToProject(
-      projectId,
-      { pageType: 'devlog' }
-    )
-
-    if (directError) {
-      return { data: [], error: directError }
-    }
-
-    let allDevlogs = [...directDevlogs]
-
-    // Get devlogs from project's quests (cascaded)
-    if (includeCascaded) {
-      // First get all quest IDs for this project
-      const { data: quests, error: questError } = await supabase
-        .from('quests')
-        .select('id')
-        .eq('project_id', projectId)
-
-      if (questError) {
-        logger.warn('Error fetching project quests for devlog cascade', questError)
-      } else if (quests && quests.length > 0) {
-        // Get devlogs for each quest
-        for (const quest of quests) {
-          const { data: questDevlogs } = await getPagesConnectedToQuest(
-            quest.id,
-            { pageType: 'devlog' }
-          )
-          if (questDevlogs) {
-            // Mark cascaded devlogs with their source
-            const markedDevlogs = questDevlogs.map(d => ({
-              ...d,
-              cascaded_from_quest: quest.id
-            }))
-            allDevlogs = [...allDevlogs, ...markedDevlogs]
-          }
-        }
-      }
-    }
-
-    // Sort by created date (newest first)
-    allDevlogs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-
-    logger.info(`Fetched ${allDevlogs.length} devlogs for project: ${projectId}`)
-    return { data: allDevlogs, error: null }
-  } catch (err) {
-    logger.error('Unexpected error fetching project devlogs', err)
-    return { data: [], error: err.message }
-  }
-}
-
-/**
  * Get all pages for a project (including cascaded from quests)
  * @param {string} projectId - The project UUID
  * @param {Object} [options] - Filter options
@@ -442,32 +375,3 @@ export async function getProjectAllPages(projectId, options = {}) {
   }
 }
 
-// ========================================
-// VALIDATION HELPERS
-// ========================================
-
-/**
- * Check if a devlog is exclusively connected (to only one project or quest)
- * @param {string} devlogId - The devlog page UUID
- * @returns {Promise<{isExclusive: boolean, connections: Array, error: string|null}>}
- */
-export async function checkDevlogExclusivity(devlogId) {
-  try {
-    const { data: connections, error } = await getPageConnections(devlogId)
-
-    if (error) {
-      return { isExclusive: false, connections: [], error }
-    }
-
-    const isExclusive = connections.length <= 1
-
-    return {
-      isExclusive,
-      connections,
-      error: null
-    }
-  } catch (err) {
-    logger.error('Unexpected error checking devlog exclusivity', err)
-    return { isExclusive: false, connections: [], error: err.message }
-  }
-}
