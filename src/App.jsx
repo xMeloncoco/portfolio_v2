@@ -30,9 +30,6 @@ import Projects from './pages/Projects'
 import ProjectForm from './pages/ProjectForm'
 import Devlogs from './pages/Devlogs'
 import DevlogForm from './pages/DevlogForm'
-import Pages from './pages/Pages'
-import PageForm from './pages/PageForm'
-import PageView from './pages/PageView'
 import Quests from './pages/Quests'
 import QuestForm from './pages/QuestForm'
 import QuestView from './pages/QuestView'
@@ -46,12 +43,10 @@ import ThemeSettings from './pages/ThemeSettings'
 
 // Import public pages
 import Home from './pages/public/Home'
-import Blog from './pages/public/Blog'
 import PublicProjects from './pages/public/Projects'
 import ProjectDetail from './pages/public/ProjectDetail'
 import PublicQuests from './pages/public/PublicQuests'
 import PublicQuestView from './pages/public/PublicQuestView'
-import PageDetail from './pages/public/PageDetail'
 import FullInventory from './pages/public/FullInventory'
 import FullAchievements from './pages/public/FullAchievements'
 import PublicCharacterStats from './pages/public/CharacterStats'
@@ -78,16 +73,6 @@ function App() {
           element={
             <PublicLayout>
               <Home />
-            </PublicLayout>
-          }
-        />
-
-        {/* Blog Page */}
-        <Route
-          path="/blog"
-          element={
-            <PublicLayout>
-              <Blog />
             </PublicLayout>
           }
         />
@@ -128,16 +113,6 @@ function App() {
           element={
             <PublicLayout>
               <PublicQuestView />
-            </PublicLayout>
-          }
-        />
-
-        {/* Public Page Detail */}
-        <Route
-          path="/page/:id"
-          element={
-            <PublicLayout>
-              <PageDetail />
             </PublicLayout>
           }
         />
@@ -278,54 +253,6 @@ function App() {
             <ProtectedRoute>
               <AdminLayout>
                 <DevlogForm />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Pages Management */}
-        <Route
-          path="/admin/pages"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <Pages />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Create New Page */}
-        <Route
-          path="/admin/pages/new"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <PageForm />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* View Page Details */}
-        <Route
-          path="/admin/pages/:id"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <PageView />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Edit Page */}
-        <Route
-          path="/admin/pages/:id/edit"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <PageForm />
               </AdminLayout>
             </ProtectedRoute>
           }

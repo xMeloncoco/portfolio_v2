@@ -78,7 +78,6 @@ function PublicLayout({ children }) {
 
   const navItems = [
     { path: '/', label: 'Home', icon: 'home' },
-    { path: '/blog', label: 'Posts', icon: 'writing' },
     { path: '/projects', label: 'Projects', icon: 'castle' },
     { path: '/quests', label: 'Quests', icon: 'quests' }
   ]
@@ -175,7 +174,6 @@ function PublicLayout({ children }) {
           {/* Navigation Links */}
           <nav className="footer-links">
             <Link to="/">Home</Link>
-            <Link to="/blog">Posts</Link>
             <Link to="/projects">Projects</Link>
             <Link to="/quests">Quests</Link>
           </nav>

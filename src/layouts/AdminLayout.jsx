@@ -69,12 +69,6 @@ const NAV_ITEMS = [
     description: 'Manage quests (Phase 3)'
   },
   {
-    path: '/admin/pages',
-    icon: 'parchment',
-    label: 'Blog & Notes',
-    description: 'Manage blog posts and notes'
-  },
-  {
     path: '/admin/issues',
     icon: 'bug',
     label: 'Issues',
