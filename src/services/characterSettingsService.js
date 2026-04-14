@@ -214,6 +214,24 @@ export async function setConstructionMode(enabled) {
   return updateCharacterSettings({ construction_mode: enabled })
 }
 
+/**
+ * Get the list of whitelisted paths during construction mode
+ * @returns {Promise<string[]>}
+ */
+export async function getConstructionWhitelist() {
+  const { data } = await getCharacterSettings()
+  return data?.construction_whitelist || []
+}
+
+/**
+ * Update the full construction whitelist
+ * @param {string[]} paths - Array of path strings (e.g. ["/application1", "/projects"])
+ * @returns {Promise<{data: Object|null, error: string|null}>}
+ */
+export async function setConstructionWhitelist(paths) {
+  return updateCharacterSettings({ construction_whitelist: paths })
+}
+
 // ========================================
 // ARRAY MANAGEMENT HELPERS
 // ========================================

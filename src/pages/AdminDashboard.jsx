@@ -8,23 +8,26 @@
 
 import { useState, useEffect } from 'react'
 import Icon from '../components/Icon'
-import { getConstructionMode, setConstructionMode } from '../services/characterSettingsService'
+import { getCharacterSettings, setConstructionMode, setConstructionWhitelist } from '../services/characterSettingsService'
 import { logger } from '../utils/logger'
 import './PlaceholderPage.css'
 import './AdminDashboard.css'
 
 function AdminDashboard() {
   const [constructionMode, setConstructionModeState] = useState(false)
+  const [whitelist, setWhitelistState] = useState([])
+  const [newPath, setNewPath] = useState('')
   const [toggling, setToggling] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchMode = async () => {
-      const enabled = await getConstructionMode()
-      setConstructionModeState(enabled)
+    const fetchSettings = async () => {
+      const { data } = await getCharacterSettings()
+      setConstructionModeState(data?.construction_mode === true)
+      setWhitelistState(data?.construction_whitelist || [])
       setLoading(false)
     }
-    fetchMode()
+    fetchSettings()
   }, [])
 
   const handleToggle = async () => {
@@ -38,6 +41,34 @@ function AdminDashboard() {
       logger.info(`Construction mode ${newValue ? 'enabled' : 'disabled'}`)
     }
     setToggling(false)
+  }
+
+  const handleAddPath = async () => {
+    const path = newPath.trim()
+    if (!path) return
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`
+    if (whitelist.includes(normalizedPath)) {
+      setNewPath('')
+      return
+    }
+    const updated = [...whitelist, normalizedPath]
+    const { error } = await setConstructionWhitelist(updated)
+    if (!error) {
+      setWhitelistState(updated)
+      setNewPath('')
+    } else {
+      logger.error('Failed to add whitelisted path', error)
+    }
+  }
+
+  const handleRemovePath = async (pathToRemove) => {
+    const updated = whitelist.filter(p => p !== pathToRemove)
+    const { error } = await setConstructionWhitelist(updated)
+    if (!error) {
+      setWhitelistState(updated)
+    } else {
+      logger.error('Failed to remove whitelisted path', error)
+    }
   }
 
   return (
@@ -75,6 +106,46 @@ function AdminDashboard() {
             </span>
           </button>
         </div>
+
+        {/* Whitelisted Pages */}
+        {constructionMode && (
+          <div className="construction-whitelist">
+            <h4>Whitelisted Pages</h4>
+            <p className="whitelist-description">
+              These pages stay accessible to visitors even during construction mode.
+            </p>
+            <div className="whitelist-add">
+              <input
+                type="text"
+                value={newPath}
+                onChange={(e) => setNewPath(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddPath()}
+                placeholder="/application1"
+                className="whitelist-input"
+              />
+              <button className="whitelist-add-button" onClick={handleAddPath} disabled={!newPath.trim()}>
+                <Icon name="plus" size={18} />
+                Add
+              </button>
+            </div>
+            {whitelist.length > 0 && (
+              <ul className="whitelist-list">
+                {whitelist.map((path) => (
+                  <li key={path} className="whitelist-item">
+                    <span className="whitelist-path">{path}</span>
+                    <button
+                      className="whitelist-remove-button"
+                      onClick={() => handleRemovePath(path)}
+                      title={`Remove ${path}`}
+                    >
+                      <Icon name="cross" size={16} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
 
         <p>Use the navigation menu to access different sections:</p>
 

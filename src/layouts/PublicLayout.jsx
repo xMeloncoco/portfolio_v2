@@ -36,6 +36,7 @@ function PublicLayout({ children }) {
   const [showContactForm, setShowContactForm] = useState(false)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [constructionMode, setConstructionMode] = useState(false)
+  const [constructionWhitelist, setConstructionWhitelist] = useState([])
   const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
   const location = useLocation()
@@ -51,6 +52,7 @@ function PublicLayout({ children }) {
         setDisplayName(`Portfolio ${data.display_name}`)
       }
       setConstructionMode(data?.construction_mode === true)
+      setConstructionWhitelist(data?.construction_whitelist || [])
 
       const { data: { session } } = await supabase.auth.getSession()
       setIsAdmin(!!session)
@@ -119,7 +121,13 @@ function PublicLayout({ children }) {
   // ========================================
 
   // Show under construction page for non-admin visitors
-  if (!loading && constructionMode && !isAdmin) {
+  // unless the current path is whitelisted
+  const isWhitelisted = constructionWhitelist.some(path => {
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`
+    return location.pathname === normalizedPath || location.pathname.startsWith(`${normalizedPath}/`)
+  })
+
+  if (!loading && constructionMode && !isAdmin && !isWhitelisted) {
     return <UnderConstruction />
   }
 
