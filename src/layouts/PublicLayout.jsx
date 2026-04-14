@@ -16,7 +16,9 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Icon from '../components/Icon'
 import ContactForm from '../components/ContactForm'
+import UnderConstruction from '../pages/public/UnderConstruction'
 import { getCharacterSettings } from '../services/characterSettingsService'
+import { supabase } from '../config/supabase'
 import './PublicLayout.css'
 
 // ========================================
@@ -33,10 +35,13 @@ function PublicLayout({ children }) {
   const [displayName, setDisplayName] = useState('Portfolio Miriam Schouten')
   const [showContactForm, setShowContactForm] = useState(false)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [constructionMode, setConstructionMode] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [loading, setLoading] = useState(true)
   const location = useLocation()
 
   // ========================================
-  // FETCH CHARACTER NAME
+  // FETCH SETTINGS & AUTH STATUS
   // ========================================
 
   useEffect(() => {
@@ -45,6 +50,11 @@ function PublicLayout({ children }) {
       if (data?.display_name) {
         setDisplayName(`Portfolio ${data.display_name}`)
       }
+      setConstructionMode(data?.construction_mode === true)
+
+      const { data: { session } } = await supabase.auth.getSession()
+      setIsAdmin(!!session)
+      setLoading(false)
     }
     fetchSettings()
   }, [])
@@ -107,6 +117,11 @@ function PublicLayout({ children }) {
   // ========================================
   // RENDER
   // ========================================
+
+  // Show under construction page for non-admin visitors
+  if (!loading && constructionMode && !isAdmin) {
+    return <UnderConstruction />
+  }
 
   return (
     <div className="public-layout">

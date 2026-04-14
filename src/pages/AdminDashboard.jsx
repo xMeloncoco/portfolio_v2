@@ -6,10 +6,40 @@
  * This will show an overview of all sections
  */
 
+import { useState, useEffect } from 'react'
 import Icon from '../components/Icon'
+import { getConstructionMode, setConstructionMode } from '../services/characterSettingsService'
+import { logger } from '../utils/logger'
 import './PlaceholderPage.css'
+import './AdminDashboard.css'
 
 function AdminDashboard() {
+  const [constructionMode, setConstructionModeState] = useState(false)
+  const [toggling, setToggling] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchMode = async () => {
+      const enabled = await getConstructionMode()
+      setConstructionModeState(enabled)
+      setLoading(false)
+    }
+    fetchMode()
+  }, [])
+
+  const handleToggle = async () => {
+    setToggling(true)
+    const newValue = !constructionMode
+    const { error } = await setConstructionMode(newValue)
+    if (error) {
+      logger.error('Failed to toggle construction mode', error)
+    } else {
+      setConstructionModeState(newValue)
+      logger.info(`Construction mode ${newValue ? 'enabled' : 'disabled'}`)
+    }
+    setToggling(false)
+  }
+
   return (
     <div className="placeholder-page">
       <div className="placeholder-header">
@@ -19,7 +49,33 @@ function AdminDashboard() {
       </div>
 
       <div className="placeholder-content">
-        <p>This is your admin dashboard home page.</p>
+        {/* Construction Mode Toggle */}
+        <div className={`construction-toggle-card ${constructionMode ? 'active' : ''}`}>
+          <div className="construction-toggle-info">
+            <Icon name="tools" size={32} />
+            <div>
+              <h3>Construction Mode</h3>
+              <p>
+                {constructionMode
+                  ? 'Site is hidden from public visitors. Only you can browse it.'
+                  : 'Site is live and visible to everyone.'}
+              </p>
+            </div>
+          </div>
+          <button
+            className={`construction-toggle-button ${constructionMode ? 'on' : 'off'}`}
+            onClick={handleToggle}
+            disabled={loading || toggling}
+          >
+            <span className="toggle-track">
+              <span className="toggle-knob" />
+            </span>
+            <span className="toggle-label">
+              {toggling ? 'Saving...' : constructionMode ? 'ON' : 'OFF'}
+            </span>
+          </button>
+        </div>
+
         <p>Use the navigation menu to access different sections:</p>
 
         <ul className="feature-list">

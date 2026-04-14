@@ -193,6 +193,28 @@ export async function deleteProfilePicture(url) {
 }
 
 // ========================================
+// CONSTRUCTION MODE
+// ========================================
+
+/**
+ * Check if construction mode is enabled
+ * @returns {Promise<boolean>}
+ */
+export async function getConstructionMode() {
+  const { data } = await getCharacterSettings()
+  return data?.construction_mode === true
+}
+
+/**
+ * Toggle construction mode on or off
+ * @param {boolean} enabled - Whether construction mode should be enabled
+ * @returns {Promise<{data: Object|null, error: string|null}>}
+ */
+export async function setConstructionMode(enabled) {
+  return updateCharacterSettings({ construction_mode: enabled })
+}
+
+// ========================================
 // ARRAY MANAGEMENT HELPERS
 // ========================================
 
