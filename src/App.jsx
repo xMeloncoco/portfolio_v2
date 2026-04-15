@@ -12,7 +12,7 @@
  * - Redirects for unauthenticated users
  */
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { logger } from './utils/logger'
 
 // Import layouts
@@ -21,6 +21,7 @@ import PublicLayout from './layouts/PublicLayout'
 
 // Import components
 import ProtectedRoute from './components/ProtectedRoute'
+import ConstructionGate from './components/ConstructionGate'
 
 // Import admin pages
 import Login from './pages/Login'
@@ -61,6 +62,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ConstructionGate>
       <Routes>
         {/* ========================================
          * PUBLIC ROUTES
@@ -400,13 +402,18 @@ function App() {
 
         {/* ========================================
          * 404 NOT FOUND
-         * Any unmatched route redirects to home
+         * Shows home page content for unmatched routes
          * ======================================== */}
         <Route
           path="*"
-          element={<Navigate to="/" replace />}
+          element={
+            <PublicLayout>
+              <Home />
+            </PublicLayout>
+          }
         />
       </Routes>
+      </ConstructionGate>
     </BrowserRouter>
   )
 }
