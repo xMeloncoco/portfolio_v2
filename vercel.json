@@ -2,8 +2,8 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "redirects": [
-    { "source": "/spirit-island", "destination": "https://spiritisland.miriamschouten.com", "permanent": false },
-    { "source": "/spirit-island/(.*)", "destination": "https://spiritisland.miriamschouten.com/$1", "permanent": false }
+    { "source": "/spirit-island", "destination": "https://spirit-island.miriamschouten.com", "permanent": false },
+    { "source": "/spirit-island/(.*)", "destination": "https://spirit-island.miriamschouten.com/$1", "permanent": false }
   ],
   "rewrites": [
     {
