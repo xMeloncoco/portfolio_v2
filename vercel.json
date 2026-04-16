@@ -2,13 +2,10 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "redirects": [
-    { "source": "/spirit-island", "destination": "/spirit-island/", "permanent": false }
+    { "source": "/spirit-island", "destination": "https://spiritisland.miriamschouten.com", "permanent": false },
+    { "source": "/spirit-island/(.*)", "destination": "https://spiritisland.miriamschouten.com/$1", "permanent": false }
   ],
   "rewrites": [
-    {
-      "source": "/spirit-island/(.*)",
-      "destination": "https://spirit-island-c5pb7l0my-miriams-projects-bca6872c.vercel.app/$1"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
