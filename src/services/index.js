@@ -62,8 +62,7 @@ export {
   disconnectPage,
   getPageConnections,
   getPagesConnectedToProject,
-  getPagesConnectedToQuest,
-  getProjectDevlogs
+  getPagesConnectedToQuest
 } from './pageConnectionsService'
 
 
@@ -71,7 +70,6 @@ export {
   // Portfolio queries
   getProjectViewData,
   getQuestViewData,
-  getDevlogViewData,
   getDashboardData,
   searchPortfolio,
   getPortfolioStatistics,
