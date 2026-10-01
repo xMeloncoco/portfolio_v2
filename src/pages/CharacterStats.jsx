@@ -195,7 +195,8 @@ function CharacterStats() {
     <div className="character-stats-page">
       <div className="page-header">
         <div className="header-left">
-          <Icon name="default-user" size={40} />
+          <Icon name="default-user" size={80
+          } />
           <div>
             <h1>Character Settings</h1>
             <p className="page-subtitle">Customize your portfolio character profile</p>
@@ -373,7 +374,7 @@ function CharacterStats() {
                     className="btn-icon"
                     onClick={() => removeFromArray('languages', index)}
                   >
-                    <Icon name="x" size={16} />
+                    <Icon name="cross" size={16} />
                   </button>
                 </div>
               ))}
@@ -417,7 +418,7 @@ function CharacterStats() {
                     className="btn-icon"
                     onClick={() => removeFromArray('frameworks', index)}
                   >
-                    <Icon name="x" size={16} />
+                    <Icon name="cross" size={16} />
                   </button>
                 </div>
               ))}
@@ -461,7 +462,7 @@ function CharacterStats() {
                     className="btn-icon"
                     onClick={() => removeFromArray('tools', index)}
                   >
-                    <Icon name="x" size={16} />
+                    <Icon name="cross" size={16} />
                   </button>
                 </div>
               ))}
@@ -515,7 +516,7 @@ function CharacterStats() {
                     className="btn-icon"
                     onClick={() => removeButton(index)}
                   >
-                    <Icon name="x" size={16} />
+                    <Icon name="cross" size={16} />
                   </button>
                 </div>
               ))}

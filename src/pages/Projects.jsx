@@ -118,7 +118,7 @@ function Projects() {
           <p className="page-description">Manage your portfolio projects</p>
         </div>
         <button className="create-button" onClick={handleCreateProject}>
-          <Icon name="plus" size={24} />
+          <Icon name="plus-blue" size={30} />
           <span>New Project</span>
         </button>
       </div>
@@ -178,7 +178,7 @@ function Projects() {
                     onClick={() => handleOpenDeleteModal(project)}
                     title="Delete project"
                   >
-                    <Icon name="trash" size={20} />
+                    <Icon name="cross" size={20} />
                   </button>
                 </div>
               </div>

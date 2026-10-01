@@ -49,7 +49,6 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-lg);
-  background: linear-gradient(135deg, var(--color-secondary-dark), var(--color-secondary));
   color: var(--color-primary-dark);
   border: 2px solid var(--color-secondary-light);
   border-radius: var(--radius-sm);

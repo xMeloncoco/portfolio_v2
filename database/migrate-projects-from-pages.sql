@@ -12,53 +12,7 @@
 -- STEP 1: CREATE PROJECTS TABLE AND JUNCTION TABLES
 -- ========================================
 
--- Create projects table if it doesn't exist
-CREATE TABLE IF NOT EXISTS public.projects (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  description TEXT,
-  slug TEXT UNIQUE NOT NULL,
-  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('planning', 'active', 'completed', 'on_hold', 'archived')),
-  visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('public', 'private')),
-  external_link TEXT,
-  start_date DATE,
-  end_date DATE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
 
--- Create indexes for projects
-CREATE INDEX IF NOT EXISTS idx_projects_status ON public.projects(status);
-CREATE INDEX IF NOT EXISTS idx_projects_visibility ON public.projects(visibility);
-CREATE INDEX IF NOT EXISTS idx_projects_slug ON public.projects(slug);
-CREATE INDEX IF NOT EXISTS idx_projects_created_at ON public.projects(created_at DESC);
-
--- Add updated_at trigger
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER update_projects_updated_at
-  BEFORE UPDATE ON public.projects
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
-
--- Create project_tags junction table
-CREATE TABLE IF NOT EXISTS public.project_tags (
-  project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE,
-  tag_id UUID REFERENCES public.tags(id) ON DELETE CASCADE,
-  PRIMARY KEY (project_id, tag_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_project_tags_project_id ON public.project_tags(project_id);
-CREATE INDEX IF NOT EXISTS idx_project_tags_tag_id ON public.project_tags(tag_id);
-
--- Add RLS policies for projects
-ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY IF NOT EXISTS "Allow public read on public projects"
   ON public.projects
