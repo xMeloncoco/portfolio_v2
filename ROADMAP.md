@@ -4,15 +4,15 @@ _Last updated: 2026-10-01_
 
 ## Direction
 
-- **Quests** are the active projects (work in progress). There are no to-do lists anymore.
-- **Projects** are only for finished work. Each one has a status: active/inactive, plus draft/concept.
+- **Projects are removed and rebranded as Quests.** Quests show finished projects only: no work in progress, no to-do lists.
+- Each quest gets an active/inactive switch and a draft/concept status.
 - **Blog & Notes** is being removed.
 - **Themes** are dropped. Any styling changes get hardcoded.
 
 ## Done
 
 - Phase 1: Login, protected admin routes, navigation
-- Phase 3: Projects & Quests
+- Phase 3: Projects & Quests (being merged, see steps 2–3)
 - Phase 4: Inventory & Achievements
 - Phase 8: Character Stats
 - Extras: Contact form + Inbox, Supabase Auth, construction mode
@@ -25,16 +25,20 @@ _Last updated: 2026-10-01_
 - Remove the Blog & Notes entries from the admin and public navigation.
 - Add a DB migration that drops `pages`, `page_connections` and the related tags and RLS (back up data first).
 
-### 2. Simplify Quests (Quests = projects in progress)
-- Remove the to-do and sub-quest features from Quests.
-- Remove the link between Quests and Projects (`project_id`), or decide to keep it as "this quest became this project".
-- Clean up the quest forms, views and service so they match.
+### 2. Remove Projects (merge into Quests)
+- Move any finished projects worth keeping from the `projects` table into quests.
+- Delete `/projects`, `/project/:slug` and the `/admin/projects/*` routes, plus their pages (`Projects`, `ProjectDetail`, `ProjectForm`).
+- Remove `projectsService` and the project tags.
+- Remove the quest-to-project link (`project_id`).
+- Add a DB migration that drops `projects` and `project_tags` (back up data first).
 
-### 3. Rework Projects (finished work only)
+### 3. Rework Quests (finished projects only)
+- Remove all in-progress features: to-dos, sub-quests, and progress/status tracking.
 - Add an `is_active` field (active/inactive).
 - Add a `status` field (`draft` / `concept` / `published`).
-- Show only active, published projects on public pages.
-- **Open decision:** manage projects through the admin panel with templates, or hardcode them.
+- Show only active, published quests on public pages.
+- Clean up the quest forms, views and service so they match.
+- **Open decision:** manage quests through the admin panel with templates, or hardcode them.
 
 ### 4. Remove the theme system remnants
 - Remove the leftover theme mentions (`src/styles/themes`, dashboard "Theme" item).
